@@ -1,0 +1,19 @@
+name: VCE Baseline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify repository
+        run: |
+          echo "VCE Foundation Baseline"
+          pwd
+          ls -la
