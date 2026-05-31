@@ -1,8 +1,7 @@
-from replay_state import ReplayState
-from lsn_validator import validate_lsn
-from transition_validator import validate_transitions
-from opcode_dispatcher import OpcodeDispatcher
-
+from epics.epic012_replay_runtime.replay_state import ReplayState
+from epics.epic012_replay_runtime.lsn_validator import validate_lsn
+from epics.epic012_replay_runtime.transition_validator import validate_transitions
+from epics.epic012_replay_runtime.opcode_dispatcher import OpcodeDispatcher
 
 class RuntimeCore:
 
