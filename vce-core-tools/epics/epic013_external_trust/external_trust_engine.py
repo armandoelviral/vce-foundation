@@ -1,7 +1,6 @@
-from certificate_chain import CertificateChain
-from transparency_log import TransparencyLog
-from trust_boundary import TrustBoundary
-
+from epics.epic013_external_trust.certificate_chain import CertificateChain
+from epics.epic013_external_trust.transparency_log import TransparencyLog
+from epics.epic013_external_trust.trust_boundary import TrustBoundary
 
 class ExternalTrustEngine:
 
