@@ -1,0 +1,13 @@
+from epics.epic025_cluster_runtime.heartbeat import (
+    Heartbeat
+)
+
+heartbeat = Heartbeat()
+
+heartbeat.monitor(
+    [
+        "http://127.0.0.1:8000",
+        "http://127.0.0.1:8001",
+        "http://127.0.0.1:8002"
+    ]
+)
