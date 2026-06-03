@@ -1,4 +1,15 @@
+from fastapi import FastAPI
+import hashlib
 import os
+
+from epics.epic028_durable_node_ledger.node_ledger import (
+    NodeLedger
+)
+
+
+ledger = NodeLedger(
+    "node_ledger.db"
+)
 
 
 STATE = {
@@ -13,19 +24,9 @@ STATE = {
         "STATE_HASH",
         "abc123"
     ),
-
-    "ledger": [
-        {
-            "sequence": 1,
-            "event": "BOOTSTRAP"
-        },
-        {
-            "sequence": 2,
-            "event": "ATTESTATION"
-        }
-    ]
+    
+    "ledger": ledger.all()
 }
-
 from fastapi import FastAPI
 import hashlib
 
@@ -77,3 +78,14 @@ def attest(
 def state():
 
     return STATE
+@app.post("/append")
+def append_event(event: dict):
+
+    ledger.append(event)
+
+    STATE["ledger"] = ledger.all()
+
+    return {
+        "status": "APPENDED",
+        "ledger_size": ledger.count()
+    }
