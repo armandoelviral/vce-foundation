@@ -27,6 +27,12 @@ class NodeLedger:
         conn.close()
 
     def append(self, event):
+
+        if self.exists(
+            event["sequence"]
+        ):
+            return False
+
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -73,3 +79,29 @@ class NodeLedger:
 
     def count(self):
         return len(self.all())
+
+    def exists(
+        self,
+        sequence
+    ):
+
+        conn = sqlite3.connect(
+            self.db_path
+        )
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM ledger
+            WHERE sequence = ?
+            """,
+            (sequence,)
+        )
+
+        result = cursor.fetchone()[0]
+
+        conn.close()
+
+        return result > 0

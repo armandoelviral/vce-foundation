@@ -24,7 +24,8 @@ STATE = {
         "STATE_HASH",
         "abc123"
     ),
-    
+    "commit_index": 0,
+
     "ledger": ledger.all()
 }
 from fastapi import FastAPI
@@ -81,11 +82,22 @@ def state():
 @app.post("/append")
 def append_event(event: dict):
 
-    ledger.append(event)
+    inserted = ledger.append(event)
 
     STATE["ledger"] = ledger.all()
 
+    if not inserted:
+
+        return {
+            "status": "DUPLICATE",
+            "durable": True,
+            "ledger_size": ledger.count(),
+            "last_sequence": event["sequence"]
+        }
+
     return {
         "status": "APPENDED",
-        "ledger_size": ledger.count()
+        "durable": True,
+        "ledger_size": ledger.count(),
+        "last_sequence": event["sequence"]
     }
