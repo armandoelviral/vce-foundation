@@ -1,3 +1,4 @@
 *.db
 repair_test.db
 .coverage
+fuzz-runtime/target/
