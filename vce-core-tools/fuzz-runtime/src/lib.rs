@@ -26,6 +26,17 @@ pub fn replay_events(events: &[&str]) -> ReplayState {
     }
 }
 
+#[no_mangle]
+pub extern "C" fn replay_sequence_number() -> u32 {
+    let events = [
+        "APPEND_EVIDENCE",
+        "REGISTER_ARTIFACT",
+        "SEAL_SNAPSHOT",
+    ];
+
+    replay_events(&events).sequence_number as u32
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -55,5 +66,10 @@ mod tests {
         let state = replay_events(&events);
 
         assert_eq!(state.sequence_number, 3);
+    }
+
+    #[test]
+    fn exported_replay_sequence_number_returns_three() {
+        assert_eq!(replay_sequence_number(), 3);
     }
 }
