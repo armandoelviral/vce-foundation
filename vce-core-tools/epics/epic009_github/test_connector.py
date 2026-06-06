@@ -1,20 +1,14 @@
 from github_connector import GitHubActionsConnector
-import os
 
-token = os.environ["GITHUB_TOKEN"]
 
-connector = GitHubActionsConnector(
-    token=token,
-    owner="armandoelviral",
-    repo="vce-foundation"
-)
+def test_connector_stores_configuration():
 
-data = connector.harvest_verifiable_artifacts()
-
-print(data.keys())
-
-if "workflow_runs" in data:
-    print(
-        f"Workflow runs found: "
-        f"{len(data['workflow_runs'])}"
+    connector = GitHubActionsConnector(
+        token="test-token",
+        owner="armandoelvira1",
+        repo="vce-foundation",
     )
+
+    assert connector.token == "test-token"
+    assert connector.owner == "armandoelvira1"
+    assert connector.repo == "vce-foundation"

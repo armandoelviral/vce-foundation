@@ -1,5 +1,4 @@
-from certificate_chain import CertificateChain
-
+from epics.epic013_external_trust.certificate_chain import CertificateChain
 
 chain = CertificateChain()
 

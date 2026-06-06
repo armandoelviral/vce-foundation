@@ -1,30 +1,35 @@
-from ledger_admission import LedgerAdmissionController
+from epics.epic013_external_trust.ledger_admission import (
+    LedgerAdmissionController,
+)
 
 
-controller = LedgerAdmissionController()
+def test_admits_approved_entry():
 
+    controller = LedgerAdmissionController()
 
-approved = {
-    "ledger_admission": "APPROVED",
-    "state_hash": "abc123",
-    "sequence_number": 3
-}
+    approved = {
+        "ledger_admission": "APPROVED",
+        "state_hash": "abc123",
+        "sequence_number": 3,
+    }
 
-
-rejected = {
-    "ledger_admission": "DENIED"
-}
-
-
-print(
-    controller.admit(
+    result = controller.admit(
         approved
-    )["status"]
-)
+    )
+
+    assert result["status"] == "COMMITTED"
 
 
-print(
-    controller.admit(
+def test_rejects_denied_entry():
+
+    controller = LedgerAdmissionController()
+
+    rejected = {
+        "ledger_admission": "DENIED",
+    }
+
+    result = controller.admit(
         rejected
-    )["status"]
-)
+    )
+
+    assert result["status"] != "COMMITTED"

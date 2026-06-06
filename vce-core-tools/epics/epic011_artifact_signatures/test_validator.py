@@ -1,26 +1,45 @@
-from signature_validator import SignatureValidator
+from cryptography.exceptions import InvalidSignature
 
-
-validator = SignatureValidator()
-
-valid_artifact = {
-    "stack": {
-        "trust": {
-            "signature_value": "0xabc123"
-        }
-    }
-}
-
-invalid_artifact = {
-    "stack": {
-        "trust": {}
-    }
-}
-
-print(
-    validator.validate(valid_artifact)
+from epics.epic011_artifact_signatures.signature_validator import (
+    SignatureValidator,
 )
 
-print(
-    validator.validate(invalid_artifact)
-)
+
+class ValidKey:
+    def verify(
+        self,
+        signature,
+        payload,
+    ):
+        return None
+
+
+class InvalidKey:
+    def verify(
+        self,
+        signature,
+        payload,
+    ):
+        raise InvalidSignature()
+
+
+def test_accepts_valid_signature():
+
+    validator = SignatureValidator()
+
+    assert validator.validate(
+        ValidKey(),
+        b"signature",
+        b"payload",
+    ) is True
+
+
+def test_rejects_invalid_signature():
+
+    validator = SignatureValidator()
+
+    assert validator.validate(
+        InvalidKey(),
+        b"signature",
+        b"payload",
+    ) is False

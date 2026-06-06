@@ -1,34 +1,48 @@
-from github_oidc import GitHubOIDCAdapter
-from trust_boundary import TrustBoundary
+from epics.epic013_external_trust.github_oidc import GitHubOIDCAdapter
+from epics.epic013_external_trust.trust_boundary import TrustBoundary
 
 
-claims = {
-    "iss": "github-actions",
-    "sub": "repo:vce-foundation",
-    "repository": "vce-foundation",
-    "workflow": "ci.yml",
-    "signature_valid": True
-}
+def test_github_oidc_normalizes_claims():
 
+    claims = {
+        "iss": "github-actions",
+        "sub": "repo:vce-foundation",
+        "repository": "vce-foundation",
+        "workflow": "ci.yml",
+        "signature_valid": True,
+    }
 
-adapter = GitHubOIDCAdapter()
+    adapter = GitHubOIDCAdapter()
 
-evidence = adapter.normalize(
-    claims
-)
-
-
-boundary = TrustBoundary(
-    [
-        "github-actions"
-    ]
-)
-
-
-print(evidence)
-
-print(
-    boundary.verify(
-        evidence
+    evidence = adapter.normalize(
+        claims
     )
-)
+
+    assert evidence is not None
+
+
+def test_github_oidc_evidence_passes_trust_boundary():
+
+    claims = {
+        "iss": "github-actions",
+        "sub": "repo:vce-foundation",
+        "repository": "vce-foundation",
+        "workflow": "ci.yml",
+        "signature_valid": True,
+    }
+
+    adapter = GitHubOIDCAdapter()
+
+    evidence = adapter.normalize(
+        claims
+    )
+
+    boundary = TrustBoundary(
+        allowed_issuers=[
+            "github-actions",
+        ]
+    )
+
+    assert boundary.verify(
+        evidence
+    ) is True

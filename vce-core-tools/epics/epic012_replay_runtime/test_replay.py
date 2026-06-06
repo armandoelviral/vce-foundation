@@ -1,30 +1,33 @@
-from replay_engine import ReplayEngine
+from epics.epic012_replay_runtime.replay_engine import ReplayEngine
 
-engine = ReplayEngine()
 
-events = [
-    "AppendEvidence",
-    "SealSnapshot",
-    "RegisterArtifact"
-]
+def test_replay_is_deterministic():
 
-run_a = engine.replay(
-    events
-)
+    events = [
+        "AppendEvidence",
+        "SealSnapshot",
+        "RegisterArtifact",
+    ]
 
-run_b = engine.replay(
-    events
-)
+    engine = ReplayEngine()
 
-print(
-    run_a.state_hash
-)
+    run_a = engine.replay(events)
+    run_b = engine.replay(events)
 
-print(
-    run_b.state_hash
-)
+    assert run_a.state_hash == run_b.state_hash
+    assert run_a.sequence_number == run_b.sequence_number
 
-print(
-    run_a.state_hash ==
-    run_b.state_hash
-)
+
+def test_replay_tracks_sequence_number():
+
+    events = [
+        "AppendEvidence",
+        "SealSnapshot",
+        "RegisterArtifact",
+    ]
+
+    engine = ReplayEngine()
+
+    state = engine.replay(events)
+
+    assert state.sequence_number == 3

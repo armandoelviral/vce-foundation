@@ -1,4 +1,4 @@
-from replay_state import ReplayState
+from epics.epic012_replay_runtime.replay_state import ReplayState
 
 
 class ReplayEngine:

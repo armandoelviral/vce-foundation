@@ -1,27 +1,37 @@
-from transparency_log import TransparencyLog
-
-
-log = TransparencyLog()
-
-
-artifact = {
-    "name": "vce-runtime-attestation",
-    "state_hash": "abc123"
-}
-
-
-entry = log.create_entry(
-    artifact
+from epics.epic013_external_trust.transparency_log import (
+    TransparencyLog,
 )
 
 
-print(
-    entry
-)
+def test_creates_transparency_log_entry():
 
+    log = TransparencyLog()
 
-print(
-    log.verify_inclusion(
-        entry
+    artifact = {
+        "name": "vce-runtime-attestation",
+        "state_hash": "abc123",
+    }
+
+    entry = log.create_entry(
+        artifact
     )
-)
+
+    assert entry is not None
+
+
+def test_verifies_log_inclusion():
+
+    log = TransparencyLog()
+
+    artifact = {
+        "name": "vce-runtime-attestation",
+        "state_hash": "abc123",
+    }
+
+    entry = log.create_entry(
+        artifact
+    )
+
+    assert log.verify_inclusion(
+        entry
+    ) is True

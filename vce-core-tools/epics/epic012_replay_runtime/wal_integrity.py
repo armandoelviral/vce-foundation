@@ -1,5 +1,4 @@
-from hash_chain import HashChain
-
+from epics.epic012_replay_runtime.hash_chain import HashChain
 
 def verify_wal(records):
 

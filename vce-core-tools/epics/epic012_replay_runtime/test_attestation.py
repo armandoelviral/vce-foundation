@@ -1,32 +1,41 @@
-from runtime_core import RuntimeCore
-from attestation import ExecutionAttestation
+from epics.epic012_replay_runtime.attestation import (
+    ExecutionAttestation,
+)
+from epics.epic012_replay_runtime.runtime_core import (
+    RuntimeCore,
+)
 
 
-events = [
-    {
-        "lsn": 1,
-        "opcode": "APPEND_EVIDENCE",
-        "payload": "artifact-001"
-    },
-    {
-        "lsn": 2,
-        "opcode": "REGISTER_ARTIFACT",
-        "payload": "artifact-001"
-    },
-    {
-        "lsn": 3,
-        "opcode": "SEAL_SNAPSHOT",
-        "payload": "snapshot-001"
-    }
-]
+def test_execution_attestation_contains_expected_fields():
 
-runtime = RuntimeCore()
-state = runtime.execute(events)
+    events = [
+        {
+            "lsn": 1,
+            "opcode": "APPEND_EVIDENCE",
+            "payload": "artifact-001",
+        },
+        {
+            "lsn": 2,
+            "opcode": "REGISTER_ARTIFACT",
+            "payload": "artifact-001",
+        },
+        {
+            "lsn": 3,
+            "opcode": "SEAL_SNAPSHOT",
+            "payload": "snapshot-001",
+        },
+    ]
 
-builder = ExecutionAttestation()
-attestation = builder.build(events, state)
+    runtime = RuntimeCore()
+    state = runtime.execute(events)
 
-print(attestation["attestation_type"])
-print(attestation["sequence_number"])
-print(attestation["state_hash"])
-print(attestation["verified"])
+    builder = ExecutionAttestation()
+    attestation = builder.build(
+        events,
+        state,
+    )
+
+    assert attestation["attestation_type"] == "VCE_RUNTIME_EXECUTION"
+    assert attestation["sequence_number"] == 3
+    assert attestation["state_hash"] == state.state_hash
+    assert attestation["verified"] is True
