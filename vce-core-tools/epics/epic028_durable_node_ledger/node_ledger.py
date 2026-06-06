@@ -7,7 +7,7 @@ class NodeLedger:
     def __init__(self, db_path):
         self.db_path = db_path
         self.initialize()
-
+       
     def initialize(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -15,8 +15,7 @@ class NodeLedger:
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS ledger (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                sequence INTEGER NOT NULL,
+                sequence INTEGER PRIMARY KEY,
                 event TEXT NOT NULL,
                 payload TEXT NOT NULL
             )
@@ -26,6 +25,12 @@ class NodeLedger:
         conn.commit()
         conn.close()
 
+    def exists(self, sequence):
+        return any(
+            event["sequence"] == sequence
+            for event in self.all()
+        )
+    
     def append(self, event):
 
         if self.exists(
@@ -80,9 +85,9 @@ class NodeLedger:
     def count(self):
         return len(self.all())
 
-    def exists(
+    def replace_all(
         self,
-        sequence
+        events
     ):
 
         conn = sqlite3.connect(
@@ -93,15 +98,32 @@ class NodeLedger:
 
         cursor.execute(
             """
-            SELECT COUNT(*)
-            FROM ledger
-            WHERE sequence = ?
-            """,
-            (sequence,)
+            DELETE FROM ledger
+            """
         )
 
-        result = cursor.fetchone()[0]
+        for event in events:
 
+            cursor.execute(
+                """
+                INSERT INTO ledger (
+                    sequence,
+                    event,
+                    payload
+                )
+                VALUES (?, ?, ?)
+                """,
+                (
+                    event["sequence"],
+                    event.get(
+                        "event",
+                        "RECOVERED"
+                    ),
+                    json.dumps(event)
+                )
+            )
+
+        conn.commit()
         conn.close()
 
-        return result > 0
+        return len(events)
