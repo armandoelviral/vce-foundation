@@ -26,15 +26,32 @@ pub fn replay_events(events: &[&str]) -> ReplayState {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn replay_sequence_number() -> u32 {
+pub fn replay_fixture_events() -> ReplayState {
     let events = [
         "APPEND_EVIDENCE",
         "REGISTER_ARTIFACT",
         "SEAL_SNAPSHOT",
     ];
 
-    replay_events(&events).sequence_number as u32
+    replay_events(&events)
+}
+
+#[no_mangle]
+pub extern "C" fn replay_sequence_number() -> u32 {
+    replay_fixture_events().sequence_number as u32
+}
+
+#[no_mangle]
+pub extern "C" fn replay_hash_prefix() -> u32 {
+    let state = replay_fixture_events();
+
+    let prefix = &state.state_hash[0..8];
+
+    u32::from_str_radix(
+        prefix,
+        16,
+    )
+    .unwrap()
 }
 
 #[cfg(test)]
@@ -57,13 +74,7 @@ mod tests {
 
     #[test]
     fn sequence_number_matches_event_count() {
-        let events = [
-            "APPEND_EVIDENCE",
-            "REGISTER_ARTIFACT",
-            "SEAL_SNAPSHOT",
-        ];
-
-        let state = replay_events(&events);
+        let state = replay_fixture_events();
 
         assert_eq!(state.sequence_number, 3);
     }
@@ -71,5 +82,13 @@ mod tests {
     #[test]
     fn exported_replay_sequence_number_returns_three() {
         assert_eq!(replay_sequence_number(), 3);
+    }
+
+    #[test]
+    fn exported_replay_hash_prefix_is_stable() {
+        assert_eq!(
+            replay_hash_prefix(),
+            replay_hash_prefix(),
+        );
     }
 }
