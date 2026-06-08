@@ -1,4 +1,6 @@
 import json
+import hashlib
+
 from dataclasses import dataclass
 from typing import Any
 
@@ -31,3 +33,11 @@ class VeracityArtifact:
             separators=(",", ":"),
             ensure_ascii=False,
         )
+
+    def compute_hash(self):
+
+        payload = self.to_canonical_json()
+
+        return hashlib.sha256(
+            payload.encode("utf-8")
+        ).hexdigest()
