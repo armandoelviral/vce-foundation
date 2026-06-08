@@ -51,3 +51,39 @@ class VeracityRuntime:
             artifact,
             receipt,
         )
+
+    def prove(
+        self,
+        identity,
+        trust,
+        provenance,
+        replay,
+        evidence,
+        governance,
+        ledger_sequence=1,
+    ):
+
+        artifact = self.create_artifact(
+            identity=identity,
+            trust=trust,
+            provenance=provenance,
+            replay=replay,
+            evidence=evidence,
+            governance=governance,
+        )
+
+        receipt = self.anchor(
+            artifact,
+            ledger_sequence=ledger_sequence,
+        )
+
+        verified = self.verify(
+            artifact,
+            receipt,
+        )
+
+        return {
+            "artifact": artifact,
+            "receipt": receipt,
+            "verified": verified,
+        }
