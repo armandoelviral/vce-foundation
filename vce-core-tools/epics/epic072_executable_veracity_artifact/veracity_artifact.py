@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from typing import Any
 
@@ -21,3 +22,12 @@ class VeracityArtifact:
             "evidence": self.evidence,
             "governance": self.governance,
         }
+
+    def to_canonical_json(self):
+
+        return json.dumps(
+            self.to_dict(),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
