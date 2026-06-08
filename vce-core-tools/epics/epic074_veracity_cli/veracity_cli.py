@@ -25,7 +25,25 @@ def build_parser():
         "verify",
     )
 
+    subparsers.add_parser(
+        "audit",
+    )
+
     return parser
+
+
+def _build_cli_proof(
+    runtime,
+):
+
+    return runtime.prove(
+        identity={"identity_id": "cli-id"},
+        trust={"certificate_id": "cli-cert"},
+        provenance={"input_hash": "cli-input"},
+        replay={"sequence_number": 3},
+        evidence={"evidence_hash": "cli-evidence"},
+        governance={"schema_version": "1.0"},
+    )
 
 
 def run(
@@ -42,13 +60,8 @@ def run(
 
     if args.command == "prove":
 
-        proof = runtime.prove(
-            identity={"identity_id": "cli-id"},
-            trust={"certificate_id": "cli-cert"},
-            provenance={"input_hash": "cli-input"},
-            replay={"sequence_number": 3},
-            evidence={"evidence_hash": "cli-evidence"},
-            governance={"schema_version": "1.0"},
+        proof = _build_cli_proof(
+            runtime
         )
 
         return runtime.export_proof(
@@ -57,13 +70,8 @@ def run(
 
     if args.command == "verify":
 
-        proof = runtime.prove(
-            identity={"identity_id": "cli-id"},
-            trust={"certificate_id": "cli-cert"},
-            provenance={"input_hash": "cli-input"},
-            replay={"sequence_number": 3},
-            evidence={"evidence_hash": "cli-evidence"},
-            governance={"schema_version": "1.0"},
+        proof = _build_cli_proof(
+            runtime
         )
 
         payload = {
@@ -77,6 +85,21 @@ def run(
 
         return json.dumps(
             payload,
+            sort_keys=True,
+        )
+
+    if args.command == "audit":
+
+        proof = _build_cli_proof(
+            runtime
+        )
+
+        audit = runtime.audit_proof(
+            proof
+        )
+
+        return json.dumps(
+            audit,
             sort_keys=True,
         )
 
