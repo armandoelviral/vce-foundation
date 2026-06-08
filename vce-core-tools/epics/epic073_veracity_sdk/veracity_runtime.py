@@ -1,3 +1,5 @@
+import json
+
 from epics.epic072_executable_veracity_artifact.artifact_verifier import (
     verify_artifact,
 )
@@ -86,4 +88,39 @@ class VeracityRuntime:
             "artifact": artifact,
             "receipt": receipt,
             "verified": verified,
+        }
+       
+    def export_proof(
+        self,
+        proof,
+    ):
+
+        receipt = proof["receipt"]
+
+        payload = {
+            "artifact_hash": receipt.artifact_hash,
+            "ledger_sequence": receipt.ledger_sequence,
+            "verified": proof["verified"],
+        }
+
+        return json.dumps(
+            payload,
+            sort_keys=True,
+        )
+
+    def audit_proof(
+        self,
+        proof,
+    ):
+
+        verified = self.verify(
+            proof["artifact"],
+            proof["receipt"],
+        )
+
+        return {
+            "audit_status": "PASSED" if verified else "FAILED",
+            "verified": verified,
+            "artifact_hash": proof["receipt"].artifact_hash,
+            "ledger_sequence": proof["receipt"].ledger_sequence,
         }
