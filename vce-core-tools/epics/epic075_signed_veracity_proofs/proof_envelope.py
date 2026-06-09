@@ -35,13 +35,15 @@ class SignedProofEnvelope:
         payload = self.to_dict()
 
         payload_without_signature = {
-            key: value
-            for key, value in payload.items()
-            if key
-            not in {
-                "signature",
-                "rekor_set",
-            }
+           key: value
+           for key, value in payload.items()
+           if key not in {
+               "signature",
+               "rekor_set",
+               "signing_key_id",
+               "signature_algorithm",
+               "signing_timestamp",
+           }
         }
 
         return json.dumps(
