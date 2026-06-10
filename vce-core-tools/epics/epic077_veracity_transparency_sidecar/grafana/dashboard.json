@@ -1,0 +1,54 @@
+{
+  "title": "Veracity Transparency Sidecar",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Anchor Jobs Total",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "veracity_anchor_jobs_total"
+        }
+      ]
+    },
+    {
+      "title": "Anchor Success Total",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "veracity_anchor_success_total"
+        }
+      ]
+    },
+    {
+      "title": "Anchor Failure Total",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "veracity_anchor_failure_total"
+        }
+      ]
+    },
+    {
+      "title": "Pending Jobs",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "veracity_pending_jobs"
+        }
+      ]
+    },
+    {
+      "title": "Anchor Latency",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(veracity_anchor_latency_seconds_sum[5m])"
+        }
+      ]
+    }
+  ]
+}
