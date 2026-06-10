@@ -53,6 +53,14 @@ class SignedProofEnvelope:
             ensure_ascii=False,
         )
 
+    def to_canonical_json(self):
+
+        return json.dumps(
+            self.to_dict(),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
 
 def build_unsigned_envelope(
     proof,
