@@ -1,0 +1,6 @@
+apiVersion: v2
+name: veracity-transparency-sidecar
+description: Helm chart for the Veracity Transparency Sidecar
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

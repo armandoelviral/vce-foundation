@@ -1,0 +1,22 @@
+image:
+  repository: veracity/transparency-sidecar
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+sidecar:
+  enabled: true
+  backend: rekor
+  queuePath: /var/lib/veracity/queue
+  receiptPath: /var/lib/veracity/receipts
+
+metrics:
+  enabled: true
+  port: 9090
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
