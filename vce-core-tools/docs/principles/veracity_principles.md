@@ -75,3 +75,100 @@ Veracity does not prove that the decision should have been made.
 Application data quality, model training quality, policy compliance, medical correctness, financial fairness, and business-rule validity remain responsibilities of the application governance layer.
 
 A perfectly verified execution can still produce a wrong, harmful, illegal, or biased result if the input data, model, or business policy is defective.
+
+# VERACITY PRINCIPLE #4
+
+Not all valid evidence
+is admissible evidence.
+
+## Rationale
+
+Cryptographic validity alone does not guarantee admissibility.
+
+Evidence must satisfy governance requirements,
+operational constraints,
+and policy controls
+before admission.
+
+## Introduced By
+
+EPIC081 Evidence Admissibility Engine
+
+# VERACITY PRINCIPLE #5
+
+Historical evidence
+should have independent witnesses.
+
+## Rationale
+
+Evidence should not depend on a single observer.
+
+Independent witnesses reduce trust concentration
+and strengthen historical verification.
+
+## Introduced By
+
+EPIC082 External Ledger Root Anchoring
+EPIC084 Witness Consensus Layer
+
+# VERACITY PRINCIPLE #6
+
+Evidence decisions
+must be traceable
+to approved policies.
+
+## Rationale
+
+Every admission decision must be attributable
+to a specific policy,
+policy version,
+approval authority,
+and governance state.
+
+## Introduced By
+
+EPIC085 Policy Authority Layer
+
+# VERACITY PRINCIPLE #7
+
+History must be replayed
+under the policy
+that governed history.
+
+## Rationale
+
+Historical decisions must never be reinterpreted
+under newer policies.
+
+Replay must use the exact policy version
+active at the time of the original decision.
+
+## Introduced By
+
+EPIC086 Historical Policy Replay Audit
+
+# VERACITY PRINCIPLE #8
+
+History must be replayed
+in a verifiably equivalent environment.
+
+## Rationale
+
+Replay results are only trustworthy
+if the replay environment
+can be demonstrated to be equivalent
+to the original execution environment.
+
+Equivalent environments include:
+
+- runtime configuration
+- dependency manifests
+- model fingerprints
+- policy versions
+- execution profiles
+
+## Introduced By
+
+EPIC087 Replay Environment Attestation
+
+
