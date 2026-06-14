@@ -123,3 +123,14 @@ PQC signing adapters
 Witness health checks
 Quorum availability monitoring
 ```
+
+### Reference IaC Modules
+
+#### GCP Witness Module
+
+```text
+Confidential VM
+Cloud KMS asymmetric signing key
+restricted ingress from coordinator
+dedicated service account
+witness metadata export
