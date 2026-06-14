@@ -102,6 +102,10 @@ This ADR does not define production-grade IAM, logging, patching, or incident re
 
 ## Consequences
 
+Reference IaC modules are not automatically considered production-ready.
+
+Production deployment eligibility requires compliance with the Production Hardening Requirements section of this ADR.
+
 This strengthens ZTC-10 Multi-Party Verification by turning witnesses into independent trust domains.
 
 It also prepares ZTC-11 Distributed Attestation.
@@ -111,6 +115,10 @@ The main operational tradeoff is increased infrastructure complexity.
 Infrastructure as Code can reduce deployment friction, but it does not eliminate multi-cloud operational responsibility.
 
 ## Future Work
+
+Future infrastructure implementations should comply with the Production Hardening Requirements defined in this ADR.
+
+Reference IaC modules are expected to satisfy these requirements before being considered production-ready.
 
 Future implementation tracks may introduce:
 
@@ -124,13 +132,77 @@ Witness health checks
 Quorum availability monitoring
 ```
 
-### Reference IaC Modules
+### Reference IaC Module: GCP Witness
 
-#### GCP Witness Module
+The GCP witness module should provision an independent witness trust domain with:
 
 ```text
 Confidential VM
-Cloud KMS asymmetric signing key
-restricted ingress from coordinator
+Cloud KMS asymmetric signing key for the classical signature layer
+local or adapter-based PQC signing layer
+restricted ingress from the consensus coordinator
 dedicated service account
+minimal KMS signing permissions
 witness metadata export
+coordinator-ready gRPC endpoint
+
+### Production Hardening Requirements
+
+The reference GCP witness module is intentionally simplified.
+
+Production deployments should additionally satisfy the following requirements.
+
+#### Cryptography
+
+```text
+Do not treat EC_SIGN_P256_SHA256 as ML-DSA.
+Use EC_SIGN_P256_SHA256 only for the classical signature layer.
+Use a dedicated PQC signing implementation or adapter for ML-DSA.
+Support hybrid signature verification.
+```
+
+#### Identity and Access Management
+
+```text
+Use a dedicated service account.
+Apply least-privilege IAM.
+Restrict KMS permissions to signing operations.
+Avoid broad cloud-platform scopes.
+```
+
+#### Network Security
+
+```text
+Attach firewall target tags to witness instances.
+Restrict ingress to approved coordinator identities.
+Require mTLS for coordinator-to-witness communication.
+Prefer private connectivity where possible.
+```
+
+#### Artifact Verification
+
+```text
+Verify artifact hash before execution.
+Verify artifact signature before execution.
+Reject unsigned witness binaries.
+Reject hash mismatches.
+```
+
+#### Witness Registration
+
+```text
+Export witness metadata.
+Export provider metadata.
+Export signing key identifiers.
+Support coordinator registry admission workflows.
+```
+
+#### Operational Resilience
+
+```text
+Prefer static or reserved endpoints.
+Monitor witness health.
+Monitor quorum availability.
+Support witness replacement procedures.
+Support disaster recovery workflows.
+```
