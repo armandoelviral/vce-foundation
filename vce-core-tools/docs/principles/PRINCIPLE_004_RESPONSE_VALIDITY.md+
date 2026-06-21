@@ -1,0 +1,79 @@
+# Principle #4: Response Validity
+
+## Statement
+
+Trust is preserved only while accountable citizens remain capable of response.
+
+Trust is destroyed when response validity is lost.
+
+## Rationale
+
+A claim may possess:
+
+- Proof
+- Attestation
+- Identity
+- Registry Membership
+- Governance Authorization
+
+Yet trust collapses if no accountable citizen can meaningfully answer for the claim.
+
+Therefore:
+
+Trust requires not only verifiable provenance but also verifiable response capability.
+
+## Law of Response Validity
+
+Response Invalidity
+        ↓
+Accountability Failure
+        ↓
+Trust Failure
+        ↓
+Truth Failure
+
+## Computational Citizenship Implication
+
+A Trusted Compute Citizen is defined not only by:
+
+- Identity
+- Membership
+- Governance
+
+but also by:
+
+- Ability To Respond
+
+## Foundational Principle
+
+Agents generate claims.
+
+Citizens provide accountability.
+
+Provenance provides trust.
+
+Response validity preserves trust.
+
+Trust enables truth.
+
+## Ethical Interpretation
+
+Responsibility emerges not when an entity speaks.
+
+Responsibility emerges when an entity can answer.
+
+## Architectural Consequences
+
+This principle applies to:
+
+- Governance
+- Trust Scoring
+- Reputation Systems
+- Admission Policies
+- Suspension Policies
+- Reinstatement Policies
+- Agent Hosting Policies
+
+## Canonical Rule
+
+No Claim Without An Accountable Citizen.
