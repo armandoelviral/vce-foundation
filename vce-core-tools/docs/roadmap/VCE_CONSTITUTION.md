@@ -211,3 +211,62 @@ Ratified Principles:
 
 End of Constitution.
 
+
+
+
+=========================================================
+PROPOSED PRINCIPLE #6
+VERIFIABLE RESPONSIBILITY CAPITAL
+=========================================================
+
+Status:
+PROPOSED
+
+Statement
+
+Reputation is not an opinion.
+
+Reputation is verifiable historical evidence.
+
+Responsibility accumulated through verifiable actions
+constitutes a form of societal capital.
+
+Rationale
+
+Financial capital accumulates economic value.
+
+Human capital accumulates knowledge.
+
+Social capital accumulates relationships.
+
+Verifiable Responsibility Capital accumulates
+demonstrated accountability.
+
+Core Principle
+
+Historical accountability creates reputation.
+
+Verifiable reputation creates trust.
+
+Trust accumulated over time becomes
+Verifiable Responsibility Capital.
+
+Constitutional Rule
+
+No Reputation Without Verifiable History.
+
+Future Relationship
+
+Identity
+    ↓
+
+Governance
+    ↓
+
+Response Validity
+    ↓
+
+Reputation
+    ↓
+
+Verifiable Responsibility Capital
