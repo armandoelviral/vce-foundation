@@ -270,3 +270,24 @@ Reputation
     ↓
 
 Verifiable Responsibility Capital
+
+Principle #7
+
+Verifiable Institutional Justice
+
+Status: RATIFIED
+
+Statement:
+
+Authority without appeal
+is arbitrary.
+
+Governance without adjudication
+is incomplete.
+
+Justice requires verifiable review.
+
+Constitutional Rule:
+
+No Final Authority
+Without Right of Appeal.
