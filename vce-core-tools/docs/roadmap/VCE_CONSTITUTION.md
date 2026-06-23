@@ -575,3 +575,86 @@ by verifiable capital.
 
 No Delegated Authority
 Without Verifiable Accountability.
+
+Capital
+    ↓
+Capacity
+    ↓
+Delegation
+    ↓
+Authority
+
+
+# Principle #15
+Verifiable Constitutional Exchange
+All exchanges must be:
+
+- voluntary
+- authorized
+- auditable
+- constitutionally valid
+
+Mutual consent is required.
+
+Settlement must be verifiable.
+
+No Constitutional Exchange
+Without Verifiable Consent.
+Consecuencia arquitectónica
+Delegation
+    ↓
+Exchange
+    ↓
+Coordination
+
+La cooperación entre actores independientes surge mediante consentimiento verificable.
+
+
+# Principle #16
+Verifiable Constitutional Credit
+Credit is trust extended through time.
+
+Future claims must remain bounded
+by verifiable historical conduct.
+
+Default becomes constitutional evidence.
+
+No Constitutional Credit
+Without Verifiable Accountability.
+Consecuencia arquitectónica
+Historical Conduct
+        ↓
+Trust
+        ↓
+Credit
+        ↓
+Future Obligation
+
+El crédito deja de ser una promesa arbitraria y se convierte en confianza históricamente fundamentada.
+
+
+# Principle #17
+Verifiable Constitutional Risk
+Risk is not fear.
+
+Risk is measurable exposure
+to future constitutional failure.
+
+Risk must be attributable.
+
+Risk must be auditable.
+
+Risk must be bounded by evidence.
+
+No Constitutional Risk
+Without Verifiable Exposure.
+Consecuencia arquitectónica
+Credit
+    ↓
+Exposure
+    ↓
+Risk
+    ↓
+Potential Failure
+
+El riesgo deja de ser percepción subjetiva y pasa a ser una magnitud verificable derivada de exposición observable.
