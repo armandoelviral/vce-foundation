@@ -291,3 +291,196 @@ Constitutional Rule:
 
 No Final Authority
 Without Right of Appeal.
+
+# Principle #7
+
+## Verifiable Constitutional Evolution
+
+Status: RATIFIED
+
+### Statement
+
+Institutions evolve.
+
+Constitutions govern institutional evolution.
+
+Constitutional change must remain historically traceable, reviewable, and verifiable.
+
+### Constitutional Rule
+
+No Constitutional Amendment Without Ratified Constitutional Process.
+
+### Rationale
+
+A constitutional system must be capable of adaptation without losing legitimacy, continuity, or historical accountability.
+
+Evolution is permitted.
+
+Untraceable evolution is not.
+
+### Architectural Consequence
+
+Constitution
+↓
+Proposal
+↓
+Amendment
+↓
+Ratification
+↓
+Version
+↓
+History
+
+### Architectural Mapping
+
+PHASE4-019 Constitutional Evolution Layer
+
+
+# Principle #8
+
+## Verifiable Constitutional Supremacy
+
+Status: RATIFIED
+
+### Statement
+
+The Constitution governs governance.
+
+Constitutional review governs constitutional change.
+
+No institution may exercise authority beyond constitutional limits.
+
+### Constitutional Rule
+
+No Constitutional Amendment Without Constitutional Review.
+
+### Rationale
+
+Governance derives authority from the Constitution.
+
+Constitutional review preserves constitutional legitimacy by ensuring that constitutional change remains consistent with constitutional order.
+
+The Constitution remains superior to ordinary governance.
+
+### Architectural Consequence
+
+Governance
+↓
+Constitution
+↓
+Constitutional Review
+↓
+Constitutional Decision
+↓
+Constitutional Precedent
+
+### Architectural Mapping
+
+PHASE4-020 Constitutional Court Layer
+
+
+# Principle #9
+
+## Verifiable Fundamental Rights
+
+Status: RATIFIED
+
+### Statement
+
+Citizens possess rights that cannot be removed by ordinary governance.
+
+Governance derives legitimacy from rights.
+
+Rights do not derive legitimacy from governance.
+
+### Constitutional Rule
+
+No Governance Decision May Override Fundamental Rights.
+
+### Rationale
+
+Rights establish the protected constitutional space within which governance may operate.
+
+Governance is constrained by rights.
+
+Rights are not granted by governance and therefore cannot be revoked by ordinary governance.
+
+### Architectural Mapping
+
+PHASE4-021 Constitutional Rights Layer
+
+# Principle #10
+
+## Verifiable Identity Sovereignty
+
+Status: RATIFIED
+
+### Statement
+
+Rights belong to identities.
+
+Identities do not belong to institutions.
+
+Governance may recognize identity.
+
+Governance may not own identity.
+
+### Constitutional Rule
+
+No Institution Owns Citizen Identity.
+
+### Rationale
+
+Identity precedes governance.
+
+A sovereign identity remains constitutionally independent from any institution that recognizes it.
+
+Institutions may validate, register, or interact with identities, but they may not claim ownership over them.
+
+### Architectural Mapping
+
+PHASE4-022 Constitutional Identity Layer
+
+# Principle #11
+
+## Verifiable Responsibility Capital
+
+Status: RATIFIED
+
+### Statement
+
+Reputation is not opinion.
+
+Reputation is historically verifiable evidence of rights exercised, duties fulfilled, and obligations honored.
+
+### Constitutional Rule
+
+No Reputation Claim Without Verifiable Evidence.
+
+### Rationale
+
+Reputation shall not be derived from popularity, authority, narrative, or subjective opinion.
+
+Reputation shall be derived exclusively from verifiable historical evidence recorded within the constitutional system.
+
+Responsibility Capital emerges from sustained constitutional conduct.
+
+### Architectural Consequence
+
+Identity
+↓
+Rights
+↓
+Obligations
+↓
+Evidence
+↓
+Reputation
+↓
+Responsibility Capital
+
+### Architectural Mapping
+
+PHASE4-024 Reputation Constitution Layer
+
