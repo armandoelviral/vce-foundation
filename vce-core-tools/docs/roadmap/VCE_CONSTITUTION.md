@@ -484,3 +484,36 @@ Responsibility Capital
 
 PHASE4-024 Reputation Constitution Layer
 
+# Principle #12
+
+## Verifiable Constitutional Capital
+
+Status: RATIFIED
+
+### Statement
+
+Capital emerges from historically verifiable conduct.
+
+Capital cannot be created without evidence.
+
+Capital cannot be transferred without constitutional authorization.
+
+### Constitutional Rule
+
+No Constitutional Capital Without Verifiable Evidence.
+
+### Rationale
+
+Rights exercised,
+obligations fulfilled,
+and reputation accumulated
+constitute the basis of constitutional capital.
+
+Capital is derived.
+
+Capital is not arbitrary.
+
+### Architectural Mapping
+
+PHASE4-025 Constitutional Economy
+
