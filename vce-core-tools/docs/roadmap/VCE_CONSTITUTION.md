@@ -214,13 +214,12 @@ End of Constitution.
 
 
 
-=========================================================
-PROPOSED PRINCIPLE #6
+
+# PRINCIPLE #6
 VERIFIABLE RESPONSIBILITY CAPITAL
-=========================================================
 
 Status:
-PROPOSED
+APROVED
 
 Statement
 
@@ -271,7 +270,7 @@ Reputation
 
 Verifiable Responsibility Capital
 
-Principle #7
+# Principle #7
 
 Verifiable Institutional Justice
 
@@ -410,6 +409,7 @@ Rights are not granted by governance and therefore cannot be revoked by ordinary
 
 PHASE4-021 Constitutional Rights Layer
 
+
 # Principle #10
 
 ## Verifiable Identity Sovereignty
@@ -441,6 +441,7 @@ Institutions may validate, register, or interact with identities, but they may n
 ### Architectural Mapping
 
 PHASE4-022 Constitutional Identity Layer
+
 
 # Principle #11
 
@@ -484,6 +485,7 @@ Responsibility Capital
 
 PHASE4-024 Reputation Constitution Layer
 
+
 # Principle #12
 
 ## Verifiable Constitutional Capital
@@ -517,3 +519,59 @@ Capital is not arbitrary.
 
 PHASE4-025 Constitutional Economy
 
+Institutions accumulate capital through
+historically verifiable conduct.
+
+Institutional capital derives from:
+
+- compliance
+- governance
+- reputation
+- constitutional behavior
+
+Institutional trust is not declared.
+
+Institutional trust is computed.
+
+No Institutional Trust
+
+# Principle #13
+Verifiable Institutional Capital
+
+Institutions accumulate capital through
+historically verifiable conduct.
+
+Institutional capital derives from:
+
+- compliance
+- governance
+- reputation
+- constitutional behavior
+
+Institutional trust is not declared.
+
+Institutional trust is computed.
+
+No Institutional Trust
+Without Verifiable Evidence.
+
+
+# Principle #14
+Verifiable Delegation
+
+Delegated authority must remain
+historically traceable.
+
+Delegation transfers authority.
+
+Delegation does not transfer responsibility.
+
+Revocation terminates authority.
+
+Revocation does not erase history.
+
+Delegated capacity must remain bounded
+by verifiable capital.
+
+No Delegated Authority
+Without Verifiable Accountability.
