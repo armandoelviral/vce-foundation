@@ -791,3 +791,133 @@ through preserved evidence.
 
 No Civilizational Continuity
 Without Verifiable Preservation.
+
+
+NIVELES FUNDAMENTALES VCE
+Nivel 0
+Reality Layer
+
+Pregunta:
+
+What exists?
+
+Entidad fundamental:
+
+Reality
+
+Todavía no implementado.
+
+Nivel 1
+Observation Layer
+
+Pregunta:
+
+What was observed?
+
+Entidad fundamental:
+
+Observation
+
+Principio emergente:
+
+No Physical Trust
+Without Verifiable Observation.
+
+Futura PHASE5.
+
+Nivel 2
+Evidence Layer
+
+Pregunta:
+
+What can be proven?
+
+Entidades:
+
+Execution
+Replay
+WAL
+Provenance
+Attestation
+Transparency
+
+Principio:
+
+No Verifiable Trust
+Without Verifiable Evidence.
+Nivel 3
+Trust Layer
+
+Pregunta:
+
+What deserves trust?
+
+Entidades:
+
+Trust
+Reputation
+Responsibility
+
+Principio:
+
+No Constitutional Economy
+Without Verifiable Trust.
+Nivel 4
+Coordination Layer
+
+Pregunta:
+
+How can trusted actors act together?
+
+Entidades:
+
+Identity
+Citizenship
+Governance
+Voting
+Federation
+Nivel 5
+Constitutional Layer
+
+Pregunta:
+
+How is coordination constrained?
+
+Entidades:
+
+Constitution
+Rights
+Obligations
+Court
+Evolution
+
+Principio:
+
+No Authority
+Beyond Constitutional Limits.
+Nivel 6
+Economic Layer
+
+Pregunta:
+
+How is trust stored and deployed?
+
+Entidades:
+
+Capital
+Credit
+Risk
+Insurance
+Reserves
+Treasury
+Liquidity
+Nivel 7
+Civilization Layer
+
+Pregunta:
+
+How does coordination survive generations?
+
+Entidad emergente:
+
+Civilization
