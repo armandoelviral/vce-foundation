@@ -1,40 +1,55 @@
-class MembershipView:
+from epics.phase4_036_constitutional_sustainability.sustainability_record import SustainabilityRecord
+from epics.phase4_036_constitutional_sustainability.sustainability_registry import SustainabilityRegistry
 
-    def __init__(self):
 
-        self.members = {}
+def test_registry_stores_record():
+    registry = SustainabilityRegistry()
 
-    def update(
-        self,
-        discovered
-    ):
+    registry.add(
+        SustainabilityRecord(
+            "sus.001",
+            "stability.001",
+            100,
+            "continuity",
+        )
+    )
 
-        for peer in discovered:
+    assert len(registry.records()) == 1
 
-            node_id = peer.get(
-                "node_id",
-                peer["peer"]
-            )
 
-            self.members[node_id] = {
-                "peer": peer["peer"],
-                "alive": peer["alive"]
-            }
+def test_rejects_duplicate():
+    registry = SustainabilityRegistry()
 
-    def alive_nodes(self):
+    record = SustainabilityRecord(
+        "sus.001",
+        "stability.001",
+        100,
+        "continuity",
+    )
 
-        return [
-            node_id
-            for node_id, data
-            in self.members.items()
-            if data["alive"]
-        ]
+    registry.add(record)
 
-    def dead_nodes(self):
+    try:
+        registry.add(record)
+        assert False
+    except ValueError:
+        assert True
 
-        return [
-            node_id
-            for node_id, data
-            in self.members.items()
-            if not data["alive"]
-        ]
+
+def test_returns_copy():
+    registry = SustainabilityRegistry()
+
+    registry.add(
+        SustainabilityRecord(
+            "sus.001",
+            "stability.001",
+            100,
+            "continuity",
+        )
+    )
+
+    items = registry.records()
+
+    items.clear()
+
+    assert len(registry.records()) == 1

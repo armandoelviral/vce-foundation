@@ -207,13 +207,8 @@ Ratified Principles:
 
 ✅ Principle #5 Democratization of Algorithmic Control
 
----
 
-End of Constitution.
-
-
-
-
+--
 
 # PRINCIPLE #6
 VERIFIABLE RESPONSIBILITY CAPITAL
@@ -269,6 +264,8 @@ Reputation
     ↓
 
 Verifiable Responsibility Capital
+
+--
 
 # Principle #7
 
@@ -335,6 +332,7 @@ History
 
 PHASE4-019 Constitutional Evolution Layer
 
+--
 
 # Principle #8
 
@@ -378,6 +376,7 @@ Constitutional Precedent
 
 PHASE4-020 Constitutional Court Layer
 
+--
 
 # Principle #9
 
@@ -409,6 +408,7 @@ Rights are not granted by governance and therefore cannot be revoked by ordinary
 
 PHASE4-021 Constitutional Rights Layer
 
+--
 
 # Principle #10
 
@@ -442,6 +442,7 @@ Institutions may validate, register, or interact with identities, but they may n
 
 PHASE4-022 Constitutional Identity Layer
 
+--
 
 # Principle #11
 
@@ -485,6 +486,7 @@ Responsibility Capital
 
 PHASE4-024 Reputation Constitution Layer
 
+--
 
 # Principle #12
 
@@ -535,6 +537,8 @@ Institutional trust is computed.
 
 No Institutional Trust
 
+--
+
 # Principle #13
 Verifiable Institutional Capital
 
@@ -555,6 +559,7 @@ Institutional trust is computed.
 No Institutional Trust
 Without Verifiable Evidence.
 
+--
 
 # Principle #14
 Verifiable Delegation
@@ -584,6 +589,7 @@ Delegation
     ↓
 Authority
 
+--
 
 # Principle #15
 Verifiable Constitutional Exchange
@@ -609,6 +615,7 @@ Coordination
 
 La cooperación entre actores independientes surge mediante consentimiento verificable.
 
+--
 
 # Principle #16
 Verifiable Constitutional Credit
@@ -632,6 +639,7 @@ Future Obligation
 
 El crédito deja de ser una promesa arbitraria y se convierte en confianza históricamente fundamentada.
 
+--
 
 # Principle #17
 Verifiable Constitutional Risk
@@ -659,8 +667,10 @@ Potential Failure
 
 El riesgo deja de ser percepción subjetiva y pasa a ser una magnitud verificable derivada de exposición observable.
 
+--
 
-# Principle #18 — Verifiable Constitutional Protection
+# Principle #18 —
+Verifiable Constitutional Protection
 
 ```text
 Protection must be funded.
@@ -674,8 +684,10 @@ Loss absorption must be verifiable.
 No Constitutional Insurance
 Without Verifiable Reserves.
 
+--
 
-#Principle #19 — Verifiable Constitutional Reserves
+#Principle #19 —
+Verifiable Constitutional Reserves
 Reserves fund protection.
 
 Protection must remain bounded
@@ -688,8 +700,10 @@ Reserve depletion must be auditable.
 No Constitutional Reserve
 Without Verifiable Assets.
 
+--
 
-#Principle #20 — Verifiable Constitutional Trust
+#Principle #20 —
+Verifiable Constitutional Trust
 Trust is the foundational asset
 of a constitutional economy.
 
@@ -711,8 +725,10 @@ derive from trust.
 No Constitutional Economy
 Without Verifiable Trust.
 
+--
 
-#Principle #21 — Verifiable Constitutional Treasury
+#Principle #21 —
+Verifiable Constitutional Treasury
 Treasury manages constitutional reserves.
 
 Treasury cannot create trust.
@@ -728,8 +744,10 @@ auditable and reviewable.
 No Treasury Authority
 Without Verifiable Accountability.
 
+--
 
-#Principle #22 — Verifiable Observation
+#Principle #22 —
+Verifiable Observation
 Physical claims
 require physical evidence.
 
@@ -745,8 +763,10 @@ auditable.
 No Physical Trust
 Without Verifiable Observation.
 
+--
 
-# Principle #23 — Verifiable Constitutional Liquidity
+# Principle #23 —
+ Verifiable Constitutional Liquidity
 Liquidity represents
 immediately deployable
 constitutional capacity.
@@ -775,22 +795,7 @@ through preserved evidence.
 No Civilizational Continuity
 Without Verifiable Preservation.
 
-
-# Principle #24 — Verifiable Civilizational Continuity
-Observations must survive
-their observers.
-
-Evidence must survive
-its creators.
-
-Trust must survive
-individual participants.
-
-Civilizations persist
-through preserved evidence.
-
-No Civilizational Continuity
-Without Verifiable Preservation.
+--
 
 # PRINCIPIO #24
 Verifiable Constitutional Stability
@@ -812,6 +817,7 @@ Stability must remain measurable.
 No Constitutional Continuity
 Without Verifiable Stability.
 
+--
 
 # Principle #25 
 Verifiable Constitutional Sustainability
@@ -831,6 +837,7 @@ Sustainability must remain measurable.
 No Long-Term Continuity
 Without Verifiable Sustainability.
 
+--
 
 # Principle #26
 Verifiable Constitutional Prosperity
