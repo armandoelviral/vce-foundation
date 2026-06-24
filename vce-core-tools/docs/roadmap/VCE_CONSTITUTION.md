@@ -792,8 +792,29 @@ through preserved evidence.
 No Civilizational Continuity
 Without Verifiable Preservation.
 
+# PRINCIPIO #24
+Verifiable Constitutional Stability
+
+Stability represents
+the sustained capacity
+of a constitutional economy
+to preserve trust.
+
+Stability derives from
+trust,
+protection,
+reserves,
+treasury,
+and liquidity.
+
+Stability must remain measurable.
+
+No Constitutional Continuity
+Without Verifiable Stability.
 
 NIVELES FUNDAMENTALES VCE
+
+
 Nivel 0
 Reality Layer
 
@@ -806,6 +827,7 @@ Entidad fundamental:
 Reality
 
 Todavía no implementado.
+
 
 Nivel 1
 Observation Layer
@@ -824,6 +846,7 @@ No Physical Trust
 Without Verifiable Observation.
 
 Futura PHASE5.
+
 
 Nivel 2
 Evidence Layer
@@ -845,6 +868,8 @@ Principio:
 
 No Verifiable Trust
 Without Verifiable Evidence.
+
+
 Nivel 3
 Trust Layer
 
@@ -862,6 +887,8 @@ Principio:
 
 No Constitutional Economy
 Without Verifiable Trust.
+
+
 Nivel 4
 Coordination Layer
 
@@ -876,6 +903,8 @@ Citizenship
 Governance
 Voting
 Federation
+
+
 Nivel 5
 Constitutional Layer
 
@@ -895,6 +924,8 @@ Principio:
 
 No Authority
 Beyond Constitutional Limits.
+
+
 Nivel 6
 Economic Layer
 
@@ -911,6 +942,8 @@ Insurance
 Reserves
 Treasury
 Liquidity
+
+
 Nivel 7
 Civilization Layer
 
