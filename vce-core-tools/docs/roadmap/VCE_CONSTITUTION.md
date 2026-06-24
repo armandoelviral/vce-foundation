@@ -658,3 +658,136 @@ Risk
 Potential Failure
 
 El riesgo deja de ser percepción subjetiva y pasa a ser una magnitud verificable derivada de exposición observable.
+
+
+# Principle #18 — Verifiable Constitutional Protection
+
+```text
+Protection must be funded.
+
+Coverage must be measurable.
+
+Claims must be auditable.
+
+Loss absorption must be verifiable.
+
+No Constitutional Insurance
+Without Verifiable Reserves.
+
+
+#Principle #19 — Verifiable Constitutional Reserves
+Reserves fund protection.
+
+Protection must remain bounded
+by reserves.
+
+Reserves must be measurable.
+
+Reserve depletion must be auditable.
+
+No Constitutional Reserve
+Without Verifiable Assets.
+
+
+#Principle #20 — Verifiable Constitutional Trust
+Trust is the foundational asset
+of a constitutional economy.
+
+Trust derives from
+historically verifiable conduct.
+
+Trust cannot be manufactured.
+
+Trust cannot be transferred
+without constitutional authorization.
+
+All constitutional capital,
+credit,
+risk,
+protection,
+and reserves
+derive from trust.
+
+No Constitutional Economy
+Without Verifiable Trust.
+
+
+#Principle #21 — Verifiable Constitutional Treasury
+Treasury manages constitutional reserves.
+
+Treasury cannot create trust.
+
+Treasury cannot create reserves.
+
+Treasury may only allocate
+constitutionally authorized reserves.
+
+Treasury actions must remain
+auditable and reviewable.
+
+No Treasury Authority
+Without Verifiable Accountability.
+
+
+#Principle #22 — Verifiable Observation
+Physical claims
+require physical evidence.
+
+Evidence must remain
+historically reviewable.
+
+Evidence must remain
+cryptographically attributable.
+
+Observations must remain
+auditable.
+
+No Physical Trust
+Without Verifiable Observation.
+
+
+# Principle #23 — Verifiable Constitutional Liquidity
+Liquidity represents
+immediately deployable
+constitutional capacity.
+
+Liquidity cannot be created
+without constitutional backing.
+
+Liquidity must remain
+auditable.
+
+No Immediate Capacity
+Without Verifiable Liquidity.
+Principle #24 — Verifiable Civilizational Continuity
+Observations must survive
+their observers.
+
+Evidence must survive
+its creators.
+
+Trust must survive
+individual participants.
+
+Civilizations persist
+through preserved evidence.
+
+No Civilizational Continuity
+Without Verifiable Preservation.
+
+
+# Principle #24 — Verifiable Civilizational Continuity
+Observations must survive
+their observers.
+
+Evidence must survive
+its creators.
+
+Trust must survive
+individual participants.
+
+Civilizations persist
+through preserved evidence.
+
+No Civilizational Continuity
+Without Verifiable Preservation.
