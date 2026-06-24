@@ -979,6 +979,24 @@ Without Verifiable Consensus.
 
 
 Without Verifiable Attestation.
+
+---
+
+# Principio #34
+Constitutional Reality Ledger
+
+Accepted reality must remain durable.
+
+Reality records must remain reviewable.
+
+Reality records must remain auditable.
+
+Reality records must remain attributable.
+
+No Shared History
+Without a Constitutional Reality Ledger.
+
+
 -------------------------------------
 
 NIVELES FUNDAMENTALES VCE
