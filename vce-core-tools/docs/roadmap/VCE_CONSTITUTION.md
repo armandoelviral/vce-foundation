@@ -996,6 +996,246 @@ Reality records must remain attributable.
 No Shared History
 Without a Constitutional Reality Ledger.
 
+---
+
+# Principio #36
+Constitutional Reputation
+
+Trust must be earned.
+
+Reputation must derive from history.
+
+Reputation must remain reviewable.
+
+Reputation must remain auditable.
+
+No Durable Trust
+Without Constitutional Reputation.
+
+---
+
+#Principle #37
+Constitutional Credibility
+
+Credibility derives from reputation,
+but is not equivalent to reputation.
+
+Credibility must remain reviewable.
+
+Credibility must remain auditable.
+
+Credibility must remain attributable.
+
+No Constitutional Trust
+Without Constitutional Credibility.
+
+
+---
+
+#Principle #38
+Constitutional Trust
+
+Trust emerges from evidence.
+
+Trust emerges from reputation.
+
+Trust emerges from credibility.
+
+Trust must remain reviewable.
+
+Trust must remain auditable.
+
+No Constitutional Coordination
+Without Constitutional Trust.
+
+
+---
+
+#Principle #39
+Constitutional Trust Score
+
+Trust must be measurable.
+
+Trust scores must derive from
+verifiable inputs.
+
+Trust scores must remain
+reviewable.
+
+Trust scores must remain auditable.
+
+No Constitutional Coordination
+Without Constitutional Trust Scores.
+
+---
+
+#Principle #40
+Evidence Provenance
+
+Evidence must retain lineage.
+
+Evidence lineage must remain reviewable.
+
+Evidence lineage must remain auditable.
+
+Evidence lineage must remain attributable.
+
+No Durable Trust
+Without Evidence Provenance.
+
+
+---
+
+#Principle #41
+Evidence Retention
+
+Evidence must remain durable.
+
+Evidence retention must remain reviewable.
+
+Evidence retention must remain auditable.
+
+Evidence retention must remain attributable.
+
+No Durable Provenance
+Without Evidence Retention.
+
+---
+
+#Principle #42
+Evidence Recovery
+
+Evidence must remain recoverable.
+
+Recovery procedures must remain reviewable.
+
+Recovery procedures must remain auditable.
+
+Recovery procedures must remain attributable.
+
+No Durable Retention
+Without Evidence Recovery.
+
+---
+
+#Principle #43
+Evidence Durability
+
+Evidence must remain trustworthy through time.
+
+Durability assessments must remain reviewable.
+
+Durability assessments must remain auditable.
+
+Durability assessments must remain attributable.
+
+No Long-Term Trust
+Without Evidence Durability.
+
+
+---
+
+#Principle #44
+Temporal Validity
+
+Trust is time dependent.
+
+Evidence is time dependent.
+
+Validity windows must remain reviewable.
+
+Validity windows must remain auditable.
+
+No Constitutional Time
+Without Temporal Validity.
+
+
+---
+
+#Principio #45
+Trust Expiration
+
+Trust may decay through time.
+
+Trust expiration must remain reviewable.
+
+Trust expiration must remain auditable.
+
+Trust expiration must remain attributable.
+
+No Temporal Trust
+Without Trust Expiration.
+
+
+---
+
+#Principio #46
+Historical Trust Replay
+
+Trust decisions must remain replayable.
+
+Historical trust states must remain reviewable.
+
+Historical trust states must remain auditable.
+
+Historical trust states must remain attributable.
+
+No Constitutional Time
+Without Historical Replay.
+
+
+---
+
+#Principle #47
+Constitutional Snapshots
+
+Constitutional states must be snapshotable.
+
+Snapshots must remain reviewable.
+
+Snapshots must remain auditable.
+
+Snapshots must remain restorable.
+
+No Historical Replay
+Without Constitutional Snapshots.
+
+
+---
+#Principle #48
+Constitutional Time Audit
+
+Historical states must remain auditable.
+
+Audit evidence must remain attributable.
+
+Audit trails must remain reviewable.
+
+Audit conclusions must remain reproducible.
+
+No Constitutional Time
+Without Constitutional Audit.
+
+
+---
+
+#Principle #49
+Historical Civilization Replay
+
+Civilizational states must remain replayable.
+
+Historical coordination must remain reviewable.
+
+Historical trust evolution must remain auditable.
+
+Historical evidence must remain attributable.
+
+No Verifiable Civilization
+Without Historical Civilization Replay.
+
+---
+
+
 
 -------------------------------------
 
