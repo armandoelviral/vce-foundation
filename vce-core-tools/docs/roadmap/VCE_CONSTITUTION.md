@@ -1,4 +1,15 @@
 # VCE CONSTITUTION
+══════════════════════════════════════════════
+
+MISSION
+
+Enable future generations
+to reconstruct with sufficient fidelity
+what previous generations
+attempted to communicate.
+
+══════════════════════════════════════════════
+
 
 ## Constitutional Foundations of Verifiable Computational Citizenship
 
