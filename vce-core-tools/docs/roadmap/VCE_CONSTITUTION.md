@@ -1,7 +1,10 @@
-# VCE CONSTITUTION
+═══════════════════════
+VERIFIABLE CONTEXT ENGINE (VCE)
+
+Constitution
 ══════════════════════════════════════════════
 
-MISSION
+#MISSION
 
 Enable future generations
 to reconstruct with sufficient fidelity
@@ -9,6 +12,401 @@ what previous generations
 attempted to communicate.
 
 ══════════════════════════════════════════════
+
+#Research Problem
+
+The problem is not merely
+to preserve data.
+
+The problem is to preserve
+the ability
+to reconstruct
+their original context
+and intended meaning,
+
+despite technological,
+institutional,
+and generational change.
+
+---
+
+#Research Statement
+
+We investigate architectures
+capable of preserving
+
+evidence,
+
+context,
+
+and interpretive continuity
+
+over long periods of time,
+
+in a verifiable manner,
+
+to reduce the degradation
+of knowledge caused by
+
+technological,
+
+institutional,
+
+and generational change.
+
+---
+
+#Project Scope
+
+VCE investigates
+a specific class of problems:
+
+Verifiable preservation
+of evidence,
+context,
+and interpretive continuity.
+
+VCE is not intended
+to explain
+or replace
+
+human institutions,
+
+culture,
+
+politics,
+
+or civilization itself.
+
+---
+
+#Epistemic Limits
+
+VCE preserves
+the best available evidence.
+
+VCE preserves
+the best available context.
+
+VCE preserves
+the best available provenance.
+
+VCE cannot reconstruct
+context
+
+that was never recorded.
+
+VCE cannot infer
+
+missing evidence
+
+as verified fact.
+
+Irreducible uncertainty
+must remain explicit.
+
+---
+
+#Trust Boundary
+
+Human trust includes
+
+technical,
+
+social,
+
+cultural,
+
+emotional,
+
+and political dimensions.
+
+VCE does not replace trust.
+
+VCE provides
+verifiable evidence
+
+to support
+
+better-informed trust.
+
+---
+
+#Scientific Discipline
+
+Every new capability
+
+must answer
+one observable problem.
+
+Every hypothesis
+
+must be falsifiable.
+
+Every product
+
+must solve
+
+a real user problem.
+
+Architecture
+
+must not grow
+
+without necessity.
+
+---
+
+#Product Discipline
+
+Products validate research.
+
+Architecture
+exists
+
+to enable products.
+
+Products
+
+exist
+
+to solve
+observable problems.
+
+Ideas
+
+without adoption
+
+remain hypotheses.
+
+---
+
+#Architectural Gate
+
+Every new phase
+must answer:
+
+1.
+What observable problem
+does it solve?
+
+2.
+Why can't
+existing phases
+solve it?
+
+3.
+What new capability
+appears?
+
+4.
+How will success
+be measured?
+
+5.
+How could
+the hypothesis
+be falsified?
+
+---
+
+#Guiding Question
+
+How can we preserve
+
+evidence,
+
+context,
+
+and interpretive continuity,
+
+so that future generations
+
+can reconstruct
+
+with sufficient fidelity
+
+what previous generations
+
+attempted to communicate?
+
+--------------------------------------
+--------------------------------------
+
+RESEARCH MANIFESTO
+
+--------------------------------------
+--------------------------------------
+
+The Next Preservation Problem
+
+For thousands of years,
+humanity developed technologies
+to preserve information.
+
+Clay tablets.
+
+Papyrus.
+
+Parchment.
+
+Paper.
+
+Microfilm.
+
+Hard drives.
+
+Cloud storage.
+
+Although radically different,
+
+they all attempted
+to answer essentially
+the same question:
+
+How do we prevent
+information
+from disappearing?
+
+Today,
+we hypothesize
+that a different problem
+is becoming dominant.
+
+Information is increasingly abundant.
+
+What gradually disappears is:
+
+• context
+
+• provenance
+
+• interpretability
+
+• institutional memory
+
+• relationships between pieces of evidence
+
+• the ability to reconstruct
+what information originally meant.
+
+This produces
+a new form
+of knowledge degradation.
+
+We hypothesize
+that future knowledge systems
+
+will be limited
+
+less by information loss,
+
+and increasingly
+
+by context loss.
+
+VCE investigates
+whether preserving
+
+verifiable evidence,
+
+verifiable context,
+
+provenance,
+
+and interpretive continuity
+
+can reduce
+that degradation
+
+across technological,
+
+institutional,
+
+and generational change.
+
+The objective
+is not to preserve files.
+
+The objective
+is to preserve
+
+the future ability
+
+to understand them.
+
+-----------------------------------------
+
+Research Commitment
+
+Every hypothesis
+must be testable.
+
+Every capability
+must solve
+an observable problem.
+
+Every claim
+must remain
+proportional
+to the available evidence.
+
+Every architectural decision
+must ultimately enable
+a useful product.
+
+----------------------------------
+----------------------------------
+
+RESEARCH AGENDA
+
+H1
+
+As information abundance increases,
+
+knowledge degradation
+
+is increasingly caused
+
+by context loss.
+
+──────────────
+
+H2
+
+Preserving
+verifiable context
+
+improves
+
+long-term interpretability.
+
+──────────────
+
+H3
+
+Replayable provenance
+
+improves
+
+historical reconstruction fidelity.
+
+──────────────
+
+H4
+
+Evidence bundles
+
+outperform
+
+document-only archives
+
+when reconstructing
+
+historical decisions.
+
+-----------------------------------
+-----------------------------------
 
 
 ## Constitutional Foundations of Verifiable Computational Citizenship
@@ -1606,11 +2004,123 @@ verifiable evidence
 that may support
 better-informed trust.
 
+---
+
+#Principie #67
+Constitutional Decision
+
+Every deliberated proposal
+
+must produce
+
+an explicit decision.
+
+Every decision
+
+must remain
+
+reviewable,
+
+attributable,
+
+replayable,
+
+and reproducible.
+
+No Constitutional Execution
+
+Without Constitutional Decision.
 
 ---
 
+#Principie #69
+
+Constitutional Execution
+
+Every delegation
+
+must produce
+
+an observable execution.
+
+Execution
+
+must remain
+
+verifiable,
+
+replayable,
+
+reviewable,
+
+and attributable.
+
+No Constitutional Outcome
+
+Without Constitutional Execution.
+
+___
+
+Constitutional Outcome
+
+Every execution
+
+must produce
+
+an observable outcome.
+
+Outcomes
+
+must remain
+
+reviewable,
+
+measurable,
+
+verifiable,
+
+and replayable.
+
+No Institutional Learning
+
+Without Constitutional Outcome.
 
 
+---
+
+#Principie #71
+Constitutional Learning
+
+Every constitutional outcome
+
+should generate
+
+institutional learning.
+
+Learning
+
+must remain
+
+reviewable,
+
+reconstructable,
+
+attributable,
+
+and reproducible.
+
+Learning
+
+must preserve
+
+both
+
+successes
+
+and failures.
+
+
+---
 -------------------------------------
 
 NIVELES FUNDAMENTALES VCE
