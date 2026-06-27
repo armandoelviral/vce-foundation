@@ -24,3 +24,20 @@ It resides in the discipline that produced them.
 
 The continuity of that discipline is itself part of the continuity VCE seeks to preserve.
 
+
+# Milestone 001
+
+## Research Refoundation
+
+The project formally defined:
+
+- Mission
+- Foundational Thesis
+- Object of Study
+- Ontology
+- Constitutional Axioms
+- Research Methodology
+- Knowledge Architecture
+- Commercial Validation Strategy
+
+This milestone marks the transition from a software-centric architecture to a long-term interdisciplinary research program.

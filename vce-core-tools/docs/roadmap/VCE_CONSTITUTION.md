@@ -231,6 +231,10 @@ what previous generations
 
 attempted to communicate?
 
+
+---
+
+
 ## Constitutional Clause I — The Continuity of Identity
 
 Every long-lived research program must continuously evolve.
@@ -272,6 +276,26 @@ Evolution preserves relevance.
 Understanding gives purpose to all three.
 
 No architectural, scientific or commercial decision should violate this balance.
+
+# Constitutional Clause II — Research-Driven Products
+
+Every product within the VCE ecosystem exists for two simultaneous purposes.
+
+First, it must solve a concrete, observable problem for real organizations.
+
+Second, it must generate operational evidence capable of validating or falsifying one or more hypotheses of the VCE research program.
+
+Therefore, every product proposal shall explicitly answer two questions:
+
+1. Which part of the continuity between original intent and future understanding does it protect?
+
+2. Which research hypothesis does it help validate?
+
+If either question cannot be answered convincingly, the proposal does not belong to the core VCE ecosystem.
+
+Products are not endpoints.
+
+They are scientific instruments participating in the continuous evolution of the research program.
 
 
 
@@ -2897,6 +2921,119 @@ Talent may initiate a project.
 
 Discipline allows it to endure.
 
+
+---
+
+
+# Principle #101 — Evidence-Bound Authority
+
+## Statement
+
+Authority to certify a state transition belongs to the first component that possesses direct evidence that the transition has actually occurred.
+
+Authority never belongs solely to the component that initiated the transition.
+
+---
+
+## Motivation
+
+Distributed systems separate execution from observation.
+
+Producing an action is not equivalent to demonstrating that the action reached its intended state.
+
+Therefore:
+
+Generation is evidence of production.
+
+It is not evidence of successful delivery.
+
+---
+
+## General Rule
+
+Every state transition should distinguish at least three independent events:
+
+1. Production
+2. Delivery
+3. Observation
+
+Each event requires its own evidence.
+
+Each event may belong to a different authority.
+
+---
+
+## Consequence
+
+No component may certify a transition for which it lacks direct evidence.
+
+Instead, certification must be delegated to the first observer capable of verifying the resulting state.
+
+---
+
+## Example
+
+A compute engine may certify:
+
+"I generated the evidence package."
+
+It cannot certify:
+
+"The package was successfully rendered to the user."
+
+The rendering subsystem possesses evidence of rendering.
+
+The user possesses evidence of observation.
+
+Each authority is limited by its observable state.
+
+---
+
+## Architectural Consequence
+
+Knowledge Produced
+
+≠
+
+Knowledge Delivered
+
+≠
+
+Knowledge Observed
+
+≠
+
+Knowledge Understood
+
+Each transition requires independent evidence.
+
+Each transition may require a different trust authority.
+
+---
+
+## Relevance to VCE
+
+The same principle applies to every verifiable workflow.
+
+Execution.
+
+Replay.
+
+Evidence generation.
+
+Product delivery.
+
+Institutional communication.
+
+Scientific publication.
+
+Knowledge preservation.
+
+Every transition must be certified only by the authority capable of directly observing its resulting state.
+
+This principle extends verifiable computation into verifiable communication.
+
+Communication itself becomes a distributed protocol subject to evidence-based state transitions.
 
 
 -------------------------------------
