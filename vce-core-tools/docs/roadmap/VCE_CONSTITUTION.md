@@ -1,4 +1,4 @@
-═══════════════════════
+y═══════════════════════
 VERIFIABLE CONTEXT ENGINE (VCE)
 
 Constitution
@@ -6,10 +6,11 @@ Constitution
 
 #MISSION
 
-Enable future generations
-to reconstruct with sufficient fidelity
-what previous generations
-attempted to communicate.
+Advance the science 
+of preserving the continuity
+between original intent 
+and future understanding 
+through verifiable evidence.
 
 ══════════════════════════════════════════════
 
@@ -230,6 +231,51 @@ what previous generations
 
 attempted to communicate?
 
+## Constitutional Clause I — The Continuity of Identity
+
+Every long-lived research program must continuously evolve.
+
+However, evolution without continuity becomes fragmentation.
+
+Continuity without evolution becomes stagnation.
+
+Both require a stable essence.
+
+VCE therefore recognizes four inseparable dimensions:
+
+**Essence**
+
+What gives the program its identity.
+
+**Continuity**
+
+The mechanism that preserves that identity across time.
+
+**Evolution**
+
+The disciplined refinement of hypotheses, architectures, products and understanding without abandoning the essential purpose of the program.
+
+**Understanding**
+
+The purpose of preservation.
+
+Knowledge has value only insofar as it enables future generations to understand with sufficient fidelity what previous generations intended to communicate.
+
+Therefore,
+
+Essence preserves identity.
+
+Continuity preserves essence.
+
+Evolution preserves relevance.
+
+Understanding gives purpose to all three.
+
+No architectural, scientific or commercial decision should violate this balance.
+
+
+
+
 --------------------------------------
 --------------------------------------
 
@@ -413,7 +459,107 @@ historical decisions.
 
 Version: 0.1
 
-Status: Living Constitutional Document
+# VCE FOUNDATION v1.0
+
+# 1. VCE Mission
+
+## Mission
+
+Enable future generations to reconstruct with sufficient fidelity what previous generations attempted to communicate.
+
+---
+
+## Research Problem
+
+Organizations preserve data.
+
+They do not reliably preserve the ability to interpret it.
+
+As technologies, institutions, languages, and generations change, context degrades faster than information disappears.
+
+VCE investigates architectures that preserve reconstructability through verifiable evidence, provenance, policy, execution history, and contextual continuity.
+
+---
+
+## Scientific Scope
+
+VCE is a research and engineering program.
+
+It develops reproducible architectures, reference implementations, benchmarks and experiments.
+
+It is not itself a commercial product.
+
+---
+
+# 2. VCE Constitution
+
+VCE exists to investigate.
+
+Commercial products exist to validate.
+
+Research questions are driven by observable problems.
+
+Claims require evidence.
+
+Hypotheses must be falsifiable.
+
+Products must improve research.
+
+Research must improve products.
+
+Scientific independence is preserved regardless of commercial success.
+
+The mission is reconstructability—not storage.
+
+---
+
+# 3. Evidence Vault Charter
+
+Mission
+
+Make every critical AI decision answerable.
+
+Purpose
+
+Provide organizations with the ability to reconstruct, justify and verify automated decisions years after execution.
+
+Evidence Vault is the first commercial implementation built on VCE.
+
+Its responsibility is customer value.
+
+Its success validates VCE hypotheses under real operating conditions.
+
+---
+
+# 4. Evidence SDK Boundary
+
+The SDK is the contractual boundary between VCE and commercial products.
+
+Responsibilities
+
+• Evidence Package
+
+• Replay
+
+• Provenance
+
+• Verification
+
+• Identity
+
+• Policy Binding
+
+Commercial concerns remain outside the SDK.
+
+No billing.
+
+No CRM.
+
+No tenancy.
+
+No enterprise workflows.
+
+The SDK remains minimal, deterministic and reusable.
 
 ---
 
@@ -898,7 +1044,7 @@ PHASE4-024 Reputation Constitution Layer
 ---
 
 # Principle #12
-
+ 
 ## Verifiable Constitutional Capital
 
 Status: RATIFIED
@@ -948,7 +1094,7 @@ No Institutional Trust
 
 ---
 
-# Principle #13
+# Principle#13
 Verifiable Institutional Capital
 
 Institutions accumulate capital through
@@ -1000,7 +1146,7 @@ Authority
 
 ---
 
-# Principle #15
+# Principle#15
 Verifiable Constitutional Exchange
 All exchanges must be:
 
@@ -1026,7 +1172,7 @@ La cooperación entre actores independientes surge mediante consentimiento verif
 
 ---
 
-# Principle #16
+# Principle#16
 Verifiable Constitutional Credit
 Credit is trust extended through time.
 
@@ -1095,7 +1241,7 @@ Without Verifiable Reserves.
 
 ---
 
-#Principle #19 —
+# Principle #19 —
 Verifiable Constitutional Reserves
 Reserves fund protection.
 
@@ -1111,7 +1257,7 @@ Without Verifiable Assets.
 
 ---
 
-#Principle #20 —
+# Principle #20 —
 Verifiable Constitutional Trust
 Trust is the foundational asset
 of a constitutional economy.
@@ -1136,7 +1282,7 @@ Without Verifiable Trust.
 
 ---
 
-#Principle #21 —
+# Principle #21 —
 Verifiable Constitutional Treasury
 Treasury manages constitutional reserves.
 
@@ -1155,7 +1301,7 @@ Without Verifiable Accountability.
 
 ---
 
-#Principle #22 —
+# Principle#22 —
 Verifiable Observation
 Physical claims
 require physical evidence.
@@ -1188,25 +1334,10 @@ auditable.
 
 No Immediate Capacity
 Without Verifiable Liquidity.
-Principle #24 — Verifiable Civilizational Continuity
-Observations must survive
-their observers.
-
-Evidence must survive
-its creators.
-
-Trust must survive
-individual participants.
-
-Civilizations persist
-through preserved evidence.
-
-No Civilizational Continuity
-Without Verifiable Preservation.
 
 ---
 
-# PRINCIPIO #24
+# Principle #24
 Verifiable Constitutional Stability
 
 Stability represents
@@ -1248,7 +1379,7 @@ Without Verifiable Sustainability.
 
 ---
 
-# Principle #26
+# Principle#26
 Verifiable Constitutional Prosperity
 Prosperity represents
 sustainable expansion
@@ -1268,7 +1399,7 @@ Without Verifiable Prosperity.
 
 ---
 
-# Principio #27
+# Principle #27
 Verifiable Observation
 
 Observations are the entry point
@@ -1287,7 +1418,7 @@ Without Verifiable Observation.
 
 ---
 
-# Principio #28
+# Principle#28
 Verifiable Witness Attestation
 
 Observations require witnesses.
@@ -1304,7 +1435,7 @@ Without Verifiable Witnesses.
 ---
 
 
-# Principio #29
+# Principle #29
 Verifiable Physical Evidence
 
 Observations require evidence.
@@ -1320,7 +1451,7 @@ Without Verifiable Evidence.
 
 ---
 
-# Principio #30
+# Principle #30
 Verifiable Sensor Attestation
 
 Sensors may act as witnesses.
@@ -1335,7 +1466,7 @@ No Sensor Trust
 
 ---
 
-# Principio #31
+# Principle #31
 Verifiable Oracle Operators
 
 Oracle operators introduce
@@ -1356,7 +1487,7 @@ Without Verifiable Oracle Operators.
 
 ---
 
-# Principio #32
+# Principle #32
 Verifiable Reality Verification
 
 Reality claims require verification.
@@ -1372,7 +1503,7 @@ Without Verifiable Verification.
 
 ---
 
-# Principio #33
+# Principle #33
 Verifiable Observation Consensus
 
 Reality acceptance requires consensus.
@@ -1391,7 +1522,7 @@ Without Verifiable Attestation.
 
 ---
 
-# Principio #34
+# Principle #34
 Constitutional Reality Ledger
 
 Accepted reality must remain durable.
@@ -1407,7 +1538,7 @@ Without a Constitutional Reality Ledger.
 
 ---
 
-# Principio #36
+# Principle #36
 Constitutional Reputation
 
 Trust must be earned.
@@ -1423,7 +1554,7 @@ Without Constitutional Reputation.
 
 ---
 
-#Principle #37
+# Principle #37
 Constitutional Credibility
 
 Credibility derives from reputation,
@@ -1441,7 +1572,7 @@ Without Constitutional Credibility.
 
 ---
 
-#Principle #38
+# Principle #38
 Constitutional Trust
 
 Trust emerges from evidence.
@@ -1460,7 +1591,7 @@ Without Constitutional Trust.
 
 ---
 
-#Principle #39
+# Principle #39
 Constitutional Trust Score
 
 Trust must be measurable.
@@ -1478,7 +1609,7 @@ Without Constitutional Trust Scores.
 
 ---
 
-#Principle #40
+# Principle #40
 Evidence Provenance
 
 Evidence must retain lineage.
@@ -1495,7 +1626,7 @@ Without Evidence Provenance.
 
 ---
 
-#Principle #41
+# Principle #41
 Evidence Retention
 
 Evidence must remain durable.
@@ -1511,7 +1642,7 @@ Without Evidence Retention.
 
 ---
 
-#Principle #42
+# Principle #42
 Evidence Recovery
 
 Evidence must remain recoverable.
@@ -1527,7 +1658,7 @@ Without Evidence Recovery.
 
 ---
 
-#Principle #43
+# Principle #43
 Evidence Durability
 
 Evidence must remain trustworthy through time.
@@ -1544,7 +1675,7 @@ Without Evidence Durability.
 
 ---
 
-#Principle #44
+# Principle #44
 Temporal Validity
 
 Trust is time dependent.
@@ -1561,7 +1692,7 @@ Without Temporal Validity.
 
 ---
 
-#Principio #45
+# Principle #45
 Trust Expiration
 
 Trust may decay through time.
@@ -1578,7 +1709,7 @@ Without Trust Expiration.
 
 ---
 
-#Principio #46
+# Principle #46
 Historical Trust Replay
 
 Trust decisions must remain replayable.
@@ -1595,7 +1726,7 @@ Without Historical Replay.
 
 ---
 
-#Principle #47
+# Principle #47
 Constitutional Snapshots
 
 Constitutional states must be snapshotable.
@@ -1611,7 +1742,9 @@ Without Constitutional Snapshots.
 
 
 ---
-#Principle #48
+
+
+# Principle #48
 Constitutional Time Audit
 
 Historical states must remain auditable.
@@ -1628,7 +1761,7 @@ Without Constitutional Audit.
 
 ---
 
-#Principle #49
+# Principle #49
 Historical Civilization Replay
 
 Civilizational states must remain replayable.
@@ -1644,7 +1777,7 @@ Without Historical Civilization Replay.
 
 ---
 
-#Principie #50 
+# Principle #50 
 Civilizational Interpretation
 
 Memory preserves the past.
@@ -1663,7 +1796,7 @@ Without Durable Interpretation.
 ---
 
 
-#Principie #51
+# Principle #51
 Interpretive Continuity
 
 Civilizations must preserve
@@ -1683,7 +1816,7 @@ Without Interpretive Continuity.
 
 ---
 
-#Principie #52
+# Principle #52
 Generational Continuity
 
 Knowledge must survive
@@ -1700,7 +1833,7 @@ Without Generational Continuity.
 
 ---
 
-#Principie #53
+# Principle #53
 Meaning Preservation
 
 Information may survive.
@@ -1715,7 +1848,7 @@ Without Meaning.
 
 ---
 
-#Principie #54
+# Principle #54
 Constitutional Mission
 
 Enable future generations
@@ -1729,7 +1862,7 @@ to this mission.
 
 ---
 
-#Principie #55
+# Principle #55
 Shared Intent
 
 Collective action requires
@@ -1749,7 +1882,7 @@ Without Shared Intent.
 ---
 
 
-#Principie #56
+# Principle #56
 Constitutional Proposal
 
 Shared intent
@@ -1771,7 +1904,7 @@ Without Constitutional Proposal.
 
 ---
 
-#Principie #57
+# Principle #57
 Constitutional Deliberation
 
 Every proposal
@@ -1790,7 +1923,7 @@ Without Constitutional Deliberation.
 
 ---
 
-#Principie #58
+# Principle #58
 Scientific Discipline
 Every new idea
 must pass four questions.
@@ -1816,7 +1949,7 @@ our hypothesis?
 
 ---
 
-#Principle #59
+# Principle #59
 Epistemic Boundary
 
 VCE can preserve
@@ -1838,7 +1971,7 @@ not omniscience.
 
 ---
 
-#Principle #60
+# Principle #60
 Epistemic Humility
 
 The absence of evidence
@@ -1853,7 +1986,7 @@ must be preserved.
 
 ---
 
-#Principle #61
+# Principle #61
 
 Scope Discipline
 
@@ -1882,7 +2015,7 @@ must remain justified.
 
 ---
 
-#Principle #62
+# Principle #62
 
 Scientific Humility
 
@@ -1908,7 +2041,7 @@ not from claims.
 
 ---
 
-#Principle #63
+# Principle #63
 
 Evidence Before Vision
 
@@ -1925,7 +2058,7 @@ what its evidence supports.
 
 ---
 
-#Principle #64
+# Principle #64
 
 Concrete Value
 
@@ -1953,7 +2086,7 @@ Adoption validates architecture.
 ---
 
 
-#Principle #65
+# Principle #65
 
 Product Reality
 
@@ -1978,7 +2111,7 @@ must be questioned.
 
 ---
 
-Principle #66
+# Principle #66
 
 Trust Boundary
 
@@ -2006,7 +2139,7 @@ better-informed trust.
 
 ---
 
-#Principie #67
+# Principle #67
 Constitutional Decision
 
 Every deliberated proposal
@@ -2033,7 +2166,7 @@ Without Constitutional Decision.
 
 ---
 
-#Principie #69
+# Principle #69
 
 Constitutional Execution
 
@@ -2088,7 +2221,7 @@ Without Constitutional Outcome.
 
 ---
 
-#Principie #71
+# Principle #71
 Constitutional Learning
 
 Every constitutional outcome
@@ -2119,8 +2252,653 @@ successes
 
 and failures.
 
+---
+
+# Principle #72 
+Research Independence
+
+The objective
+of the first products
+
+is not
+
+to maximize revenue.
+
+The objective
+
+is to finance
+
+the next stage
+
+of research
+
+without compromising
+
+the scientific direction
+
+of the project.
 
 ---
+
+# Principle #73 
+Invisible Research
+
+Customer-facing features
+
+must solve
+
+customer problems.
+
+Research instrumentation
+
+must remain
+
+invisible
+
+unless it provides
+
+direct customer value.
+
+---
+
+# Principle #74 
+Reconstructability First
+
+Evidence
+
+has no value
+
+unless
+
+it enables
+
+decision reconstruction.
+
+---
+
+# Principle #75 
+Customers Buy Answers
+
+Customers
+
+do not buy
+
+cryptography.
+
+Customers buy
+
+the ability
+
+to answer
+
+the next difficult question.
+
+---
+
+# Principle #76 
+Answerability
+
+Evidence
+
+fulfills
+
+its purpose
+
+only when
+
+it enables
+
+a future answer
+
+to an important question.
+
+Principle #77 — Questions Drive Architecture
+
+Questions
+
+define
+
+the architecture.
+
+Not
+
+artifacts.
+
+Principle #78 — Operational Validation
+
+Research
+
+must be validated
+
+through
+
+operational reality,
+
+not
+
+presentation.
+
+---
+
+# Principle #79 
+Product–Research Flywheel
+
+Products
+
+validate
+
+research.
+
+Research
+
+improves
+
+products.
+
+Neither
+
+exists
+
+without
+
+the other.
+
+---
+
+#Principle #80 
+Research Platform
+
+VCE
+
+is not
+
+a product.
+
+VCE exists
+
+to investigate,
+
+validate
+
+and evolve
+
+architectures
+
+for verifiable
+
+knowledge continuity.
+
+Commercial products
+
+may be built
+
+upon VCE.
+
+They must never
+
+redefine
+
+its scientific mission.
+
+---
+
+# Principle #81 
+Commercial Validation
+
+Commercialization
+
+exists
+
+to validate
+
+research
+
+under
+
+real-world conditions.
+
+Revenue
+
+is evidence
+
+of usefulness,
+
+not
+
+of scientific truth.
+
+---
+
+# Principle #82 
+Scientific Independence
+
+Revenue
+
+may accelerate
+
+research.
+
+Revenue
+
+must never
+
+determine
+
+scientific conclusions.
+
+Scientific integrity
+
+always
+
+takes precedence.
+
+---
+
+# Principle #83 
+Reconstructability over Preservation
+
+The objective
+
+is not
+
+to preserve
+
+artifacts.
+
+The objective
+
+is
+
+to preserve
+
+the ability
+
+to reconstruct
+
+their meaning.
+
+---
+
+# Principle #84 
+Observable Before Abstract
+
+Every
+
+new phase
+
+must begin
+
+with
+
+an observable
+
+problem.
+
+Not
+
+with
+
+an attractive abstraction.
+
+---
+
+# Principle #85 
+One Problem at a Time
+
+Every
+
+commercial product
+
+must solve
+
+one
+
+clearly defined
+
+problem
+
+exceptionally well
+
+before
+
+expanding
+
+its scope.
+
+---
+
+# Principle #86 
+Falsifiable Progress
+
+Every
+
+research hypothesis
+
+must define
+
+how
+
+it can
+
+be disproven.
+
+Progress
+
+comes from
+
+surviving
+
+attempts
+
+at falsification.
+
+---
+
+# Principle #87 
+Separation of Missions
+
+VCE
+
+advances
+
+scientific knowledge.
+
+Commercial products
+
+deliver
+
+customer value.
+
+Neither
+
+should compromise
+
+the mission
+
+of the other.
+
+
+---
+
+
+# Principle #88
+ 
+Reconstructability is the Measure
+
+The value
+
+of a system
+
+is measured
+
+not by
+
+how much
+
+it stores,
+
+but by
+
+how faithfully
+
+it enables
+
+future reconstruction.
+
+---
+
+# Principle #89 — Multidimensional Rigor
+Scientific rigor
+
+Engineering rigor
+
+Commercial rigor
+
+Operational rigor
+
+Epistemological rigor
+
+must evolve
+
+together.
+
+The project
+
+is only
+
+as strong
+
+as its weakest
+
+dimension.
+
+---
+
+# Principle #90 
+Intent Preservation
+
+Information
+
+without
+
+intent
+
+becomes
+
+ambiguity.
+
+Intent
+
+without
+
+information
+
+becomes
+
+speculation.
+
+A verifiable system
+
+must preserve
+
+the chain
+
+from
+
+human intent
+
+to
+
+future interpretation.
+
+---
+
+# Principle #91 — Continuity Chain
+Knowledge continuity
+
+depends
+
+on preserving
+
+not only
+
+information,
+
+but
+
+the relationships
+
+between
+
+intent,
+
+context,
+
+evidence,
+
+and interpretation.
+
+---
+
+# Principle #92 
+Continuity of Meaning
+
+The objective
+
+is not
+
+to preserve
+
+information.
+
+The objective
+
+is to preserve
+
+the continuity
+
+between
+
+original intent
+
+and
+
+future understanding
+
+through
+
+verifiable evidence.
+
+---
+
+# Principle #93 
+Meaning Emerges Through Continuity
+
+Meaning
+
+does not reside
+
+in artifacts.
+
+Meaning
+
+emerges
+
+from the
+
+verifiable continuity
+
+between
+
+intent,
+
+context,
+
+evidence,
+
+and interpretation.
+
+
+---
+
+# Principle #94 
+Language Before Code
+
+A stable language
+
+precedes
+
+a stable architecture.
+
+A stable architecture
+
+precedes
+
+a stable implementation.
+
+Code changes.
+
+Language
+
+defines
+
+the continuity
+
+of the project.
+
+---
+
+#Principle #95 
+Knowledge Must Exist Outside the Code
+
+Knowledge must never depend solely on source code.
+
+Every fundamental concept must exist as durable documentation that can survive implementation changes.
+
+Code implements.
+
+Documents preserve intent.
+
+
+---
+
+# Principle #96  
+Research-First Repository
+
+A research repository should reflect the lifecycle of knowledge, not the layout of source code.
+
+Research
+
+↓
+
+Knowledge
+
+↓
+
+Architecture
+
+↓
+
+Products
+
+↓
+
+Runtime
+
+↓
+
+Papers
+
+↓
+
+Archives
+
+---
+
+
+# Principle #97 
+Preserve Essence
+
+The objective is not to preserve everything.
+
+The objective is to preserve what is essential for faithful future reconstruction.
+
+
+---
+
+# Principle #98 
+Foundations Are Earned
+
+Strong foundations are not the result of inspiration alone.
+
+They emerge through disciplined iteration, accumulated evidence, explicit boundaries, continuous refinement and the willingness to revise previous assumptions.
+
+Talent may initiate a project.
+
+Discipline allows it to endure.
+
+
+
 -------------------------------------
 
 NIVELES FUNDAMENTALES VCE
