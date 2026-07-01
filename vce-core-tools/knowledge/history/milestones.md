@@ -41,3 +41,16 @@ The project formally defined:
 - Commercial Validation Strategy
 
 This milestone marks the transition from a software-centric architecture to a long-term interdisciplinary research program.
+
+# Historical Milestone H-001 — Research Refoundation
+
+Today VCE ceased to be understood solely as a verifiable architecture and began to operate as a scientific research program.
+
+From this milestone onward, the evolution of the research itself is expected to satisfy the same trust principles that govern the artifacts it produces.
+
+Research questions, hypotheses, architectural decisions, products and scientific conclusions become subject to provenance, traceability, historical reconstruction and evidence-based validation.
+
+In this way, VCE applies its own principles to its own evolution.
+
+The research program itself becomes part of the evidence.
+
