@@ -1,0 +1,100 @@
+# Design Hypothesis DH-001
+
+## Title
+
+Research Cycle as a Reproducible Unit of Knowledge Evolution
+
+---
+
+## Status
+
+**Design Hypothesis**
+
+This document proposes a research hypothesis regarding the organization of scientific knowledge.
+
+It does not represent accepted knowledge.
+
+---
+
+## Motivation
+
+During the institutionalization of the VCE Research Program, an architectural observation emerged.
+
+Traditional research repositories preserve documents.
+
+However, they often fragment the reasoning that connects questions, hypotheses, experiments, evidence and decisions.
+
+This fragmentation may hinder the reconstruction of the research process by future observers.
+
+---
+
+## Hypothesis
+
+A self-contained Research Cycle may constitute a reproducible unit of knowledge evolution.
+
+Rather than organizing research around isolated documents, an entire research cycle—including its question, hypothesis, literature, formalization, experiments, evidence, counterexamples, reviews and decisions—may serve as the minimal reproducible unit through which the evolution of knowledge can be reconstructed.
+
+---
+
+## Expected Properties
+
+If the hypothesis is correct, each Research Cycle should preserve:
+
+- the original research question;
+- the historical context;
+- the working hypotheses;
+- alternative explanations;
+- formal models;
+- experiments performed;
+- supporting evidence;
+- contradictory evidence;
+- critical reviews;
+- the final research decision.
+
+Together these elements may enable an independent observer to reconstruct the evolution of the reasoning process.
+
+---
+
+## Potential Contribution
+
+If validated, the Research Cycle could become a reproducible unit of scientific reasoning rather than merely a collection of documents.
+
+This would extend reproducibility beyond experimental execution toward reproducibility of the research process itself.
+
+---
+
+## Alternative Explanations
+
+Equivalent organizational models may already exist in:
+
+- Electronic Laboratory Notebooks (ELNs)
+- Research Data Management (RDM)
+- FAIR Research Objects
+- Computational Reproducibility
+- Provenance Models
+- History and Philosophy of Science
+- Knowledge Management Systems
+
+The present hypothesis does not claim novelty.
+
+Its objective is to determine whether a common formal structure already exists or whether VCE contributes a distinct organizational model.
+
+---
+
+## Validation Plan
+
+The hypothesis should be evaluated through:
+
+1. Literature review.
+2. Comparative analysis of existing research management systems.
+3. Formal characterization.
+4. Longitudinal application within the VCE Research Program.
+5. External replication by independent research groups.
+
+---
+
+## Research Integrity Statement
+
+No claim of originality is made at this stage.
+
+The hypothesis remains provisional until supported—or rejected—through theoretical analysis, experimental evidence and comparison with existing scientific methodologies.
