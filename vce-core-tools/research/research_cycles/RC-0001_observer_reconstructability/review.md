@@ -1,0 +1,9 @@
+Goodhart epistemológico
+Product Capture
+Metric Capture
+Confirmation Bias
+Novelty Bias
+Terminology Inflation
+Constitutional Capture
+Evidence Laundering
+Historical Rewrite
