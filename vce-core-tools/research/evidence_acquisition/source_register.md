@@ -54,3 +54,31 @@ EC-0002
 
 Status:
 Acquired
+
+---
+
+SRC-0003
+
+Title:
+
+W3C Process Document
+
+Primary Organization:
+
+World Wide Web Consortium
+
+Category:
+
+Standards Governance
+
+Source Type:
+
+Standard Development Process
+
+Evidence Card:
+
+EC-0003
+
+Status:
+
+Acquired
