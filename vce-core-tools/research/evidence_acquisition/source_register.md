@@ -1,33 +1,29 @@
 # Source Register
 
-Every acquired source receives a permanent identifier.
-
-Example:
+---
 
 SRC-0001
 
 Title:
+Technology Readiness Levels
 
-Authors:
+Primary Organization:
+NASA
 
-Year:
+Origin:
+1970s
 
-Discipline:
+Category:
+Standardized Technology Maturity Framework
 
 Source Type:
+Technology Maturity Model
 
 Database:
+NASA / ISO / ESA
 
 Evidence Card:
+EC-0001
 
 Status:
-
 Acquired
-
-Reviewed
-
-Integrated
-
-Rejected
-
-Archived
