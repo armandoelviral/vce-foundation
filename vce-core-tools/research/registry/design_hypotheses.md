@@ -72,22 +72,131 @@ Question: Is there a partial isomorphism between VSTE transitions and Research C
 
 ---
 
-## DH-010 - Epistemic Transition Algebra
+## DH-010 — Epistemic Transition Algebra
 
-Can the evolution of knowledge be described by an algebra of verifiable transitions analogous—though not necessarily identical—to the one used by VSTE to describe state transitions?
+Status: Active
+
+Research Question:
+
+Can the evolution of scientific knowledge be represented as a system of admissible epistemic transitions analogous, though not necessarily identical, to state-transition systems such as AVST?
+
+Motivation:
+
+Determine whether knowledge evolution possesses a transition algebra with explicit admissibility rules.
+
+Current Status:
+
+Pending literature review.
+
+Related:
+
+RC-0001
 
 ---
 
-## DH-011 - Knowledge Transition Grammar
-Can the evolution of knowledge be modeled by means of an explicit grammar of epistemological transitions, featuring admissibility rules, invariants, and verifiable criteria for state change?
+## DH-011 — Knowledge Transition Grammar
+
+Status: Active
+
+Research Question:
+
+Can epistemic artifacts evolve according to an explicit grammar governing admissible transitions between knowledge states?
+
+Motivation:
+
+Investigate whether scientific evolution can be constrained by formally defined transition rules.
+
+Current Status:
+
+Pending formalization.
 
 ---
 
-## DH-012 - 
-Are there types of organizations for which a representation based on verifiable roles and AVST-governed transitions proves insufficient to explain, reconstruct, or govern their operational behavior?
+## DH-012 — Verifiable Organizational Algebra
+
+Status: Active
+
+Research Question:
+
+Can organizations be modeled as collections of verifiable role transitions whose legitimacy is reconstructable, auditable and formally governed independently of domain?
+
+Primary Falsification Question:
+
+Do there exist classes of organizations for which role-based verifiable transitions are insufficient to explain, reconstruct or govern operational behavior?
+
+Current Status:
+
+Comparative literature review opened.
+
 ---
 
-## DH-013 - 
-Can the provenance of research questions be as important for scientific continuity as the provenance of the answers?
+## DH-013 — Question Provenance
+
+Status: Active
+
+Research Question:
+
+Can the provenance of research questions be as important for scientific continuity as the provenance of scientific answers?
+
+Motivation:
+
+Evaluate whether preserving the genealogy of questions improves long-term reconstructability.
+
+Current Status:
+
+Pending literature review.
 
 ---
+
+## DH-014 — Evidence Taxonomy
+
+Status: Active
+
+Research Question:
+
+Can scientific evidence be systematically classified into complementary categories that improve evaluation of research maturity?
+
+Candidate Categories:
+
+- Experimental Evidence
+- Comparative Evidence
+- Operational Evidence
+- Formal Evidence
+
+Current Status:
+
+Methodological hypothesis.
+
+---
+
+## DH-015 — Epistemic Health Metrics
+
+Status: Active
+
+Research Question:
+
+Can the health of a scientific research program be evaluated through indicators of self-correction, evidence quality and reconstructability rather than traditional productivity metrics?
+
+Current Status:
+
+Pending validation.
+
+
+---
+
+## DH-016 — Research Laboratory Protocol
+
+Status: Active
+
+Research Question:
+
+Can a long-term scientific research program be operated through explicit execution protocols, allowing independent researchers to continue investigations with full reconstructability of context, objectives and methodological state?
+
+Motivation:
+
+Transform the VCE Research Program from a document repository into an operational research laboratory.
+
+Current Status:
+
+Protocol architecture under construction.
+
