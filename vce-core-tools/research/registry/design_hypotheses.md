@@ -69,3 +69,25 @@ Question: Can a scientific program integrate products, operational evidence and 
 Status: Pending
 
 Question: Is there a partial isomorphism between VSTE transitions and Research Cycles?
+
+---
+
+## DH-010 - Epistemic Transition Algebra
+
+Can the evolution of knowledge be described by an algebra of verifiable transitions analogous—though not necessarily identical—to the one used by VSTE to describe state transitions?
+
+---
+
+## DH-011 - Knowledge Transition Grammar
+Can the evolution of knowledge be modeled by means of an explicit grammar of epistemological transitions, featuring admissibility rules, invariants, and verifiable criteria for state change?
+
+---
+
+## DH-012 - 
+Are there types of organizations for which a representation based on verifiable roles and AVST-governed transitions proves insufficient to explain, reconstruct, or govern their operational behavior?
+---
+
+## DH-013 - 
+Can the provenance of research questions be as important for scientific continuity as the provenance of the answers?
+
+---
