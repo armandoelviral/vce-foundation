@@ -7,3 +7,57 @@
 | E-003 | Can the model be formalized? | Mathematical Analysis | Pending | — |
 | E-004 | Does VCE constitute a longitudinal case study? | Historical Reconstruction | Pending | — |
 | E-005 | Does the RC model generalize to an external domain? | External Application | Pending | — |
+
+----
+
+# Evidence Register
+
+## E-001 — Antecedents of the Epistemic Status Contract
+
+Status: Open
+
+Research Question:
+
+Do existing frameworks already provide an equivalent mechanism to the VCE Epistemic Status Contract?
+
+Method:
+
+Comparative literature review.
+
+Candidate Sources:
+
+- Technology Readiness Levels
+- Evidence-Based Medicine evidence hierarchies
+- RFC maturity/status models
+- W3C specification maturity models
+- FAIR Principles
+- Research Objects
+- OAIS
+- PROV Data Model
+- Electronic Laboratory Notebooks
+- Research Data Management
+
+Expected Output:
+
+Classify each source as:
+
+- Equivalent
+- Partial Equivalent
+- Related but Distinct
+- Not Equivalent
+
+Evaluation Criterion:
+
+A source is equivalent only if it requires each knowledge artifact to explicitly declare:
+
+- epistemic category
+- maturity
+- validation status
+- evidence status
+- reviewer
+- revision history
+- conditions for promotion or revision
+
+Initial Result:
+
+Pending.
