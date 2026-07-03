@@ -91,3 +91,33 @@ Conclusion
 DH-002 remains under evaluation.
 
 ---
+
+## Evidence Update — RFC / IETF Standards Process
+
+Framework Reviewed:
+
+RFC / IETF Standards Process
+
+Evidence Card:
+
+EC-0002
+
+Current Classification:
+
+Partial Equivalent
+
+Reason:
+
+The RFC process defines document status, maturity, community review, revision and promotion mechanisms. It therefore strongly overlaps with DH-002.
+
+Current Limitation:
+
+The RFC process appears specific to Internet technical specifications and standards governance. It does not yet fully subsume the proposed generalized Epistemic Status Contract for all scientific knowledge artifacts.
+
+Impact:
+
+DH-002 must narrow its novelty claim.
+
+Conclusion:
+
+DH-002 remains active but weakened. Its possible contribution shifts toward generalization and integration rather than invention.

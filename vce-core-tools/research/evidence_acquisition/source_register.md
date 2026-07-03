@@ -27,3 +27,30 @@ EC-0001
 
 Status:
 Acquired
+
+---
+
+SRC-0002
+
+Title:
+The Internet Standards Process / RFC Maturity Process
+
+Primary Organization:
+IETF / RFC Editor
+
+Core Sources:
+RFC 2026
+RFC 6410
+RFC 7127
+
+Category:
+Standards Process / Maturity Framework
+
+Source Type:
+Standardization Governance Model
+
+Evidence Card:
+EC-0002
+
+Status:
+Acquired
