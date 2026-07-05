@@ -160,3 +160,162 @@ These three provenance chains describe different stages of scientific reasoning 
 Observation only.
 
 Requires validation through comparative literature review.
+
+---
+
+# OBS-005
+
+## Title
+
+Hypotheses May Be Evaluated at the Claim Level
+
+### Context
+
+During the design of EXP-0001 it became apparent that experiments rarely evaluate an entire hypothesis simultaneously.
+
+Instead, they often evaluate individual scientific assertions contained within the hypothesis.
+
+### Observation
+
+A Design Hypothesis may contain multiple independently testable claims.
+
+Each claim may accumulate evidence independently.
+
+Consequently, the epistemic evolution of a hypothesis may be better represented as the evolution of its constituent claims rather than as a single monolithic object.
+
+### Existing Related Concepts
+
+Initial review indicates conceptual proximity to:
+
+- Toulmin Claims
+- Atomic Claims
+- Scientific Claim Generation
+- Argumentation Theory
+
+However, their role appears different from claim-level research governance.
+
+### Status
+
+Observation only.
+
+Comparative literature review required.
+
+---
+
+---
+
+# OBS-006
+
+## Architectural Layer Separation
+
+The progressive separation between Reality Theory, Scientific Object Theory, Corpus Theory and Scientific Instrument Theory appears to increase architectural evolvability by reducing conceptual coupling.
+
+Status:
+
+Observation.
+
+Future Research:
+
+Evaluate through multiple Research Cycles.
+
+---
+
+# OBS-007
+
+## Scientific Objects Simplify Knowledge Organization
+
+Organizing research around Scientific Objects rather than documents appears to reduce conceptual ambiguity and improve architectural coherence.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-008
+
+## Documents Become Representations
+
+During architectural refinement, documents progressively ceased to behave as primary epistemic entities and became representations of Scientific Objects.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-009
+
+## Knowledge Emerges Through Relationships
+
+Individual Scientific Objects possess limited explanatory value in isolation.
+
+Explanatory capability appears to emerge from governed relationships among Scientific Objects.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-010
+
+## Theory Stabilization Precedes Stable Implementations
+
+Stable implementations consistently appeared only after sufficient theoretical stabilization.
+
+Observed repeatedly during Runtime, Corpus and Scientific Object design.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-011
+
+## Architectural Compression
+
+Successive abstraction reduced the number of primary architectural concepts without reducing explanatory capability.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-012
+
+## Scientific Instruments as Translators
+
+Scientific Instruments appear to translate observable realities into Scientific Objects through governed observation.
+
+Status:
+
+Observation.
+
+Pending validation.
+
+---
+
+# OBS-013
+
+## Snapshot Interpretation
+
+A Snapshot represents a verifiable representation of the state of a reality over an observation interval sufficiently small to be treated as instantaneous relative to the phenomenon under study.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-014
+
+## Transition Reconstruction
+
+System evolution is reconstructed through governed comparison between successive snapshots rather than through direct observation of transitions.
+
+Status:
+
+Observation.

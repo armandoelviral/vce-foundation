@@ -1,0 +1,15 @@
+research/laboratory/capability_matrix.md
+research/laboratory/open_gaps.md
+research/laboratory/readiness_assessment.md
+research/laboratory/README.md
+research/registry/conceptual_models.md
+research/registry/accepted_principles.md
+research/registry/formal_theorems.md
+research/EMPTY_FILES_AUDIT.txt
+research/research_cycles/RC-0001_observer_reconstructability/counterexamples.md
+research/research_cycles/RC-0001_observer_reconstructability/experiments.md
+research/research_cycles/RC-0001_observer_reconstructability/closure_report.md
+research/research_cycles/RC-0001_observer_reconstructability/literature.md
+research/research_cycles/RC-0001_observer_reconstructability/formalization.md
+research/research_cycles/RC-0001_observer_reconstructability/README.md
+research/research_cycles/RC-0001_observer_reconstructability/decision.md

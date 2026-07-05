@@ -1,23 +1,70 @@
-Knowledge Object
+# Scientific Object Relationships
 
-│
+## Purpose
 
-├── Constitutional Decision
+Scientific knowledge is constructed through governed relationships among Scientific Objects.
 
-├── Design Hypothesis
+Objects are first-class entities.
 
-├── Scientific Hypothesis
+Relationships are first-class entities as well.
 
-├── Conceptual Model
+Knowledge emerges from the structure formed by both.
 
-├── Formalization
+---
 
-├── Evidence
+# Canonical Relationships
 
-├── Counterexample
+supports
 
-├── Accepted Principle
+contradicts
 
-├── Formal Theorem
+derives_from
 
-└── Research Cycle
+refines
+
+revises
+
+depends_on
+
+answers
+
+questions
+
+produces
+
+validates
+
+invalidates
+
+extends
+
+specializes
+
+generalizes
+
+references
+
+supersedes
+
+---
+
+# Properties
+
+Relationships are directional.
+
+Relationships are reconstructable.
+
+Relationships possess provenance.
+
+Relationships may evolve.
+
+Relationships may themselves become Scientific Objects if subject to scientific investigation.
+
+---
+
+# Guiding Principle
+
+Scientific Objects never evolve in isolation.
+
+Scientific progress emerges from the governed evolution of both objects and their relationships.
+
