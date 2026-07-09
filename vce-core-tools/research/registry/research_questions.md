@@ -335,3 +335,33 @@ Medium.
 Potential Research Cycle:
 
 Future.
+
+---
+
+# RQ-003
+
+Can methodological mechanisms be represented as Scientific Objects without introducing conceptual contradictions?
+
+Status
+
+Open.
+
+---
+
+# RQ-004
+
+What architectural properties distinguish Research Program Evolvability from ordinary process improvement?
+
+Status
+
+Open.
+
+---
+
+# RQ-005
+
+Can Architectural Invariants be formally derived from existing Scientific Object Theory?
+
+Status
+
+Open.

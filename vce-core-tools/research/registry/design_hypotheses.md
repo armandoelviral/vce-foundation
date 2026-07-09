@@ -200,3 +200,93 @@ Current Status:
 
 Protocol architecture under construction.
 
+
+---
+
+# DH-006
+
+## Stable Interfaces Preserve Architectural Longevity
+
+Hypothesis
+
+Architectures preserving stable interfaces across implementation changes exhibit greater long-term evolvability than architectures preserving implementations.
+
+Falsification
+
+Identify a long-lived architecture whose longevity does not depend upon stable interfaces.
+
+Status:
+
+Candidate.
+
+---
+
+# DH-007
+
+## Governed Evolution Pattern
+
+Hypothesis
+
+Multiple independent domains can be represented using the candidate governed evolution chain:
+
+Reality
+→ Event
+→ Governance
+→ Operation
+→ Transition
+→ State
+→ Representation
+
+Falsification
+
+Find a domain whose evolution requires additional primitive concepts.
+
+Status:
+
+Candidate.
+
+---
+
+# DH-008
+
+## Architectural Reduction Improves Theory Quality
+
+Hypothesis
+
+Systematic elimination of reducible concepts increases explanatory power while decreasing architectural complexity.
+
+Falsification
+
+Demonstrate a case where architectural reduction decreases explanatory capability.
+
+Status:
+
+Candidate.
+
+---
+
+# DH-009
+
+Programs capable of improving their own methodological mechanisms exhibit greater long-term conceptual continuity than programs that evolve only through theoretical expansion.
+
+Falsification
+
+Identify a long-lived research program whose methodological mechanisms remain fixed while preserving equivalent adaptive capability.
+
+Status
+
+Candidate.
+
+---
+
+# DH-010
+
+Architectural Invariants increase long-term research stability without reducing evolvability.
+
+Falsification
+
+Demonstrate a research program where explicit architectural invariants decrease adaptability.
+
+Status
+
+Candidate.

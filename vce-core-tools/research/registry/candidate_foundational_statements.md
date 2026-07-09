@@ -138,3 +138,89 @@ Theories should communicate through explicit interfaces rather than through shar
 Status:
 
 Candidate Foundational Principle.
+
+---
+
+# CFP-009
+
+## No Epistemic Privilege of Origin
+
+No Scientific Object, Principle, Theory or Architectural Decision possesses authority because of its origin.
+
+Its continued existence depends exclusively on surviving ongoing cycles of evidence, criticism and reconstruction.
+
+Status:
+
+Candidate.
+
+---
+
+# CFP-010
+
+## Continuous Selection
+
+Scientific knowledge remains active only while it continues to satisfy the governing selection criteria of the Research Program.
+
+Status:
+
+Candidate.
+
+---
+
+# CFP-011
+
+## Minimal Sufficient Theory
+
+The preferred scientific theory is the smallest theory capable of explaining the largest reconstructable set of phenomena.
+
+Status:
+
+Candidate.
+
+---
+
+# CFP-012
+
+## Theory Before Expansion
+
+Before introducing a new theory, the Research Program shall first attempt to derive the proposed abstraction from existing theories.
+
+Only irreducible abstractions may become candidate theories.
+
+Status:
+
+Candidate.
+
+---
+
+# CFP-013
+
+The continuity of a Research Program depends more upon the quality of its methodological mechanisms than upon the permanence of its individual theories.
+
+Status
+
+Candidate.
+
+---
+
+# CFP-014
+
+Scientific progress includes the continuous improvement of the mechanisms through which scientific knowledge is generated, evaluated and preserved.
+
+Status
+
+Candidate.
+
+---
+
+# CFP-015
+
+No methodological mechanism possesses permanent authority.
+
+Every mechanism remains subject to future evidence and revision.
+
+Status
+
+Candidate.
+
+

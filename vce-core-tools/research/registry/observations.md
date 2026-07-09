@@ -319,3 +319,63 @@ System evolution is reconstructed through governed comparison between successive
 Status:
 
 Observation.
+
+---
+
+# OBS-015
+
+Stable interfaces appear to preserve architectural continuity while allowing implementations to evolve independently.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-016
+
+Architectural reduction increases explanatory density by eliminating concepts that fail irreducibility tests.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-017
+
+Scientific ideas appear to persist through continuous selection rather than historical authority.
+
+Status:
+
+Observation.
+
+---
+
+# OBS-018
+
+Methodological mechanisms demonstrated practical value by modifying the behavior of the Research Program before being formally accepted.
+
+Status
+
+Observation.
+
+---
+
+# OBS-019
+
+Architectural protocols can themselves become Scientific Objects and participate in Research Cycles.
+
+Status
+
+Observation.
+
+---
+
+# OBS-020
+
+Improving methodological mechanisms appears to increase the long-term adaptive capacity of the Research Program.
+
+Status
+
+Observation.

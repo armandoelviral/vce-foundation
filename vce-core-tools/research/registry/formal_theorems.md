@@ -47,3 +47,120 @@ Formal theorem construction is planned for later research stages.
 # Guiding Principle
 
 The absence of theorems is preferable to admitting statements that have not yet earned formal status.
+
+
+---
+
+# Candidate Axioms — Scientific Object Theory
+
+---
+
+## AX-C001
+
+Every Scientific Object possesses persistent identity throughout its lifecycle.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
+
+---
+
+## AX-C002
+
+Every Scientific Object has exactly one immutable Type.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
+
+---
+
+## AX-C003
+
+Every Scientific Object occupies exactly one valid lifecycle State at any instant.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
+
+---
+
+## AX-C004
+
+Scientific Objects evolve exclusively through governed Transitions.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
+
+---
+
+## AX-C005
+
+Scientific Objects preserve reconstructable provenance across every Transition.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
+
+---
+
+## AX-C006
+
+Relationships between Scientific Objects are first-class entities within the research architecture.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
+
+---
+
+## AX-C007
+
+Scientific Objects may change State without changing Identity.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
+
+---
+
+## AX-C008
+
+Representations may evolve independently of the Scientific Object they describe.
+
+Status:
+
+Candidate.
+
+Research Cycle:
+
+RC-0002
