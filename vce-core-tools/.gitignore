@@ -3,3 +3,6 @@ repair_test.db
 .coverage
 fuzz-runtime/target/
 fuzz-runtime/target/
+
+# macOS
+.DS_Store
