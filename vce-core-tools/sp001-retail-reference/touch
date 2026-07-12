@@ -1,0 +1,11 @@
+from sp001.models.objective import Objective
+from sp001.models.case import Case
+
+
+def test_objective_creates_case():
+
+    objective = Objective()
+
+    case = objective.create_case()
+
+    assert isinstance(case, Case)

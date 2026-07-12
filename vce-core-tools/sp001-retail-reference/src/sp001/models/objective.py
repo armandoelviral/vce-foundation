@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 
+from .case import Case
+
 
 @dataclass(frozen=True, slots=True)
 class Objective:
-    """Represents organizational intent."""
+
+    def create_case(self) -> Case:
+        return Case()
