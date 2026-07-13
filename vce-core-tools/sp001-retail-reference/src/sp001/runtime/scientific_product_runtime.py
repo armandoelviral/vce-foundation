@@ -3,6 +3,9 @@ from sp001.models.expert_decision import ExpertDecision
 from sp001.models.objective import Objective
 from sp001.models.recommendation import Recommendation
 from sp001.models.operational_evidence import OperationalEvidence
+from sp001.models.capability_candidate import CapabilityCandidate
+from sp001.models.governance_decision import GovernanceDecision
+from sp001.models.institutional_capability import InstitutionalCapability
 
 class ScientificProductRuntime:
     """Coordinates Scientific Product lifecycle transitions."""
@@ -35,3 +38,21 @@ class ScientificProductRuntime:
         decision: ExpertDecision,
     ) -> OperationalEvidence:
         return OperationalEvidence()
+
+    def create_capability_candidate(
+        self,
+        evidence: OperationalEvidence,
+    ) -> CapabilityCandidate:
+        return CapabilityCandidate()
+
+    def create_governance_decision(
+        self,
+        candidate: CapabilityCandidate,
+    ) -> GovernanceDecision:
+        return GovernanceDecision()
+
+    def create_institutional_capability(
+        self,
+        decision: GovernanceDecision,
+    ) -> InstitutionalCapability:
+        return InstitutionalCapability()

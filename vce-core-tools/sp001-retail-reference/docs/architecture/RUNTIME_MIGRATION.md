@@ -21,9 +21,9 @@ Move Scientific Product lifecycle coordination from domain models into the Scien
 - [ ] Case → Recommendation
 - [x] Recommendation → Expert Decision
 - [x] Expert Decision → Operational Evidence
-- [ ] Operational Evidence → Capability Candidate
-- [ ] Capability Candidate → Governance Decision
-- [ ] Governance Decision → Institutional Capability
+- [x] Operational Evidence → Capability Candidate
+- [x] Capability Candidate → Governance Decision
+- [x] Governance Decision → Institutional Capability
 
 ## Compatibility Rule
 
