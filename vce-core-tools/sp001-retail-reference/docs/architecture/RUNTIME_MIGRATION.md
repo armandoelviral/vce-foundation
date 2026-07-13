@@ -18,7 +18,7 @@ Move Scientific Product lifecycle coordination from domain models into the Scien
 ## Current State
 
 - [x] Objective → Case implemented in Runtime
-- [ ] Case → Recommendation
+- [x] Case → Recommendation
 - [x] Recommendation → Expert Decision
 - [x] Expert Decision → Operational Evidence
 - [x] Operational Evidence → Capability Candidate
