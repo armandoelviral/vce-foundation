@@ -41,3 +41,13 @@ They are transitional compatibility APIs, not the final architecture.
 - [ ] Operational Evidence → Capability Candidate returns RuntimeResult
 - [ ] Capability Candidate → Governance Decision returns RuntimeResult
 - [ ] Governance Decision → Institutional Capability returns RuntimeResult
+
+## Transition Layer Migration
+
+- [x] Objective → Case delegated to ObjectiveToCaseTransition
+- [ ] Case → Recommendation delegated to Transition
+- [ ] Recommendation → Expert Decision delegated to Transition
+- [ ] Expert Decision → Operational Evidence delegated to Transition
+- [ ] Operational Evidence → Capability Candidate delegated to Transition
+- [ ] Capability Candidate → Governance Decision delegated to Transition
+- [ ] Governance Decision → Institutional Capability delegated to Transition

@@ -7,10 +7,16 @@ from sp001.models.objective import Objective
 from sp001.models.operational_evidence import OperationalEvidence
 from sp001.models.recommendation import Recommendation
 from sp001.runtime.runtime_result import RuntimeResult
+from sp001.runtime.transitions.objective_to_case import (
+    ObjectiveToCaseTransition,
+)
 
 
 class ScientificProductRuntime:
     """Coordinates Scientific Product lifecycle transitions."""
+
+    def __init__(self) -> None:
+        self._objective_to_case = ObjectiveToCaseTransition()
 
     def create_case(
         self,
@@ -19,17 +25,10 @@ class ScientificProductRuntime:
         case_id: str = "",
         scope: str = "",
     ) -> RuntimeResult:
-        case = Case(
+        return self._objective_to_case.execute(
+            objective,
             case_id=case_id,
-            objective_id=objective.objective_id,
-            objective_title=objective.title,
             scope=scope,
-        )
-
-        return RuntimeResult(
-            output=case,
-            transition="Objective->Case",
-            success=True,
         )
 
     def create_recommendation(self, case: Case) -> Recommendation:
