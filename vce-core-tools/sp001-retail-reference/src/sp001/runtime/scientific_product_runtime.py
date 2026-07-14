@@ -7,6 +7,9 @@ from sp001.models.objective import Objective
 from sp001.models.operational_evidence import OperationalEvidence
 from sp001.models.recommendation import Recommendation
 from sp001.runtime.runtime_result import RuntimeResult
+from sp001.runtime.transitions.case_to_recommendation import (
+    CaseToRecommendationTransition,
+)
 from sp001.runtime.transitions.objective_to_case import (
     ObjectiveToCaseTransition,
 )
@@ -17,6 +20,7 @@ class ScientificProductRuntime:
 
     def __init__(self) -> None:
         self._objective_to_case = ObjectiveToCaseTransition()
+        self._case_to_recommendation = CaseToRecommendationTransition()
 
     def create_case(
         self,
@@ -31,8 +35,8 @@ class ScientificProductRuntime:
             scope=scope,
         )
 
-    def create_recommendation(self, case: Case) -> Recommendation:
-        return Recommendation()
+    def create_recommendation(self, case: Case) -> RuntimeResult:
+        return self._case_to_recommendation.execute(case)
 
     def create_expert_decision(
         self,

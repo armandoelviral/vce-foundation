@@ -35,7 +35,7 @@ They are transitional compatibility APIs, not the final architecture.
 
 - [x] RuntimeResult v0 introduced
 - [x] Objective → Case returns RuntimeResult
-- [ ] Case → Recommendation returns RuntimeResult
+- [x] Case → Recommendation returns RuntimeResult
 - [ ] Recommendation → Expert Decision returns RuntimeResult
 - [ ] Expert Decision → Operational Evidence returns RuntimeResult
 - [ ] Operational Evidence → Capability Candidate returns RuntimeResult
@@ -45,7 +45,7 @@ They are transitional compatibility APIs, not the final architecture.
 ## Transition Layer Migration
 
 - [x] Objective → Case delegated to ObjectiveToCaseTransition
-- [ ] Case → Recommendation delegated to Transition
+- [x] Case → Recommendation delegated to Transition
 - [ ] Recommendation → Expert Decision delegated to Transition
 - [ ] Expert Decision → Operational Evidence delegated to Transition
 - [ ] Operational Evidence → Capability Candidate delegated to Transition
