@@ -1,9 +1,10 @@
 from sp001.models.case import Case
 from sp001.models.objective import Objective
+from sp001.runtime.runtime_result import RuntimeResult
 from sp001.runtime.scientific_product_runtime import ScientificProductRuntime
 
 
-def test_runtime_creates_case_preserving_objective_identity() -> None:
+def test_runtime_returns_runtime_result() -> None:
     runtime = ScientificProductRuntime()
     objective = Objective(
         objective_id="OBJ-001",
@@ -17,10 +18,9 @@ def test_runtime_creates_case_preserving_objective_identity() -> None:
         scope="STORE-MX-014",
     )
 
-    case = result.output
-
-    assert isinstance(case, Case)
-    assert case.case_id == "CASE-001"
-    assert case.objective_id == "OBJ-001"
-    assert case.objective_title == "Increase pink dress sell-through"
-    assert case.scope == "STORE-MX-014"
+    assert isinstance(result, RuntimeResult)
+    assert result.success is True
+    assert result.transition == "Objective->Case"
+    assert isinstance(result.output, Case)
+    assert result.output.case_id == "CASE-001"
+    assert result.output.objective_id == "OBJ-001"

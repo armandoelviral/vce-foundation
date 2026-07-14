@@ -30,3 +30,14 @@ Move Scientific Product lifecycle coordination from domain models into the Scien
 Model transition methods remain available during migration.
 
 They are transitional compatibility APIs, not the final architecture.
+
+## RuntimeResult Migration
+
+- [x] RuntimeResult v0 introduced
+- [x] Objective → Case returns RuntimeResult
+- [ ] Case → Recommendation returns RuntimeResult
+- [ ] Recommendation → Expert Decision returns RuntimeResult
+- [ ] Expert Decision → Operational Evidence returns RuntimeResult
+- [ ] Operational Evidence → Capability Candidate returns RuntimeResult
+- [ ] Capability Candidate → Governance Decision returns RuntimeResult
+- [ ] Governance Decision → Institutional Capability returns RuntimeResult

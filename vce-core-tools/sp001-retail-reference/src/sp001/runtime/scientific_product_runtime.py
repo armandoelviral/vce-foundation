@@ -1,11 +1,13 @@
+from sp001.models.capability_candidate import CapabilityCandidate
 from sp001.models.case import Case
 from sp001.models.expert_decision import ExpertDecision
-from sp001.models.objective import Objective
-from sp001.models.recommendation import Recommendation
-from sp001.models.operational_evidence import OperationalEvidence
-from sp001.models.capability_candidate import CapabilityCandidate
 from sp001.models.governance_decision import GovernanceDecision
 from sp001.models.institutional_capability import InstitutionalCapability
+from sp001.models.objective import Objective
+from sp001.models.operational_evidence import OperationalEvidence
+from sp001.models.recommendation import Recommendation
+from sp001.runtime.runtime_result import RuntimeResult
+
 
 class ScientificProductRuntime:
     """Coordinates Scientific Product lifecycle transitions."""
@@ -16,12 +18,18 @@ class ScientificProductRuntime:
         *,
         case_id: str = "",
         scope: str = "",
-    ) -> Case:
-        return Case(
+    ) -> RuntimeResult:
+        case = Case(
             case_id=case_id,
             objective_id=objective.objective_id,
             objective_title=objective.title,
             scope=scope,
+        )
+
+        return RuntimeResult(
+            output=case,
+            transition="Objective->Case",
+            success=True,
         )
 
     def create_recommendation(self, case: Case) -> Recommendation:
