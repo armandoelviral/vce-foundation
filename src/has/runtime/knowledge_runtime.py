@@ -6,6 +6,8 @@ from has.runtime.transitions.observation_to_hypothesis_transition import (
 
 
 class KnowledgeRuntime:
+    """Public facade for executable knowledge transitions."""
+
     def __init__(self) -> None:
         self._observation_transition = (
             ObservationToHypothesisTransition()
@@ -15,16 +17,13 @@ class KnowledgeRuntime:
         self,
         artifact: KnowledgeArtifact,
     ) -> RuntimeResult:
-
-        updated = (
-            self._observation_transition.execute(
-                artifact
-            )
+        updated = self._observation_transition.execute(
+            artifact,
         )
 
         return RuntimeResult(
             artifact=updated,
             transition_executed=(
-                updated != artifact
+                updated.state is not artifact.state
             ),
         )

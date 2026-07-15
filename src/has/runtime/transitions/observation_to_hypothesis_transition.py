@@ -4,13 +4,14 @@ from has.runtime.knowledge_promoter import KnowledgePromoter
 from has.runtime.knowledge_promotion_service import (
     KnowledgePromotionService,
 )
+from has.runtime.knowledge_state import KnowledgeState
 from has.runtime.observation_promotion_policy import (
     ObservationPromotionPolicy,
 )
 
 
 class ObservationToHypothesisTransition:
-    """Accumulates evidence and promotes an Observation to Hypothesis."""
+    """Promotes only valid Observations to Hypotheses."""
 
     def __init__(self) -> None:
         self._accumulator = EvidenceAccumulator()
@@ -23,7 +24,12 @@ class ObservationToHypothesisTransition:
         self,
         artifact: KnowledgeArtifact,
     ) -> KnowledgeArtifact:
-        artifact_with_evidence = self._accumulator.record(artifact)
+        if artifact.state is not KnowledgeState.OBSERVATION:
+            return artifact
+
+        artifact_with_evidence = self._accumulator.record(
+            artifact,
+        )
 
         return self._promotion.promote_observation(
             artifact_with_evidence,
