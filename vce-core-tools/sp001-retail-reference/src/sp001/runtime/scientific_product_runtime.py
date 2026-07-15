@@ -10,8 +10,14 @@ from sp001.runtime.runtime_result import RuntimeResult
 from sp001.runtime.transitions.case_to_recommendation import (
     CaseToRecommendationTransition,
 )
+from sp001.runtime.transitions.expert_decision_to_operational_evidence import (
+    ExpertDecisionToOperationalEvidenceTransition,
+)
 from sp001.runtime.transitions.objective_to_case import (
     ObjectiveToCaseTransition,
+)
+from sp001.runtime.transitions.recommendation_to_expert_decision import (
+    RecommendationToExpertDecisionTransition,
 )
 
 
@@ -21,6 +27,12 @@ class ScientificProductRuntime:
     def __init__(self) -> None:
         self._objective_to_case = ObjectiveToCaseTransition()
         self._case_to_recommendation = CaseToRecommendationTransition()
+        self._recommendation_to_expert_decision = (
+            RecommendationToExpertDecisionTransition()
+        )
+        self._expert_decision_to_operational_evidence = (
+            ExpertDecisionToOperationalEvidenceTransition()
+        )
 
     def create_case(
         self,
@@ -35,20 +47,27 @@ class ScientificProductRuntime:
             scope=scope,
         )
 
-    def create_recommendation(self, case: Case) -> RuntimeResult:
+    def create_recommendation(
+        self,
+        case: Case,
+    ) -> RuntimeResult:
         return self._case_to_recommendation.execute(case)
 
     def create_expert_decision(
         self,
         recommendation: Recommendation,
-    ) -> ExpertDecision:
-        return ExpertDecision()
+    ) -> RuntimeResult:
+        return self._recommendation_to_expert_decision.execute(
+            recommendation
+        )
 
     def record_operational_evidence(
         self,
         decision: ExpertDecision,
-    ) -> OperationalEvidence:
-        return OperationalEvidence()
+    ) -> RuntimeResult:
+        return self._expert_decision_to_operational_evidence.execute(
+            decision
+        )
 
     def create_capability_candidate(
         self,
