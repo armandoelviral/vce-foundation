@@ -8,10 +8,13 @@ from has.runtime.knowledge_state import KnowledgeState
 from has.runtime.observation_promotion_policy import (
     ObservationPromotionPolicy,
 )
+from has.runtime.transitions.knowledge_transition import (
+    KnowledgeTransition,
+)
 
-
-class ObservationToHypothesisTransition:
-    """Promotes only valid Observations to Hypotheses."""
+class ObservationToHypothesisTransition(
+    KnowledgeTransition,
+):
 
     def __init__(self) -> None:
         self._accumulator = EvidenceAccumulator()
