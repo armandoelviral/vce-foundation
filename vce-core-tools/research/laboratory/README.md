@@ -38,3 +38,35 @@ Not yet fully validated for external scientific collaboration.
 ## Current Priority
 
 Produce evidence before expanding infrastructure.
+
+---
+
+# Laboratory
+
+The Laboratory research area studies the laboratory itself.
+
+Unlike HAS, which studies reproducible collaboration,
+Laboratory research studies reproducible research systems.
+
+Its objective is to understand how laboratories
+generate, preserve, govern and evolve knowledge.
+
+The laboratory itself becomes
+an object of scientific investigation.
+
+Current research themes include:
+
+- Laboratory History
+
+- Laboratory Governance
+
+- Reproducible Laboratories
+
+- Institutional Memory
+
+- Knowledge Evolution
+
+This research area intentionally remains
+independent from any individual Scientific Product.
+
+Its subject of study is the laboratory itself.
