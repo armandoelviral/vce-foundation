@@ -14,15 +14,14 @@ from has.runtime.observation_promotion_policy import (
 
 class KnowledgePromotionService:
 
-    def __init__(self):
+    def __init__(
+        self,
+        policy: ObservationPromotionPolicy,
+        promoter: KnowledgePromoter,
+    ) -> None:
 
-        self._policy = (
-            ObservationPromotionPolicy()
-        )
-
-        self._promoter = (
-            KnowledgePromoter()
-        )
+        self._policy = policy
+        self._promoter = promoter
 
     def promote_observation(
         self,
