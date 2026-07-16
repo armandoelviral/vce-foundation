@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "release": {
+    "name": "HAS Foundation",
+    "version": "1.0",
+    "status": "Frozen"
+  },
+  "assets": {
+    "specifications": [
+      "research/specifications/runtime_specification.md",
+      "research/specifications/SPECIFICATION_STYLE_GUIDE.md",
+      "research/specifications/SPECIFICATION_GRAMMAR.md",
+      "research/specifications/manifest/runtime_manifest.yaml",
+      "research/specifications/TRACEABILITY_SCHEMA.md",
+      "research/specifications/TRACEABILITY.yaml"
+    ]
+  },
+  "contracts": {
+    "specification": [
+      "tests/specifications/test_runtime_specification_consistency.py",
+      "tests/specifications/test_specification_style_guide.py",
+      "tests/specifications/test_specification_grammar.py",
+      "tests/specifications/test_runtime_manifest.py",
+      "tests/specifications/test_specification_consistency.py",
+      "tests/specifications/test_traceability_schema.py",
+      "tests/specifications/test_traceability_registry.py"
+    ]
+  },
+  "suites": {
+    "runtime": "tests/runtime",
+    "specifications": "tests/specifications"
+  }
+}

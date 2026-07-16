@@ -1,55 +1,59 @@
+import json
 from pathlib import Path
+from typing import Any
 
 
-REQUIRED_SPEC_TESTS = (
-    "test_runtime_specification_consistency.py",
-    "test_specification_style_guide.py",
-    "test_specification_grammar.py",
-    "test_runtime_manifest.py",
-    "test_specification_consistency.py",
-    "test_traceability_schema.py",
-    "test_traceability_registry.py",
+RELEASE = Path(
+    "research/releases/HAS_FOUNDATION_1_0.json"
 )
 
 
-def test_required_foundation_contracts_exist() -> None:
-    root = Path("tests/specifications")
-
-    for contract in REQUIRED_SPEC_TESTS:
-        assert (root / contract).is_file()
-
-
-def test_runtime_specification_exists() -> None:
-    assert Path(
-        "research/specifications/runtime_specification.md"
-    ).is_file()
+def release() -> dict[str, Any]:
+    return json.loads(
+        RELEASE.read_text(
+            encoding="utf-8",
+        )
+    )
 
 
-def test_style_guide_exists() -> None:
-    assert Path(
-        "research/specifications/SPECIFICATION_STYLE_GUIDE.md"
-    ).is_file()
+def test_release_registry_exists() -> None:
+    assert RELEASE.is_file()
 
 
-def test_grammar_exists() -> None:
-    assert Path(
-        "research/specifications/SPECIFICATION_GRAMMAR.md"
-    ).is_file()
+def test_release_registry_is_valid_json() -> None:
+    data = release()
+
+    assert isinstance(data, dict)
 
 
-def test_manifest_exists() -> None:
-    assert Path(
-        "research/specifications/manifest/runtime_manifest.yaml"
-    ).is_file()
+def test_release_identity_is_frozen_foundation_1_0() -> None:
+    data = release()["release"]
+
+    assert data["name"] == "HAS Foundation"
+    assert data["version"] == "1.0"
+    assert data["status"] == "Frozen"
 
 
-def test_traceability_exists() -> None:
-    assert Path(
-        "research/specifications/TRACEABILITY.yaml"
-    ).is_file()
+def test_every_registered_asset_exists() -> None:
+    assets = release()["assets"]["specifications"]
+
+    assert assets
+
+    for asset in assets:
+        assert Path(asset).is_file(), asset
 
 
-def test_traceability_schema_exists() -> None:
-    assert Path(
-        "research/specifications/TRACEABILITY_SCHEMA.md"
-    ).is_file()
+def test_every_registered_contract_exists() -> None:
+    contracts = release()["contracts"]["specification"]
+
+    assert contracts
+
+    for contract in contracts:
+        assert Path(contract).is_file(), contract
+
+
+def test_registered_suites_exist() -> None:
+    suites = release()["suites"]
+
+    assert Path(suites["runtime"]).is_dir()
+    assert Path(suites["specifications"]).is_dir()
