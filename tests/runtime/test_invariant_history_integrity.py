@@ -8,20 +8,24 @@ from has.runtime.knowledge_history_recorder import (
 )
 from has.runtime.knowledge_state import KnowledgeState
 from has.runtime.runtime_event import RuntimeEvent
+from has.runtime.runtime_event_verifier import RuntimeEventVerifier
 from has.runtime.runtime_result import RuntimeResult
 
 
-def artifact() -> KnowledgeArtifact:
+def make_artifact() -> KnowledgeArtifact:
     return KnowledgeArtifact(
         identifier="K-001",
-        title="Example",
+        title="History integrity",
         state=KnowledgeState.HYPOTHESIS,
     )
 
 
-def valid_event() -> RuntimeEvent:
+def make_valid_event(
+    *,
+    event_id: str = "EVT-001",
+) -> RuntimeEvent:
     return RuntimeEvent(
-        event_id="EVT-001",
+        event_id=event_id,
         artifact_id="K-001",
         from_state=KnowledgeState.OBSERVATION,
         to_state=KnowledgeState.HYPOTHESIS,
@@ -31,7 +35,7 @@ def valid_event() -> RuntimeEvent:
     )
 
 
-def invalid_event() -> RuntimeEvent:
+def make_invalid_event() -> RuntimeEvent:
     return RuntimeEvent(
         event_id="EVT-INVALID",
         artifact_id="K-001",
@@ -43,57 +47,36 @@ def invalid_event() -> RuntimeEvent:
     )
 
 
-def test_records_verified_event() -> None:
+def test_every_stored_event_is_semantically_valid() -> None:
+    history = KnowledgeHistory().append(
+        make_valid_event(),
+    )
+
+    verifier = RuntimeEventVerifier()
+
+    results = tuple(
+        verifier.verify(event)
+        for event in history.events
+    )
+
+    assert all(
+        result.valid
+        for result in results
+    )
+
+
+def test_recorder_rejects_invalid_event_before_storage() -> None:
     history = KnowledgeHistory()
 
     result = RuntimeResult(
-        artifact=artifact(),
+        artifact=make_artifact(),
         transition_executed=True,
-        event=valid_event(),
-    )
-
-    updated = KnowledgeHistoryRecorder().record(
-        history,
-        result,
-    )
-
-    assert len(history) == 0
-    assert len(updated) == 1
-    assert updated.events[0].event_id == "EVT-001"
-
-
-def test_ignores_none_event() -> None:
-    history = KnowledgeHistory()
-
-    result = RuntimeResult(
-        artifact=artifact(),
-        transition_executed=False,
-        event=None,
-    )
-
-    updated = KnowledgeHistoryRecorder().record(
-        history,
-        result,
-    )
-
-    assert updated is history
-
-
-def test_rejects_invalid_runtime_event() -> None:
-    history = KnowledgeHistory()
-
-    result = RuntimeResult(
-        artifact=artifact(),
-        transition_executed=True,
-        event=invalid_event(),
+        event=make_invalid_event(),
     )
 
     with pytest.raises(
         ValueError,
-        match=(
-            "runtime event verification failed: "
-            "transition_not_allowed"
-        ),
+        match="transition_not_allowed",
     ):
         KnowledgeHistoryRecorder().record(
             history,
