@@ -1,0 +1,39 @@
+version: 1
+
+claims:
+
+  KS-001:
+
+    title: Knowledge States
+
+    asset:
+      runtime_specification.md
+
+    capability:
+      Knowledge Lifecycle
+
+    contracts:
+
+      - test_runtime_specification_consistency.py
+
+    runtime:
+
+      - knowledge_history_stream.py
+
+  GP-001:
+
+    title: Replay Determinism
+
+    asset:
+      runtime_specification.md
+
+    capability:
+      Replay Determinism
+
+    contracts:
+
+      - test_runtime_manifest.py
+
+    runtime:
+
+      - runtime_result.py
