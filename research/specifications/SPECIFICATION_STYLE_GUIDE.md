@@ -43,3 +43,8 @@ the specification.
 
 No additional sections should be introduced
 without explicit architectural justification.
+
+---
+
+All executable specifications shall conform
+to the Runtime Specification Grammar.
