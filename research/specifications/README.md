@@ -8,6 +8,8 @@ Supporting Documents
 
 - Specification Style Guide
 
+- Specification Grammar
+
 Status
 
 The Runtime Specification is currently the
@@ -15,7 +17,8 @@ normative description of the executable
 knowledge model.
 
 All future specifications shall follow the
-Specification Style Guide.
+Specification Style Guide and the
+Specification Grammar.
 
 Manifest
 
