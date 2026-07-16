@@ -22,11 +22,23 @@ def make_hypothesis(
 def test_runtime_advances_eligible_hypothesis() -> None:
     result = KnowledgeRuntime().evaluate_hypothesis(
         make_hypothesis(),
+        event_id="EVT-002",
     )
 
     assert result.transition_executed is True
     assert (
         result.artifact.state
+        is KnowledgeState.CANDIDATE_PRINCIPLE
+    )
+
+    assert result.event is not None
+    assert result.event.event_id == "EVT-002"
+    assert (
+        result.event.from_state
+        is KnowledgeState.HYPOTHESIS
+    )
+    assert (
+        result.event.to_state
         is KnowledgeState.CANDIDATE_PRINCIPLE
     )
 
@@ -38,11 +50,12 @@ def test_runtime_rejects_ineligible_hypothesis() -> None:
 
     result = KnowledgeRuntime().evaluate_hypothesis(
         artifact,
+        event_id="EVT-002",
     )
 
     assert result.transition_executed is False
+    assert result.event is None
     assert result.artifact is artifact
-    assert result.artifact.state is KnowledgeState.HYPOTHESIS
 
 
 def test_runtime_does_not_mutate_hypothesis() -> None:
@@ -50,6 +63,7 @@ def test_runtime_does_not_mutate_hypothesis() -> None:
 
     KnowledgeRuntime().evaluate_hypothesis(
         artifact,
+        event_id="EVT-002",
     )
 
     assert artifact.state is KnowledgeState.HYPOTHESIS

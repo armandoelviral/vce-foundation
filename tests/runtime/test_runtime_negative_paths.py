@@ -4,7 +4,6 @@ from has.runtime.knowledge_state import KnowledgeState
 
 
 def test_hypothesis_is_not_promoted_again() -> None:
-
     runtime = KnowledgeRuntime()
 
     artifact = KnowledgeArtifact(
@@ -15,11 +14,11 @@ def test_hypothesis_is_not_promoted_again() -> None:
     )
 
     result = runtime.record_observation(
-        artifact
+        artifact,
+        event_id="EVT-001",
     )
 
     assert result.transition_executed is False
-
+    assert result.event is None
     assert result.artifact.state is KnowledgeState.HYPOTHESIS
-
     assert result.artifact.evidence_count == 10

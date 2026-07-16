@@ -22,10 +22,22 @@ def make_candidate_principle(
 def test_runtime_advances_eligible_candidate_principle() -> None:
     result = KnowledgeRuntime().evaluate_candidate_principle(
         make_candidate_principle(),
+        event_id="EVT-003",
     )
 
     assert result.transition_executed is True
     assert result.artifact.state is KnowledgeState.PRINCIPLE
+
+    assert result.event is not None
+    assert result.event.event_id == "EVT-003"
+    assert (
+        result.event.from_state
+        is KnowledgeState.CANDIDATE_PRINCIPLE
+    )
+    assert (
+        result.event.to_state
+        is KnowledgeState.PRINCIPLE
+    )
 
 
 def test_runtime_rejects_ineligible_candidate_principle() -> None:
@@ -35,11 +47,12 @@ def test_runtime_rejects_ineligible_candidate_principle() -> None:
 
     result = KnowledgeRuntime().evaluate_candidate_principle(
         artifact,
+        event_id="EVT-003",
     )
 
     assert result.transition_executed is False
+    assert result.event is None
     assert result.artifact is artifact
-    assert result.artifact.state is KnowledgeState.CANDIDATE_PRINCIPLE
 
 
 def test_runtime_does_not_mutate_candidate_principle() -> None:
@@ -47,6 +60,7 @@ def test_runtime_does_not_mutate_candidate_principle() -> None:
 
     KnowledgeRuntime().evaluate_candidate_principle(
         artifact,
+        event_id="EVT-003",
     )
 
     assert artifact.state is KnowledgeState.CANDIDATE_PRINCIPLE
