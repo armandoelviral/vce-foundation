@@ -21,7 +21,7 @@ from has.runtime.runtime_result import (
 )
 
 
-def artifact():
+def artifact() -> KnowledgeArtifact:
     return KnowledgeArtifact(
         identifier="OBS-001",
         title="Example",
@@ -29,7 +29,7 @@ def artifact():
     )
 
 
-def runtime_event():
+def event() -> RuntimeEvent:
     return RuntimeEvent(
         event_id="EVT-001",
         artifact_id="OBS-001",
@@ -43,38 +43,46 @@ def runtime_event():
 
 def test_records_runtime_event():
 
-    recorder = KnowledgeRecorder()
+    history = KnowledgeHistory()
 
-    history = recorder.record(
-        KnowledgeHistory(),
-        RuntimeResult(
-            artifact=artifact(),
-            transition_executed=True,
-            event=runtime_event(),
-        ),
+    result = RuntimeResult(
+        artifact=artifact(),
+        transition_executed=True,
+        event=event(),
     )
 
-    assert len(history) == 1
+    updated = (
+        KnowledgeRecorder().record(
+            history,
+            result,
+        )
+    )
+
+    assert len(history) == 0
+
+    assert len(updated) == 1
 
     assert (
-        history.events[0].event_id
+        updated.events[0].event_id
         == "EVT-001"
     )
 
 
-def test_no_event_keeps_history():
-
-    recorder = KnowledgeRecorder()
+def test_ignores_results_without_event():
 
     history = KnowledgeHistory()
 
-    updated = recorder.record(
-        history,
-        RuntimeResult(
-            artifact=artifact(),
-            transition_executed=False,
-            event=None,
-        ),
+    result = RuntimeResult(
+        artifact=artifact(),
+        transition_executed=False,
+        event=None,
+    )
+
+    updated = (
+        KnowledgeRecorder().record(
+            history,
+            result,
+        )
     )
 
     assert updated is history

@@ -7,7 +7,7 @@ from has.runtime.runtime_result import (
 
 
 class KnowledgeRecorder:
-    """Records runtime events into immutable knowledge histories."""
+    """Updates immutable knowledge history from runtime results."""
 
     def record(
         self,
