@@ -1,0 +1,30 @@
+version: 1
+
+runtime:
+
+  name: HAS Runtime
+
+  specification:
+
+    grammar:
+      - SPECIFICATION_GRAMMAR.md
+
+    style:
+      - SPECIFICATION_STYLE_GUIDE.md
+
+    normative:
+      - runtime_specification.md
+
+contracts:
+
+  invariants:
+
+    - Replay Determinism
+
+    - History Integrity
+
+    - Verification Closure
+
+    - Pipeline Closure
+
+    - State Monotonicity

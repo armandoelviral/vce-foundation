@@ -16,3 +16,11 @@ knowledge model.
 
 All future specifications shall follow the
 Specification Style Guide.
+
+Manifest
+
+- runtime_manifest.yaml
+
+The manifest defines the normative
+entry point for the executable
+runtime specification.
