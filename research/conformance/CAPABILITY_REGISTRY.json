@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "registry": {
+    "name": "HAS Conformance Capability Registry",
+    "status": "Draft"
+  },
+  "capabilities": {
+    "CAP-001": {
+      "name": "Knowledge Lifecycle",
+      "claims": [
+        "KS-001"
+      ],
+      "contracts": [
+        "tests/specifications/test_runtime_specification_consistency.py"
+      ]
+    },
+    "CAP-002": {
+      "name": "Replay Determinism",
+      "claims": [
+        "GP-001"
+      ],
+      "contracts": [
+        "tests/runtime/invariants/test_invariant_replay_determinism.py"
+      ]
+    }
+  }
+}
