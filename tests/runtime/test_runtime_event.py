@@ -9,9 +9,10 @@ from has.runtime.runtime_event import (
 )
 
 
-def test_runtime_event_defaults() -> None:
+def test_runtime_event():
 
     event = RuntimeEvent(
+        event_id="EVT-001",
         artifact_id="OBS-001",
         from_state=KnowledgeState.OBSERVATION,
         to_state=KnowledgeState.HYPOTHESIS,
@@ -19,6 +20,8 @@ def test_runtime_event_defaults() -> None:
             eligible=True,
         ),
     )
+
+    assert event.event_id == "EVT-001"
 
     assert event.artifact_id == "OBS-001"
 
@@ -32,4 +35,4 @@ def test_runtime_event_defaults() -> None:
         is KnowledgeState.HYPOTHESIS
     )
 
-    assert event.evaluation.eligible is True
+    assert event.evaluation.eligible

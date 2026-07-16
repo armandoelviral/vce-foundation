@@ -12,6 +12,8 @@ from has.runtime.knowledge_state import (
 class RuntimeEvent:
     """Immutable description of a runtime transition."""
 
+    event_id: str
+
     artifact_id: str
 
     from_state: KnowledgeState
