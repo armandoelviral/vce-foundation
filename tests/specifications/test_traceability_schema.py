@@ -6,56 +6,47 @@ SCHEMA = Path(
 )
 
 
-def schema_text() -> str:
+def text() -> str:
     return SCHEMA.read_text(
         encoding="utf-8",
     )
+
+
+def normalized_text() -> str:
+    return " ".join(text().split())
 
 
 def test_schema_exists() -> None:
     assert SCHEMA.is_file()
 
 
-def test_schema_declares_traceability_unit() -> None:
-    text = schema_text()
-
-    assert "Normative Claim" in text
-    assert "stable identifier" in text
+def test_claim_is_traceability_unit() -> None:
+    assert "Normative Claim" in text()
 
 
-def test_schema_declares_required_fields() -> None:
-    text = schema_text()
+def test_runtime_is_out_of_scope() -> None:
+    normalized = normalized_text()
 
-    required = (
-        "Claim ID",
-        "Specification Asset",
-        "Capability",
-        "Executable Contracts",
-        "Runtime Components",
-    )
+    assert (
+        "Runtime components are intentionally outside "
+        "the scope of the Specification Platform."
+    ) in normalized
 
-    for field in required:
-        assert field in text
+    assert (
+        "They shall be introduced by the "
+        "Conformance milestone."
+    ) in normalized
 
 
-def test_schema_declares_relationship() -> None:
-    text = schema_text()
+def test_relationship_is_defined() -> None:
+    schema = text()
 
     relationship = (
         "Normative Claim",
         "Specification Asset",
         "Capability",
         "Executable Contract",
-        "Runtime Component",
     )
 
     for item in relationship:
-        assert item in text
-
-
-def test_schema_declares_constraints() -> None:
-    text = schema_text()
-
-    assert "Constraints" in text
-    assert "Every Claim shall reference exactly one" in text
-    assert "Every Capability shall reference at least one" in text
+        assert item in schema

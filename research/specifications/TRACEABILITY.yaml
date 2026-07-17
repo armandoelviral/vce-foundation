@@ -16,10 +16,6 @@ claims:
 
       - test_runtime_specification_consistency.py
 
-    runtime:
-
-      - knowledge_history_stream.py
-
   GP-001:
 
     title: Replay Determinism
@@ -33,7 +29,3 @@ claims:
     contracts:
 
       - test_runtime_manifest.py
-
-    runtime:
-
-      - runtime_result.py

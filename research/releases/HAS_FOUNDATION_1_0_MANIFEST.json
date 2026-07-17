@@ -33,7 +33,8 @@
     "tests/specifications/test_conf_close_001.py",
     "tests/specifications/test_foundation_close_001.py",
     "tests/specifications/test_foundation_release_contract.py",
-    "tests/specifications/test_foundation_release_readiness.py"
+    "tests/specifications/test_foundation_release_readiness.py",
+    "tests/specifications/test_foundation_release_manifest.py"
   ],
   "release_gates": {
     "runtime": "tests/runtime",

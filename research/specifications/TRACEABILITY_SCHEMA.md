@@ -2,7 +2,7 @@
 
 Version
 
-1.0
+1.1
 
 Status
 
@@ -17,7 +17,7 @@ Specification Traceability Registry.
 
 The schema defines relationships.
 
-It does not contain traceability data.
+It does not contain implementation evidence.
 
 ---
 
@@ -42,17 +42,12 @@ Normative document containing the Claim.
 
 Capability
 
-Runtime capability satisfying the Claim.
+Normative capability required by the Claim.
 
 Executable Contracts
 
 One or more executable contracts providing
 objective evidence.
-
-Runtime Components
-
-One or more runtime components implementing
-the Capability.
 
 ---
 
@@ -72,9 +67,15 @@ Capability
 
 Executable Contract(s)
 
-↓
+---
 
-Runtime Component(s)
+## Runtime Mapping
+
+Runtime components are intentionally outside
+the scope of the Specification Platform.
+
+They shall be introduced by the
+Conformance milestone.
 
 ---
 
@@ -88,19 +89,3 @@ Capability.
 
 Every Capability shall reference at least one
 Executable Contract.
-
-Every Capability shall reference at least one
-Runtime Component.
-
----
-
-## Future Extensions
-
-Bidirectional traceability.
-
-Coverage analysis.
-
-Impact analysis.
-
-Dependency graph.
-

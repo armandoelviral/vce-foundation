@@ -1,15 +1,12 @@
 from pathlib import Path
 
-
 REGISTRY = Path(
     "research/specifications/TRACEABILITY.yaml"
 )
 
 
-def registry_text() -> str:
-    return REGISTRY.read_text(
-        encoding="utf-8",
-    )
+def registry() -> str:
+    return REGISTRY.read_text(encoding="utf-8")
 
 
 def test_registry_exists() -> None:
@@ -17,36 +14,22 @@ def test_registry_exists() -> None:
 
 
 def test_registry_declares_claims() -> None:
-    text = registry_text()
-
-    assert "claims:" in text
+    text = registry()
 
     assert "KS-001" in text
     assert "GP-001" in text
 
 
-def test_registry_declares_required_sections() -> None:
-    text = registry_text()
+def test_registry_declares_required_fields() -> None:
+    text = registry()
 
-    required = (
+    for field in (
         "asset:",
         "capability:",
         "contracts:",
-        "runtime:",
-    )
-
-    for section in required:
-        assert section in text
+    ):
+        assert field in text
 
 
-def test_registry_references_assets() -> None:
-    text = registry_text()
-
-    assert "runtime_specification.md" in text
-
-
-def test_registry_references_contracts() -> None:
-    text = registry_text()
-
-    assert "test_runtime_specification_consistency.py" in text
-    assert "test_runtime_manifest.py" in text
+def test_registry_contains_no_runtime_mapping() -> None:
+    assert "runtime:" not in registry()

@@ -4,7 +4,8 @@ from typing import Any
 
 
 RELEASE = Path(
-    "research/releases/HAS_FOUNDATION_1_0.json"
+    "research/releases/"
+    "HAS_FOUNDATION_1_0_MANIFEST.json"
 )
 
 
@@ -24,6 +25,7 @@ def test_release_registry_is_valid_json() -> None:
     data = release()
 
     assert isinstance(data, dict)
+    assert data["schema_version"] == 1
 
 
 def test_release_identity_is_frozen_foundation_1_0() -> None:
@@ -32,10 +34,11 @@ def test_release_identity_is_frozen_foundation_1_0() -> None:
     assert data["name"] == "HAS Foundation"
     assert data["version"] == "1.0"
     assert data["status"] == "Frozen"
+    assert data["channel"] == "LTS"
 
 
 def test_every_registered_asset_exists() -> None:
-    assets = release()["assets"]["specifications"]
+    assets = release()["normative_assets"]
 
     assert assets
 
@@ -44,7 +47,7 @@ def test_every_registered_asset_exists() -> None:
 
 
 def test_every_registered_contract_exists() -> None:
-    contracts = release()["contracts"]["specification"]
+    contracts = release()["closure_contracts"]
 
     assert contracts
 
@@ -53,7 +56,11 @@ def test_every_registered_contract_exists() -> None:
 
 
 def test_registered_suites_exist() -> None:
-    suites = release()["suites"]
+    suites = release()["release_gates"]
 
     assert Path(suites["runtime"]).is_dir()
     assert Path(suites["specifications"]).is_dir()
+    assert Path(suites["conformance"]).is_dir()
+
+    for suite in suites["foundation"]:
+        assert Path(suite).is_dir(), suite
