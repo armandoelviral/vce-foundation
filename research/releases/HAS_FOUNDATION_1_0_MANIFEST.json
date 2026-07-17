@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "release": {
+    "name": "HAS Foundation",
+    "version": "1.0",
+    "status": "Frozen",
+    "channel": "LTS"
+  },
+  "platforms": [
+    "Runtime",
+    "Executable Knowledge Infrastructure",
+    "Specification Platform",
+    "Conformance Platform"
+  ],
+  "normative_assets": [
+    "research/releases/HAS_FOUNDATION_1_0_RELEASE_CONTRACT.md",
+    "research/specifications/runtime_specification.md",
+    "research/specifications/SPECIFICATION_STYLE_GUIDE.md",
+    "research/specifications/SPECIFICATION_GRAMMAR.md",
+    "research/specifications/manifest/runtime_manifest.yaml",
+    "research/specifications/TRACEABILITY_SCHEMA.md",
+    "research/specifications/TRACEABILITY.yaml",
+    "research/conformance/CONF_CHARTER.md",
+    "research/conformance/CONFORMANCE_INPUT_CONTRACT.md",
+    "research/conformance/CONFORMANCE_DECISION_MODEL.md",
+    "research/conformance/CONFORMANCE_EVIDENCE_MODEL.md",
+    "research/conformance/CONFORMANCE_EVALUATOR_CONTRACT.md",
+    "research/conformance/CONFORMANCE_DECISION_RECORD.md"
+  ],
+  "closure_contracts": [
+    "tests/specifications/test_eki_close_001.py",
+    "tests/specifications/test_sp_audit_001.py",
+    "tests/specifications/test_conf_close_001.py",
+    "tests/specifications/test_foundation_close_001.py",
+    "tests/specifications/test_foundation_release_contract.py",
+    "tests/specifications/test_foundation_release_readiness.py"
+  ],
+  "release_gates": {
+    "runtime": "tests/runtime",
+    "specifications": "tests/specifications",
+    "conformance": "tests/conformance",
+    "foundation": [
+      "tests/runtime",
+      "tests/specifications",
+      "tests/conformance"
+    ]
+  },
+  "next_milestone": {
+    "id": "SR-001",
+    "name": "Specification Runtime Charter"
+  }
+}
