@@ -6,349 +6,479 @@ CP-001
 
 Title
 
-Common Trust Architecture
+Cross-Domain Normative Independence
 
 Version
 
-0.1
+0.2
 
 Status
 
 Draft
 
+Model
+
+Reduced Constitutional Proposition
+
 ---
 
 ## Purpose
 
-Define the constitutional
-requirement for a reusable
-Common Trust Architecture
-across independent
-Domain Runtimes.
+Define the candidate
+constitutional principle
 
-This principle is
-a constitutional candidate.
+that normative semantics
+claimed to be reusable
+across independent domains
 
-It shall remain
-Draft until validated
-through independent
-Domain Runtimes
-and systematic
-refutation.
+shall remain independent
+from the semantics
+of any single domain.
 
----
-
-## Principle
-
-The repository
-shall not implement
-domain-specific
-trust mechanisms
-when those mechanisms
-represent reusable
-trust semantics.
-
-The repository
-shall pursue
-a reusable
+This principle
+does not require
+a particular
 Common Trust Architecture.
 
-Every conforming
-Domain Runtime
-shall inherit
-common trust semantics
-from the Platform.
-
-Only domain semantics
-may vary.
+It governs
+the validity
+of cross-domain
+normative claims.
 
 ---
 
-## Applicability Boundary
+## Constitutional Proposition
 
-The Common Trust Architecture
-shall only apply
-when a computational
-result requires
-one or more
-of the following:
+A normative abstraction
+claimed to be
+cross-domain
 
-Defensibility.
+shall not derive
+its meaning
+from one
+specific domain.
 
-Reproducibility.
+No Domain Runtime
+shall silently redefine
+a validly shared
+cross-domain
+normative semantic.
 
-Attribution.
+Cross-domain
+normative authority
 
-Verifiability.
-
-Traceability.
-
-The Common Trust Architecture
-shall not be imposed
-upon software
-without meaningful
-trust requirements.
-
-Ordinary CRUD systems,
-
-generic APIs,
-
-ordinary microservices,
-
-and unrelated
-application infrastructure
-
-shall not be required
-to adopt
-the Common Trust Architecture.
+shall require evidence
+that the abstraction
+remains meaningful
+outside
+the domain
+from which
+it originated.
 
 ---
 
-## Architectural Minimalism
+## Scope
 
-The success
-of the Common Trust Architecture
-shall not be measured
-by everything
-it can contain.
+CP-001 applies only
+to normative semantics
+that claim:
 
-Its success
-shall be measured
-by its ability
-to remain:
+Cross-domain applicability.
 
-Small.
+Platform-level reuse.
 
-Stable.
+Shared repository
+normative meaning.
 
-Domain-independent.
+CP-001 does not require
+every repository capability
+to become cross-domain.
 
-Implementation-independent.
-
-Reusable.
-
-The Common Trust Architecture
-shall remain minimal
-while Domain Runtimes
-evolve around it.
-
-Capabilities belonging
-exclusively to
-a Domain Runtime
-shall not enter
-the Common Trust Architecture.
-
----
-
-## Architectural Role
-
-The Common Trust Architecture
-shall define
-normative architectural
-interfaces and semantics.
-
-It shall not
-implement
-domain behavior.
-
-It shall not
-define
-business decisions.
-
-It shall not
-define
-domain-specific
-policies.
-
-It shall not
-become
-a software framework.
-
-Domain behavior
+Domain-local semantics
 shall remain
-within
-Domain Specifications
-and Domain Runtimes.
+domain-local.
 
 ---
 
-## Framework Prohibition
+## Non-Goals
 
-The Common Trust Architecture
-is an architecture.
+CP-001 shall not define:
 
-It is not
-a framework.
+Common Trust Architecture.
 
-It shall not
-require:
+Trust Kernel.
 
-A programming language.
+Trust Profiles.
 
-A class hierarchy.
+Evidence schemas.
 
-A framework.
+Replay semantics.
 
-An SDK.
+Certification.
 
-A library.
+Attestation.
 
-A database.
+Runtime behavior.
 
-A cloud provider.
+Commercial product behavior.
 
-An execution engine.
+Implementation technology.
 
-A computer vision engine.
+Programming languages.
 
-An AI model.
+Frameworks.
 
-A specific
-deployment technology.
+Libraries.
+
+Execution engines.
+
+These concerns
+belong to
+lower normative layers.
 
 ---
 
-## Domain Runtime Relationship
+## Domain Independence Requirement
 
-The Common Trust Architecture
-shall enable
-Domain Runtimes.
+A cross-domain
+normative abstraction
+shall remain meaningful
+without requiring
+the business semantics
+of one specific domain.
 
-It shall not
-replace them.
+A cross-domain abstraction
+shall not require
+knowledge of:
+
+Retail.
+
+Finance.
+
+Healthcare.
+
+Legal systems.
+
+Manufacturing.
+
+Scientific computing.
+
+Artificial intelligence.
+
+Computer vision.
+
+Supply chain.
+
+Robotics.
+
+or any future
+application domain
+
+unless that knowledge
+is explicitly
+part of its
+declared applicability
+boundary.
+
+---
+
+## Domain Runtime Boundary
+
+Domain Runtimes
+may define:
+
+Domain semantics.
+
+Domain policy.
+
+Domain decisions.
+
+Domain actions.
+
+Commercial behavior.
 
 A Domain Runtime
-shall define
-its own
+may specialize
+a shared normative
+abstraction
+
+only within
+its declared
+domain boundary.
+
+It shall not
+silently redefine
+the shared
+cross-domain meaning.
+
+---
+
+## Cross-Domain Claim Rule
+
+A claim
+of cross-domain
+applicability
+shall require
+cross-domain evidence.
+
+Success
+within one domain
+shall not establish
+cross-domain validity.
+
+Success
+within multiple
+similar domains
+shall not automatically
+establish
+independence.
+
+The evidence
+shall be sufficient
+to test
+whether the abstraction
+survives
+materially different
 domain semantics.
 
-A Domain Runtime
-shall not
-redefine
-common trust semantics
-that have been
-validly promoted
-into the Platform.
+---
+
+## Generalization Rule
+
+Validated knowledge
+may move
+from a Domain Runtime
+
+toward
+shared repository
+normative semantics
+
+only when
+the generalization
+survives
+cross-domain
+refutation.
+
+Domain success
+shall not itself
+create
+cross-domain
+normative authority.
 
 ---
 
-## Commercial Boundary
+## Falsifiability
 
-The Common Trust Architecture
-shall not be
-the commercial product.
-
-The Common Trust Architecture
-shall enable
-commercial products.
-
-Every Domain Runtime
-shall maintain
-its own
-commercial narrative
-based upon
-the problem
-it solves.
-
-Commercial users
-shall interact
-with domain capabilities,
-
-not with
-internal architectural
-layers.
-
----
-
-## Research Constraint
-
-The Common Trust Architecture
+CP-001
 shall remain
-Draft
+a falsifiable
+constitutional candidate.
 
-until validated
-through at least
-three sufficiently
-independent
-Domain Runtime contexts.
+The proposition
+shall fail
+or require narrowing
+if evidence demonstrates
+that:
 
-Candidate validation
-contexts include:
+Shared semantics
+cannot remain meaningful
+without domain-specific
+knowledge.
 
-Knowledge Runtime.
+Domain Runtimes
+must repeatedly redefine
+the shared semantics
+to remain correct.
 
-Compute Runtime.
+Cross-domain
+generalization
+creates greater
+semantic ambiguity
+than domain-local
+specification.
 
-Visual Runtime.
+The abstraction
+cannot define
+a stable
+applicability boundary.
 
-No abstraction
-shall become
-constitutional
-solely because
-it appears elegant.
-
-Evidence shall govern
-architectural promotion.
+The claimed
+cross-domain property
+does not survive
+independent domains.
 
 ---
 
-## Evolution Rule
+## Relationship to Common Trust Architecture
 
-The Common Trust Architecture
-may evolve
-while it remains
-Draft.
+Common Trust Architecture
+is not required
+by this principle.
 
-Evolution shall follow
-evidence
-over attachment.
+CTA may emerge
+as one architectural
+response
 
-A proposed abstraction
-that fails
-cross-domain validation
-shall be removed,
+if evidence demonstrates
+that reusable
+cross-domain
+normative semantics
+require
+a common architecture.
 
-refined,
+CTA shall therefore
+remain
+an architectural
+research candidate
 
-or returned
-to research.
+until independently
+justified.
 
-Once validly frozen,
+CP-001 shall not
+constitutionalize
+an architectural
+solution
+before
+the underlying
+constitutional proposition
+has survived
+promotion.
 
-implementation technologies
-shall evolve
-around the architecture,
+---
 
-not redefine it.
+## Relationship to RC-001
+
+CP-001 remains
+subordinate to
+
+RC-001
+Repository Constitution
+Baseline 1.0.
+
+CP-001 shall not
+reinterpret:
+
+Repository normative
+authority.
+
+Implementation independence.
+
+Technology independence.
+
+Domain boundary.
+
+Constitutional minimality.
+
+CP-001 specializes
+the constitutional
+question of
+
+how cross-domain
+normative claims
+may acquire
+repository-level authority.
 
 ---
 
 ## Candidate Invariants
 
-Trust semantics
+CPI-001
+
+A cross-domain
+normative abstraction
+shall not derive
+its meaning
+from one
+specific domain.
+
+CPI-002
+
+Domain-local semantics
 shall remain
-reusable.
+domain-local
+unless validly generalized.
 
-Domain semantics
-shall remain
-outside
-the Common Trust Architecture.
+CPI-003
 
-Implementation technology
-shall not define
-the Common Trust Architecture.
-
-Commercial products
-shall remain
-Domain Runtime concerns.
-
-Architectural complexity
+Cross-domain claims
 shall require
-demonstrated necessity.
+cross-domain evidence.
 
-Evidence
-shall precede
-constitutional promotion.
+CPI-004
+
+Domain Runtime behavior
+shall not silently
+redefine
+shared cross-domain
+normative semantics.
+
+CPI-005
+
+Domain success
+shall not itself
+create
+cross-domain
+normative authority.
+
+CPI-006
+
+A cross-domain
+normative claim
+shall remain
+falsifiable.
+
+CPI-007
+
+CP-001 shall not require
+a particular
+architectural implementation.
+
+---
+
+## Current Status
+
+Identifier
+
+CP-001
+
+Version
+
+0.2
+
+Status
+
+Draft
+
+Model
+
+Reduced Constitutional Proposition
+
+Refutation Cycles Completed
+
+1
+
+Constitutional Necessity
+
+NOT YET PROVEN.
+
+Cross-Domain Proposition
+
+RETAINED FOR TESTING.
+
+Common Trust Architecture
+
+RELOCATED
+TO ARCHITECTURAL
+RESEARCH.
+
+Freeze
+
+PROHIBITED.
+
+Next Required Activity
+
+Adversarial
+Cross-Domain Refutation.
 
 ---
 

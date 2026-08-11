@@ -6,272 +6,667 @@ CP-002
 
 Title
 
-Trust Model First
+Explicit Trust Assumptions
 
 Version
 
-0.1
+0.2
 
 Status
 
 Draft
 
+Model
+
+Reduced Epistemic Model
+
 ---
 
 ## Purpose
 
-Define the constitutional
-candidate principle
-that architectural
-and implementation decisions
-shall derive
-from an explicit
-model of trust,
+Define the candidate
+constitutional principle
 
-rather than
-allowing implementation
-choices to define
-the model.
+that architectural claims
+whose validity depends
+upon trust assumptions
 
----
+shall make
+those assumptions
+explicit,
+traceable,
+and refutable.
 
-## Principle
+CP-002 does not define
+normative authority hierarchy.
 
-The Trust Model
-shall define
-the architecture.
-
-Architecture
-shall define
-normative specifications.
-
-Normative specifications
-shall define
-executable contracts.
-
-Executable contracts
-shall constrain
-implementations.
-
-Implementations
-shall realize
-the model.
-
-The direction
-shall never
-be reversed.
+It governs
+epistemic discipline
+for trust-dependent
+architectural claims.
 
 ---
 
-## Authority Direction
+## Core Proposition
 
-The canonical
-direction of authority
-is:
+An architectural claim
+that depends upon
+trust assumptions
 
-Trust Model
+shall identify
+those assumptions
+explicitly.
 
-↓
+Trust assumptions
+shall not remain
+implicit
+when they materially
+affect:
 
-Architecture
+Security.
 
-↓
+Authority.
 
-Normative Specification
+Evidence.
 
-↓
+Adversarial behavior.
 
-Executable Contract
+Defensibility.
 
-↓
+Integrity.
 
-Reference Implementation
+Execution boundaries.
 
-↓
+Reliance.
 
-Runtime Artifact
-
-↓
-
-Execution
-
-No lower layer
-shall redefine
-a higher layer.
+The assumptions
+shall be sufficiently
+explicit
+to permit
+challenge
+and refutation.
 
 ---
 
-## Implementation Constraint
+## Authority Boundary
 
-Implementation convenience
-shall never become
+Trust assumptions
+do not create
 normative authority.
 
+A Trust Model
+does not supersede:
+
+RC-001.
+
+Constitutional Principles.
+
+Architecture Principles.
+
+Normative Specifications.
+
+Promotion decisions.
+
+Version Authority.
+
+Normative authority
+shall continue
+to derive
+from explicit
+repository authority
+mechanisms.
+
+Epistemic precedence
+shall not be confused
+with normative authority.
+
+---
+
+## Epistemic Precedence
+
+Where
+an architectural claim
+depends materially
+upon trust,
+
+the relevant
+trust assumptions
+shall be identified
+
+before the claim
+is treated
+as adequately justified.
+
+This is
+a reasoning requirement.
+
+It is not
+an authority hierarchy.
+
+---
+
+## Evidence Flow
+
+Evidence
+may originate
+from:
+
+Implementation.
+
+Runtime execution.
+
+Testing.
+
+Operational failure.
+
+Security analysis.
+
+Adversarial analysis.
+
+Research.
+
+Domain observation.
+
+Lower-level evidence
+may challenge
+higher-level assumptions.
+
+This does not
+grant
+normative authority
+to the evidence source.
+
+Evidence flow
+and authority flow
+shall remain distinct.
+
+---
+
+## Implementation Boundary
+
+Implementation
+shall not silently
+define
+trust assumptions.
+
 Existing code
-shall not become
-a specification
+shall not establish
+trust semantics
 merely because
-it already exists.
+it exists.
 
 A successful implementation
-shall not establish
+shall not prove
 architectural correctness
 by itself.
 
-Reference implementations
-shall remain
-replaceable.
-
----
-
-## Evidence Over Attachment
-
-Architectural decisions
-shall follow
+Implementation behavior
+may provide
 evidence
-over attachment.
+for or against
+architectural assumptions.
 
-Historical investment
-shall not protect
-an abstraction
-from refutation.
+Implementation evidence
+may therefore
+trigger reconsideration
 
-Implementation familiarity
-shall not protect
-an abstraction
-from refutation.
-
-Architectural elegance
-shall not protect
-an abstraction
-from refutation.
-
-If evidence demonstrates
-a better model,
-
-the Platform
-shall evolve.
+without becoming
+normative authority.
 
 ---
 
-## Scientific Discipline
+## Trust Model Boundary
 
-Architectural ideas
-shall be treated
-as hypotheses
-until sufficiently
-validated.
+CP-002 does not require
+Trust
+to be
+the most fundamental
+repository abstraction.
 
-A foundational abstraction
-shall undergo:
+The repository
+shall remain open
+to evidence
+that a more general
+model better explains
+the relevant architecture.
 
-Observation.
+Possible alternative
+or underlying concepts
+may include:
 
-Formalization.
+Authority.
 
-Refutation.
+Claims.
 
-Experimental validation.
+Evidence.
 
-Cross-domain validation.
+Risk.
 
-Reproducibility analysis.
+Capability.
 
-Architectural promotion.
+Accountability.
 
-Only sufficiently
-validated abstractions
-may be considered
-for constitutional
-promotion.
+Adversarial assumptions.
+
+Reliance.
+
+No such concept
+is promoted
+by CP-002 merely
+through enumeration.
 
 ---
 
-## Commercial Reality
+## Applicability Boundary
 
-The Trust Model
-shall not emerge
-from technology-driven
-speculation alone.
+CP-002 applies
+only where
+architectural validity
+materially depends
+upon trust assumptions.
 
-Commercial problems
-shall provide
-real-world questions
-for applied
-scientific investigation.
+It shall not require
+a Trust Model
+for every:
 
-Research
-shall discover
-reusable principles.
+CRUD system.
+
+Utility.
+
+Library.
+
+Pure transformation.
+
+Administrative script.
+
+Domain component.
+
+Repository artifact.
+
+Applicability
+shall depend
+upon whether
+implicit trust assumptions
+would materially affect
+the validity
+of the architectural claim.
+
+---
+
+## Assumption Classes
+
+Trust assumptions
+may concern:
+
+Actors.
+
+Artifacts.
+
+Identity.
+
+Authority.
+
+Capabilities.
+
+Evidence sources.
+
+Execution environments.
+
+External services.
+
+Hardware.
+
+Software.
+
+Models.
+
+Networks.
+
+Time.
+
+Randomness.
+
+State.
+
+Adversarial capabilities.
+
+Failure modes.
+
+This list
+is non-exhaustive.
+
+CP-002 does not define
+the semantics
+of these classes.
+
+---
+
+## Refutability Requirement
+
+Trust assumptions
+shall be stated
+in a form
+that permits
+meaningful challenge.
+
+An assumption
+that cannot
+in principle
+affect the validity
+of an architectural claim
+
+shall not be treated
+as necessary
+trust semantics.
+
+Where possible,
+the repository
+should be able
+to determine:
+
+What is assumed.
+
+Why it is assumed.
+
+What depends upon it.
+
+What evidence supports it.
+
+What evidence
+could refute it.
+
+What fails
+if the assumption
+is false.
+
+---
+
+## Implicit Trust Failure
+
+An architectural design
+shall be considered
+epistemically incomplete
+
+when its correctness
+depends materially
+upon an undeclared
+trust assumption.
+
+This does not
+automatically make
+the implementation invalid.
+
+It means
+the architectural claim
+has insufficiently
+specified premises.
+
+---
+
+## Relationship to Architecture
 
 Architecture
-shall stabilize
-those principles.
+may consume
+explicit trust assumptions.
 
-Domain Runtimes
-shall convert
-those principles
-into commercial value.
+Architecture
+may also generate
+new questions
+about those assumptions.
+
+The relationship
+is iterative.
+
+Trust assumptions
+may constrain
+architecture.
+
+Architectural evidence
+may refine
+or refute
+trust assumptions.
+
+No universal
+one-direction
+design pipeline
+is required.
 
 ---
 
-## Research Boundary
+## Relationship to SL-001
 
-The Trust Model
-is presently
-under active
-foundational research.
+CP-002
+shall not redefine
+the Repository
+Specification Lifecycle.
 
-Candidate abstractions
-shall not be
-prematurely frozen.
+Research,
+review,
+refutation,
+promotion,
+and authority transition
 
-The current investigation
-shall remain open
-to the possibility
-that Trust
-is not
-the most fundamental
-abstraction.
+remain governed
+by their respective
+normative mechanisms.
 
-Evidence may demonstrate
-that a more general
-appraisal model
-better explains
-the architecture.
+CP-002 contributes
+only
+the epistemic requirement
+that trust-dependent
+architectural claims
+make their assumptions
+explicit and refutable.
 
-Such a result
-shall be accepted
-if supported
-by stronger evidence.
+---
+
+## Relationship to RC-001
+
+CP-002 remains
+subordinate to
+
+RC-001
+Repository Constitution
+Baseline 1.0.
+
+CP-002 shall not
+reinterpret:
+
+Repository normative
+authority.
+
+Constitutional authority.
+
+Implementation independence.
+
+Technology independence.
+
+Evidence-driven revision.
+
+Constitutional minimality.
+
+---
+
+## Non-Goals
+
+CP-002 shall not define:
+
+A Trust Kernel.
+
+A Common Trust Architecture.
+
+A Threat Model format.
+
+A security framework.
+
+A risk framework.
+
+A verification framework.
+
+A programming language.
+
+A runtime.
+
+A commercial process.
+
+A research lifecycle.
+
+A Promotion Gate.
+
+Version Authority.
+
+---
+
+## Falsifiability
+
+CP-002
+shall remain
+a falsifiable
+constitutional candidate.
+
+The proposition
+shall fail
+or require narrowing
+if evidence demonstrates
+that:
+
+Explicit trust assumptions
+provide no material
+architectural value.
+
+Trust-dependent claims
+can remain equally
+refutable
+without exposing
+their assumptions.
+
+The requirement
+creates more ambiguity
+than it removes.
+
+The requirement
+cannot be distinguished
+from ordinary
+specification completeness.
+
+The requirement
+is already fully implied
+by RC-001
+without any independent
+constitutional property.
 
 ---
 
 ## Candidate Invariants
 
-Model
-precedes architecture.
+CPI-201
 
-Architecture
-precedes implementation.
+Trust-dependent
+architectural claims
+shall make
+material trust assumptions
+explicit.
 
-Evidence
-precedes promotion.
+CPI-202
 
-Commercial reality
-precedes speculative
-abstraction.
+Trust assumptions
+shall remain
+refutable.
+
+CPI-203
+
+Epistemic precedence
+shall not create
+normative authority.
+
+CPI-204
+
+Evidence flow
+shall remain distinct
+from authority flow.
+
+CPI-205
 
 Implementation
-shall not define
-normative truth.
+shall not silently define
+trust semantics.
 
-The Platform
-shall change
-its ideas
-before forcing
-evidence
-to fit them.
+CPI-206
+
+Implementation evidence
+may challenge
+trust assumptions
+
+without creating
+normative authority.
+
+CPI-207
+
+CP-002 shall not require
+Trust
+to be
+the repository's
+most fundamental
+abstraction.
+
+CPI-208
+
+CP-002 shall apply
+only where
+trust assumptions
+materially affect
+architectural validity.
+
+---
+
+## Current Status
+
+Identifier
+
+CP-002
+
+Version
+
+0.2
+
+Status
+
+Draft
+
+Model
+
+Reduced Epistemic Model
+
+Refutation Cycles Completed
+
+1
+
+Authority Hierarchy
+
+REMOVED.
+
+Epistemic Discipline
+
+RETAINED.
+
+Trust as
+Fundamental Abstraction
+
+NOT ASSUMED.
+
+Constitutional Necessity
+
+NOT YET PROVEN.
+
+Freeze
+
+PROHIBITED.
+
+Next Required Activity
+
+Adversarial
+Implicit Trust
+Refutation.
 
 ---
 
