@@ -6,15 +6,15 @@ RC-001
 
 Version
 
-1.0
+0.2
 
 Status
 
-Normative
+Draft
 
 Model
 
-Constitutional Baseline
+Minimal Canonical Model
 
 ---
 
@@ -28,17 +28,43 @@ The Constitution
 shall remain minimal.
 
 It shall govern
-only those semantics
-required to preserve:
+only those principles
+that must remain
+stable across:
 
-Repository authority.
+Architectures.
 
-Constitutional principle
+Specifications.
+
+Implementations.
+
+Technologies.
+
+Domains.
+
+Commercial products.
+
+The Constitution
+shall not encode
+current architectural
+detail.
+
+---
+
+## Constitutional Role
+
+The Constitution
+defines repository-level
+normative authority.
+
+It shall govern:
+
+Constitutional Principle
 authority.
 
 Conflict resolution.
 
-Versioned evolution.
+Constitutional evolution.
 
 Implementation independence.
 
@@ -49,73 +75,37 @@ Historical traceability.
 Evidence-driven revision.
 
 The Constitution
-shall not encode
-current architectural
-or domain detail.
+shall not define:
+
+Domain semantics.
+
+Runtime behavior.
+
+Implementation behavior.
+
+Current Trust Model.
+
+Replay semantics.
+
+Evidence schemas.
+
+Certification semantics.
+
+Attestation semantics.
+
+Archive semantics.
+
+Executable Contract behavior.
+
+These concerns
+belong to
+lower normative layers.
 
 ---
 
-## Repository Authority Context
+## Repository Normative Authority
 
-Constitutional authority
-shall exist
-within an explicitly
-identified
-Repository Authority Context.
-
-The Repository Authority Context
-defines the normative
-repository scope
-within which
-a Constitution version
-may possess authority.
-
-Authority
-shall not be assumed
-to extend
-to unrelated
-repositories,
-
-forks,
-
-external systems,
-
-or independently
-governed repositories.
-
-A repository fork
-may establish
-its own
-Repository Authority Context.
-
-A transition
-between
-Repository Authority Contexts
-shall remain
-explicit
-and traceable.
-
-Operational ownership,
-
-organizational change,
-
-infrastructure migration,
-
-or repository relocation
-
-shall not
-silently change
-the Repository Authority Context.
-
----
-
-## Highest Normative Authority
-
-Within one identified
-Repository Authority Context,
-
-the authoritative
-Constitutional version
+The Constitution
 shall represent
 the highest
 repository normative
@@ -124,8 +114,8 @@ authority.
 Lower normative
 artifacts
 shall not contradict
-the currently authoritative
-Constitutional version.
+an authoritative
+Constitutional baseline.
 
 Lower layers
 may specialize
@@ -137,57 +127,12 @@ or override them.
 
 ---
 
-## Unambiguous Current Authority
-
-Current constitutional
-authority
-shall resolve
-unambiguously
-within a Repository
-Authority Context.
-
-Multiple historical
-Constitution versions
-may exist.
-
-Multiple versions
-may remain
-historically authoritative
-for their respective
-time periods.
-
-Conflicting
-simultaneously current
-constitutional authority
-shall not be permitted.
-
-Current authority
-shall be explicit.
-
-Current authority
-shall not be inferred
-from:
-
-File presence.
-
-Version recency.
-
-Commit order.
-
-Implementation behavior.
-
-Test behavior.
-
-Historical popularity.
-
----
-
 ## Constitutional Principle Authority
 
 Constitutional Principles
 shall derive authority
 from an authoritative
-Constitutional version.
+Constitutional baseline.
 
 A Constitutional Principle
 shall not become
@@ -202,13 +147,14 @@ shall require
 explicit promotion.
 
 Constitutional Principles
-shall remain distinct
+shall remain
+separate
 from Architecture Principles.
 
 Constitutional Principles
 shall define
 repository-level
-normative invariants.
+invariants.
 
 Architecture Principles
 shall define
@@ -228,7 +174,9 @@ shall enter
 the Constitution
 only when
 its removal
-would compromise:
+would compromise
+one or more
+of the following:
 
 Repository normative
 authority.
@@ -265,21 +213,23 @@ constitutional promotion.
 ## Conflict Resolution
 
 When an authoritative
-lower-level
 repository artifact
 conflicts
-with the currently
-authoritative
-Constitutional version
-within the same
-Repository Authority Context,
+with an authoritative
+Constitutional baseline,
 
-the Constitution
+the Constitutional baseline
 shall prevail.
+
+This precedence
+shall apply
+to lower
+normative layers.
 
 Conflict resolution
 shall not permit
-silent reinterpretation.
+silent reinterpretation
+of the Constitution.
 
 If evidence demonstrates
 that the Constitution
@@ -298,7 +248,8 @@ The Constitution
 shall be versioned.
 
 Multiple historical
-versions may exist.
+Constitution versions
+may exist.
 
 Only explicitly
 authorized versions
@@ -332,8 +283,7 @@ semantics
 through explicit
 versioned evolution.
 
-No published
-Constitutional baseline
+No published baseline
 shall be
 silently rewritten.
 
@@ -422,15 +372,11 @@ Historical traceability
 shall preserve,
 where applicable:
 
-Repository Authority Context.
-
 Version identity.
 
 Promotion decision.
 
 Authority status.
-
-Authority transition.
 
 Supersession history.
 
@@ -446,148 +392,6 @@ Historical evidence
 shall not be erased
 because a later version
 becomes authoritative.
-
----
-
-## Authority Metadata
-
-Constitutional authority
-shall not depend
-upon inference.
-
-Authority metadata
-shall remain
-explicit
-and traceable.
-
-At minimum,
-authority evidence
-shall identify:
-
-Repository Authority Context.
-
-Constitution version.
-
-Authority status.
-
-Promotion decision.
-
-Effective authority transition.
-
-Historical predecessor,
-where applicable.
-
-Loss of authority metadata
-shall not be resolved
-by assuming
-that the newest version
-is authoritative.
-
-Authority ambiguity
-shall require
-explicit resolution.
-
-Authority Metadata
-defines
-normative authority semantics.
-
-It shall not
-require
-a particular:
-
-Schema.
-
-Serialization format.
-
-Database.
-
-Ledger.
-
-Git representation.
-
-File format.
-
-Storage system.
-
-Implementation technology.
-
-Implementation mechanisms
-may represent
-Authority Metadata.
-
-They shall not
-define
-its constitutional meaning.
-
----
-
-## Bootstrap Authority
-
-The Constitution
-shall not claim
-to create
-its own
-original authority.
-
-Initial constitutional
-authority
-shall be established
-through an explicit
-Bootstrap Authority
-event.
-
-Bootstrap Authority
-shall remain
-historically traceable.
-
-Bootstrap Authority
-shall establish
-the first
-authoritative
-Constitutional baseline
-for an identified
-Repository Authority Context.
-
-After Bootstrap Authority
-has been established,
-
-future constitutional
-authority transitions
-shall occur
-through the normal
-constitutional evolution
-and Promotion Gate
-process.
-
-Bootstrap Authority
-shall not be used
-to bypass
-future constitutional
-revision requirements.
-
-Bootstrap Authority
-shall occur
-at most once
-per constitutional
-authority lineage.
-
-Bootstrap Authority
-shall not be reused
-to:
-
-Replace.
-
-Supersede.
-
-Invalidate.
-
-Bypass.
-
-or otherwise
-circumvent
-
-existing
-constitutional authority.
 
 ---
 
@@ -683,14 +487,14 @@ and Domain Runtimes.
 
 The Constitution
 may constrain
-how domain artifacts
-relate
+how domain-specific
+artifacts relate
 to repository-level
 authority.
 
 It shall not
-define
-the domain itself.
+define the domain
+itself.
 
 ---
 
@@ -733,39 +537,6 @@ promotion.
 
 ---
 
-## Emergency Boundary
-
-Emergency operational
-action
-may temporarily
-depart from
-constitutional conformance
-
-when governed
-by an explicit
-external emergency policy.
-
-Such action
-shall not
-silently modify
-constitutional authority.
-
-The conflict
-shall remain
-traceable.
-
-Subsequent
-constitutional
-or operational resolution
-shall be required.
-
-Emergency operation
-shall not become
-a constitutional
-revision mechanism.
-
----
-
 ## Constitutional Invariants
 
 RCI-001
@@ -779,179 +550,93 @@ authority.
 RCI-002
 
 Constitutional authority
-shall exist
-within an identified
-Repository Authority Context.
-
-RCI-003
-
-Current constitutional
-authority
-shall resolve
-unambiguously.
-
-RCI-004
-
-Constitutional authority
 shall be versioned.
 
-RCI-005
+RCI-003
 
 Published Constitutional
 baselines
 shall not be
 silently reinterpreted.
 
-RCI-006
+RCI-004
 
 Constitutional evolution
 shall remain possible
 through explicit
 versioned revision.
 
-RCI-007
+RCI-005
 
 Evidence
 shall prevail
 over attachment.
 
-RCI-008
+RCI-006
 
 Implementation
 shall not create
 constitutional authority.
 
-RCI-009
+RCI-007
 
 Technology
 shall not define
 constitutional semantics.
 
-RCI-010
+RCI-008
 
 Historical
 constitutional evidence
 shall remain traceable.
 
-RCI-011
-
-Constitutional authority
-metadata
-shall remain explicit
-and traceable.
-
-RCI-012
+RCI-009
 
 Constitutional Principles
 shall require
 explicit authority.
 
-RCI-013
+RCI-010
 
 Architecture
 shall remain subordinate
 to constitutional authority.
 
-RCI-014
+RCI-011
 
 Domain semantics
 shall remain outside
 the Constitution.
 
-RCI-015
+RCI-012
 
 The Constitution
 shall remain minimal.
-
-RCI-016
-
-Initial constitutional
-authority
-shall require
-an explicit
-Bootstrap Authority event.
-
-RCI-017
-
-Bootstrap Authority
-shall not replace
-future constitutional
-Promotion Gates.
-
-RCI-018
-
-Emergency operational
-action
-shall not silently modify
-constitutional authority.
-
-RCI-019
-
-Bootstrap Authority
-shall occur
-at most once
-per constitutional
-authority lineage.
-
-RCI-020
-
-Bootstrap Authority
-shall not be reused
-to bypass
-existing constitutional
-authority.
-
-RCI-021
-
-Repository Authority Context
-transitions
-shall remain
-explicit
-and traceable.
-
-RCI-022
-
-Authority Metadata
-shall remain
-implementation-independent.
 
 ---
 
 ## Compatibility
 
-RC-001 Baseline 1.0
-derives from
-RC-001 Version 0.4,
-the promoted
-Freeze Candidate.
+This Version 0.2
+supersedes
+the refuted
+Version 1.0 Draft.
 
-Version 0.4
-superseded
-Version 0.3 Draft
-during normative
-maturation.
-
-Version 0.3 Draft,
-
-Version 0.2 Draft,
-
-and the earlier
 Version 1.0 Draft
-
 shall remain preserved
-as historical
-research evidence.
+as research evidence.
 
-No earlier Draft
-possesses
-current constitutional
-authority.
+No authoritative
+Constitutional baseline
+was established
+by the refuted
+Version 1.0 Draft.
 
-Historical Drafts
-shall not be
-silently rewritten
-to reflect
-later authority.
+Therefore
+Version 0.2
+does not inherit
+its invalid
+immutability assumptions.
 
 ---
 
@@ -963,47 +648,27 @@ RC-001
 
 Version
 
-1.0
+0.2
 
 Status
 
-Normative
+Draft
 
 Model
 
-Constitutional Baseline
-
-Baseline
-
-1.0
-
-Authority
-
-AUTHORITATIVE.
-
-Source Candidate
-
-RC-001 Version 0.4.
+Minimal Canonical Model
 
 Refutation Cycles Completed
 
-3
-
-Adversarial Authority Cases
-
-20
-
-Targeted Authority Cases
-
-15
-
-Promotion Gate
-
-PASSED.
+1
 
 Freeze
 
-ACTIVE.
+PROHIBITED.
+
+Next Required Activity
+
+Adversarial Refutation.
 
 ---
 
