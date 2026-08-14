@@ -299,6 +299,58 @@ during FAM-001.
 
 ---
 
+## Follow-up Investigation
+
+Evidence Record
+
+FAM001_AUTHORITY_PROVENANCE_INVESTIGATION.md
+
+Identifier
+
+FAM-001-API-01.
+
+Investigation Status
+
+COMPLETE
+WITHIN DECLARED
+INVESTIGATION SCOPE.
+
+Result
+
+No independently
+traceable
+
+external Promotion Authority
+provenance
+
+was located
+
+for the examined
+foundational
+Promotion Gates.
+
+The investigation
+
+did not establish
+invalidity.
+
+The investigation
+
+did not resolve
+this finding.
+
+Finding Status
+
+REMAINS CONFIRMED.
+
+Further progress
+
+requires new
+independent
+provenance evidence.
+
+---
+
 ## Disposition
 
 CONFIRMED

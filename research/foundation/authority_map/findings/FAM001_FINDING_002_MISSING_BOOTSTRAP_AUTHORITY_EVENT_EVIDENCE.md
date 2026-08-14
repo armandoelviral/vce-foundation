@@ -231,6 +231,71 @@ STATUS OBSERVED.
 
 ---
 
+## Follow-up Investigation
+
+Evidence Record
+
+FAM001_AUTHORITY_PROVENANCE_INVESTIGATION.md
+
+Identifier
+
+FAM-001-API-01.
+
+Investigation Status
+
+COMPLETE
+WITHIN DECLARED
+INVESTIGATION SCOPE.
+
+Result
+
+No independently
+identifiable
+
+Bootstrap Authority
+event record
+
+was located
+
+for the RC-001
+constitutional lineage.
+
+No Bootstrap
+Event Identifier,
+
+Authority Source,
+
+Authority Actor,
+
+effective transition record,
+
+or historical
+bootstrap evidence reference
+
+was located.
+
+The investigation
+
+did not establish
+invalidity.
+
+The investigation
+
+did not resolve
+this finding.
+
+Finding Status
+
+REMAINS CONFIRMED.
+
+Further progress
+
+requires new
+independent
+provenance evidence.
+
+---
+
 ## Disposition
 
 CONFIRMED

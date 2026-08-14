@@ -848,6 +848,62 @@ REQUIRED.
 
 ---
 
+## Authority Provenance Investigation Result
+
+Evidence Record
+
+FAM001_AUTHORITY_PROVENANCE_INVESTIGATION.md
+
+Identifier
+
+FAM-001-API-01.
+
+Investigation Status
+
+COMPLETE
+WITHIN DECLARED
+INVESTIGATION SCOPE.
+
+Concrete Bootstrap
+Authority event
+
+NOT LOCATED.
+
+External Promotion Authority
+provenance
+
+NOT LOCATED.
+
+FAM-001-FINDING-001
+
+REMAINS CONFIRMED.
+
+FAM-001-FINDING-002
+
+REMAINS CONFIRMED.
+
+Candidate authority edges
+remaining blocked
+
+7.
+
+Authority edges admitted
+
+0.
+
+Authority roots confirmed
+
+0.
+
+Further graph mutation
+
+BLOCKED
+PENDING NEW
+INDEPENDENT
+PROVENANCE EVIDENCE.
+
+---
+
 ## Current Status
 
 Identifier
@@ -905,19 +961,25 @@ Confirmed Evidence Gaps
 Current Activity
 
 Authority Provenance
-Investigation.
+Investigation
+
+COMPLETE
+WITHIN DECLARED
+REPOSITORY SCOPE.
 
 Next Required Activity
 
-Locate independently
-identifiable
+Obtain new
+independent
+provenance evidence
 
-Bootstrap Authority
-event evidence
+capable of resolving
 
-and external
-Promotion Authority
-provenance.
+FAM-001-FINDING-001
+
+or
+
+FAM-001-FINDING-002.
 
 ---
 
