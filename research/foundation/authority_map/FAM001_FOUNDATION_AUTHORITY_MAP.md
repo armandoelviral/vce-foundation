@@ -590,6 +590,264 @@ Graph minimality.
 
 ---
 
+## Candidate Edge Adjudication
+
+Pairwise evidence extraction
+
+COMPLETE.
+
+Directed pairs evaluated
+
+20.
+
+Authority-edge candidates
+
+7.
+
+Non-authority relationships
+
+13.
+
+---
+
+### Candidate Set
+
+RC-001
+to
+SL-001.
+
+Candidate relationship
+
+SUBORDINATION.
+
+Admission
+
+BLOCKED.
+
+Blocking evidence
+
+FAM-001-FINDING-002.
+
+Concrete Bootstrap Authority
+event evidence
+
+NOT LOCATED.
+
+---
+
+RC-001
+to
+APC-001.
+
+Candidate relationship
+
+SUBORDINATION.
+
+Admission
+
+BLOCKED.
+
+Blocking evidence
+
+FAM-001-FINDING-002.
+
+Concrete Bootstrap Authority
+event evidence
+
+NOT LOCATED.
+
+---
+
+RC-001
+to
+NAM-001.
+
+Candidate relationship
+
+SUBORDINATION.
+
+Admission
+
+BLOCKED.
+
+Blocking evidence
+
+FAM-001-FINDING-002.
+
+Concrete Bootstrap Authority
+event evidence
+
+NOT LOCATED.
+
+---
+
+RC-001
+to
+ALM-001.
+
+Candidate relationship
+
+SUBORDINATION.
+
+Admission
+
+BLOCKED.
+
+Blocking evidence
+
+FAM-001-FINDING-002.
+
+Concrete Bootstrap Authority
+event evidence
+
+NOT LOCATED.
+
+---
+
+SL-001
+to
+APC-001.
+
+Candidate relationship
+
+LIFECYCLE_AUTHORITY.
+
+Admission
+
+BLOCKED.
+
+Blocking evidence
+
+FAM-001-FINDING-001.
+
+External Promotion Authority
+provenance
+
+NOT DEMONSTRATED.
+
+---
+
+SL-001
+to
+NAM-001.
+
+Candidate relationship
+
+LIFECYCLE_AUTHORITY.
+
+Admission
+
+BLOCKED.
+
+Blocking evidence
+
+FAM-001-FINDING-001.
+
+External Promotion Authority
+provenance
+
+NOT DEMONSTRATED.
+
+---
+
+APC-001
+to
+NAM-001.
+
+Candidate relationship
+
+SUBORDINATION.
+
+Admission
+
+BLOCKED.
+
+Blocking evidence
+
+FAM-001-FINDING-001.
+
+External Promotion Authority
+provenance
+
+NOT DEMONSTRATED.
+
+---
+
+### Adjudication Result
+
+Evidence sufficient
+to preserve candidates
+
+7.
+
+Evidence sufficient
+to admit authority edges
+
+0.
+
+Candidates refuted
+
+0.
+
+Candidates blocked
+by confirmed
+authority-provenance gaps
+
+7.
+
+Authority roots confirmed
+
+0.
+
+No candidate edge
+
+shall be admitted
+
+until its applicable
+
+authority-of-authority
+provenance
+
+is independently
+identified,
+
+typed,
+
+traceable,
+
+and sufficient
+
+under the FAM-001
+Authority-of-Authority Rule.
+
+Absence of located
+provenance evidence
+
+shall not be interpreted
+
+as proof of invalidity
+
+or proof that
+the candidate relationship
+
+does not exist.
+
+Architecture repair
+
+PROHIBITED
+DURING CURRENT
+MAPPING PHASE.
+
+Authority inference
+
+PROHIBITED.
+
+Further investigation
+
+REQUIRED.
+
+---
+
 ## Current Status
 
 Identifier
@@ -616,6 +874,22 @@ Nodes Under Review
 
 5.
 
+Directed Pairs Evaluated
+
+20.
+
+Authority Edge Candidates
+
+7.
+
+Candidates Blocked
+
+7.
+
+Non-Authority Relationships
+
+13.
+
 Admitted Authority Edges
 
 0.
@@ -624,14 +898,26 @@ Authority Roots Confirmed
 
 0.
 
+Confirmed Evidence Gaps
+
+2.
+
 Current Activity
 
-Evidence Extraction.
+Authority Provenance
+Investigation.
 
 Next Required Activity
 
-Foundation Authority
-Edge Evidence Matrix.
+Locate independently
+identifiable
+
+Bootstrap Authority
+event evidence
+
+and external
+Promotion Authority
+provenance.
 
 ---
 
