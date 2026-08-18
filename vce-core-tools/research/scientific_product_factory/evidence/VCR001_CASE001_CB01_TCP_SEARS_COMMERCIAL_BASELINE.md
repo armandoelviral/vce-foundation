@@ -486,6 +486,297 @@ NOT ESTABLISHED.
 
 ---
 
+## Campaign Deployment Scale
+
+Seasons Evaluated
+
+2.
+
+Deliveries Per Season
+
+3.
+
+Total Deliveries
+
+6.
+
+Points of Sale
+
+20.
+
+Fixtures Per Delivery
+Per Point of Sale
+
+4.
+
+Fixtures Per Delivery
+
+80.
+
+Fixtures Per Season
+
+240.
+
+Fixtures Per
+Two-Season Cycle
+
+480.
+
+Calculation
+
+2 seasons
+
+multiplied by
+
+3 deliveries per season
+
+multiplied by
+
+20 points of sale
+
+multiplied by
+
+4 fixtures per delivery.
+
+---
+
+## Delivery-Level Operating Scenario
+
+Fixture Reviews
+
+80.
+
+Minimum Person-Hours
+
+53.33.
+
+Maximum Person-Hours
+
+106.67.
+
+Minimum Operating Cost
+
+800.00
+USD.
+
+13333.33
+MXN.
+
+Maximum Operating Cost
+
+1600.00
+USD.
+
+26666.67
+MXN.
+
+---
+
+## Season-Level Operating Scenario
+
+Fixture Reviews
+
+240.
+
+Minimum Person-Hours
+
+160.00.
+
+Maximum Person-Hours
+
+320.00.
+
+Minimum Operating Cost
+
+2400.00
+USD.
+
+40000.00
+MXN.
+
+Maximum Operating Cost
+
+4800.00
+USD.
+
+80000.00
+MXN.
+
+---
+
+## Two-Season Operating Scenario
+
+Fixture Reviews
+
+480.
+
+Minimum Person-Hours
+
+320.00.
+
+Maximum Person-Hours
+
+640.00.
+
+Minimum Operating Cost
+
+4800.00
+USD.
+
+80000.00
+MXN.
+
+Maximum Operating Cost
+
+9600.00
+USD.
+
+160000.00
+MXN.
+
+---
+
+## Two-Season Correction Exposure
+
+Projection Condition
+
+Every fixture review
+
+requires one correction
+of ten minutes.
+
+Observed Population-Wide
+Correction Frequency
+
+NOT ESTABLISHED.
+
+Minimum Correction
+Person-Hours
+
+80.00.
+
+Maximum Correction
+Person-Hours
+
+160.00.
+
+Minimum Correction Cost
+
+1200.00
+USD.
+
+20000.00
+MXN.
+
+Maximum Correction Cost
+
+2400.00
+USD.
+
+40000.00
+MXN.
+
+---
+
+## Volume Reconciliation
+
+Previously Declared
+Monthly Volume
+
+20 fixtures.
+
+Previously Annualized
+Fixture Volume
+
+240 fixtures.
+
+Revised Two-Season
+Fixture Volume
+
+480 fixtures.
+
+If two seasons
+
+equal one year,
+
+the implied average
+
+is approximately
+
+40 fixtures per month.
+
+Equivalence Between
+
+Two Seasons
+
+and
+
+One Calendar Year
+
+NOT INDEPENDENTLY
+ESTABLISHED.
+
+The previous
+
+20-fixture monthly estimate
+
+shall not be silently
+
+combined
+
+with the revised
+
+480-fixture
+two-season deployment.
+
+The seasonal deployment
+
+is a more specific
+
+human-declared scenario.
+
+---
+
+## Scale Interpretation
+
+The operating unit
+
+is not a single
+isolated fixture.
+
+It is a coordinated
+
+campaign deployment
+
+across:
+
+seasons,
+
+deliveries,
+
+points of sale,
+
+fixtures,
+
+review roles,
+
+and correction cycles.
+
+This structural scale
+
+does not establish
+
+customer willingness
+to pay,
+
+achieved software savings,
+
+runtime capability,
+
+or commercial revenue.
+
+---
+
 ## Current Disposition
 
 Commercial Baseline
