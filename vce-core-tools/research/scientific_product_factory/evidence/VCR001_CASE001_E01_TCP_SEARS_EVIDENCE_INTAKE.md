@@ -11,7 +11,7 @@ Version
 Status
 
 EVIDENCE INTAKE
-PENDING.
+PARTIALLY MATERIALIZED.
 
 Authority
 
@@ -213,19 +213,19 @@ the expected composition.
 
 External Evidence Identifier
 
-PENDING.
+ART-001.
 
 SHA-256
 
-PENDING.
+5ee2ba02a839a1058b88e02acbe658a1589e18593da72f7dbd52a8d6eeec6bb3.
 
 Byte Size
 
-PENDING.
+543463.
 
 Media Type
 
-PENDING.
+application/pdf.
 
 Version
 
@@ -237,7 +237,7 @@ PENDING.
 
 Verification Status
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 ---
 
@@ -257,19 +257,19 @@ against REF-001.
 
 External Evidence Identifier
 
-PENDING.
+ART-004.
 
 SHA-256
 
-PENDING.
+59b25908d955a6dac998f8d57ea501c14e2ccc87a9e6b371c566a5c2b53662d1.
 
 Byte Size
 
-PENDING.
+99458.
 
 Media Type
 
-PENDING.
+image/png.
 
 Capture Context
 
@@ -277,7 +277,7 @@ PENDING.
 
 Verification Status
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 ---
 
@@ -319,19 +319,19 @@ the requested change.
 
 External Evidence Identifier
 
-PENDING.
+ART-003.
 
 SHA-256
 
-PENDING.
+c408167fff60f819711528c6f29ec6e71aa9a8294ea1e71afa6833a51c895914.
 
 Byte Size
 
-PENDING.
+2587703.
 
 Media Type
 
-PENDING.
+image/png.
 
 Instruction Authority
 
@@ -340,7 +340,7 @@ BY THIS RECORD.
 
 Verification Status
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 ---
 
@@ -401,23 +401,23 @@ correction cycle.
 
 External Evidence Identifier
 
-PENDING.
+ART-002.
 
 SHA-256
 
-PENDING.
+d07cf39032865e04b82e2f69985498d36e41ee4bdd82aa8e5013d515e4a203f5.
 
 Byte Size
 
-PENDING.
+360279.
 
 Media Type
 
-PENDING.
+image/png.
 
 Verification Status
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 ---
 
@@ -713,27 +713,27 @@ may be committed.
 
 Reference artifact
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 Observed execution
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 Declared instructions
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 Correction record
 
-NOT INGESTED.
+NOT PROVIDED.
 
 Final output
 
-NOT INGESTED.
+EXTERNAL METADATA RECORDED.
 
 Acceptance evidence
 
-NOT INGESTED.
+NOT PROVIDED.
 
 Manual baseline
 
@@ -751,11 +751,20 @@ EVIDENCE PACKAGE
 
 OPEN.
 
-Evaluation
+Preliminary constraint evaluation
+
+ELIGIBLE
+WITHIN AVAILABLE
+EVIDENCE SCOPE.
+
+Commercial validation
 
 BLOCKED
-PENDING EXTERNAL
-EVIDENCE IDENTIFICATION.
+PENDING HUMAN REVIEW,
+
+ACCEPTANCE EVIDENCE,
+
+AND MANUAL BASELINE.
 
 Implementation
 
@@ -769,31 +778,51 @@ PROHIBITED.
 
 ## Next Required Activity
 
-Compute sanitized
-
-SHA-256 identities
-
-for the selected
-
-external evidence artifacts.
-
-Assign opaque identifiers
-
-without recording
-
-confidential filenames,
-
-paths,
-
-store identities,
-
-or access information.
-
-Then materialize
+Materialize
 
 the initial
+constraint profile
 
-constraint profile.
+against:
+
+REF-001.
+
+OBS-001.
+
+INS-001.
+
+OUT-001.
+
+Preserve
+
+COR-001
+
+and
+
+ACC-001
+
+as unavailable
+
+until independent evidence
+
+is provided.
+
+Record a human
+
+Visual Merchandising review.
+
+Measure the manual
+commercial baseline.
+
+Do not infer
+
+acceptance,
+
+authority,
+
+or commercial success
+
+from file identity alone.
 
 ---
 
