@@ -241,11 +241,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed The Children's Place brand identity was visible in OBS-001.
 
 Final Observation
 
@@ -253,19 +253,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed The Children's Place brand identity remained visible in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -301,11 +301,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the TCP header was not replaced by another brand in OBS-001.
 
 Final Observation
 
@@ -313,19 +313,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the TCP header was not replaced by another brand in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -361,11 +361,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed two distinguishable presentation levels in OBS-001.
 
 Final Observation
 
@@ -373,19 +373,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed two distinguishable presentation levels in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -421,11 +421,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed four upper-level presentation positions in OBS-001; product placement is evaluated separately.
 
 Final Observation
 
@@ -433,19 +433,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed four upper-level presentation positions in OUT-001; product placement is evaluated separately.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -481,11 +481,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed four lower-level presentation positions in OBS-001; product placement and layering are evaluated separately.
 
 Final Observation
 
@@ -493,19 +493,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed four lower-level presentation positions in OUT-001; product placement and layering are evaluated separately.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -541,11 +541,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed front-facing product presentation in OBS-001.
 
 Final Observation
 
@@ -553,19 +553,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed front-facing product presentation in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -2333,23 +2333,23 @@ Total Evaluation Cells
 
 Initial Decisions Completed
 
-9.
+15.
 
 Final Decisions Completed
 
-9.
+15.
 
 Total Decisions Completed
 
-18.
+30.
 
 Change Classifications Completed
 
-9.
+15.
 
 Human Reviewer Decisions
 
-9.
+15.
 
 Formal Acceptance Records
 
