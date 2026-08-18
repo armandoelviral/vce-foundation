@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 
+from sp001.contracts.retail_context_dimension import (
+    RetailContextDimension,
+)
+
 
 @dataclass(frozen=True, slots=True)
 class RetailContextSnapshot:
@@ -8,3 +12,4 @@ class RetailContextSnapshot:
     snapshot_id: str
     snapshot_version: int
     case_id: str
+    dimensions: tuple[RetailContextDimension, ...] = ()
