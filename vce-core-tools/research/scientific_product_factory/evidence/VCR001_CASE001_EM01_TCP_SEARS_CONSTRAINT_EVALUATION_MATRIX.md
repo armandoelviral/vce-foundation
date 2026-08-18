@@ -841,11 +841,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified a nonconforming upper-level color sequence in OBS-001.
 
 Final Observation
 
@@ -853,19 +853,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the upper-level sequence MAGENTA, GRAY, BLUE, ORANGE in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -901,11 +901,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the gray short was not located in SLOT-L02 in OBS-001.
 
 Final Observation
 
@@ -913,19 +913,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the gray short was located in SLOT-L02 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -961,11 +961,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the black short was not located in SLOT-L03 in OBS-001.
 
 Final Observation
 
@@ -973,19 +973,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the black short was located in SLOT-L03 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -1201,11 +1201,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified a missing or separated blue-and-green layered presentation in OBS-001.
 
 Final Observation
 
@@ -1213,19 +1213,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the blue-and-green layered presentation in SLOT-L01 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -1261,11 +1261,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified a missing or separated navy-and-cream layered presentation in OBS-001.
 
 Final Observation
 
@@ -1273,19 +1273,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the navy-and-cream layered presentation in SLOT-L04 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -2333,23 +2333,23 @@ Total Evaluation Cells
 
 Initial Decisions Completed
 
-0.
+5.
 
 Final Decisions Completed
 
-0.
+5.
 
 Total Decisions Completed
 
-0.
+10.
 
 Change Classifications Completed
 
-0.
+5.
 
 Human Reviewer Decisions
 
-0.
+5.
 
 Formal Acceptance Records
 
@@ -2409,7 +2409,7 @@ CAPTURE PRESERVATION
 
 Constraint Evaluation
 
-PENDING HUMAN REVIEW.
+PARTIALLY HUMAN-REVIEWED.
 
 Formal Acceptance
 
