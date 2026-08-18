@@ -1081,11 +1081,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified no undeclared products occupying declared slots in OBS-001.
 
 Final Observation
 
@@ -1093,19 +1093,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review identified no undeclared products occupying declared slots in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -1141,11 +1141,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified no unauthorized product duplication in OBS-001.
 
 Final Observation
 
@@ -1153,19 +1153,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review identified no unauthorized product duplication in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -1561,11 +1561,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the eight declared fixture slots were visually distinguishable in OBS-001.
 
 Final Observation
 
@@ -1573,19 +1573,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the eight declared fixture slots were visually distinguishable in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -1741,11 +1741,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed lighting permitted qualitative identification of products and slots in OBS-001; photometric calibration was not established.
 
 Final Observation
 
@@ -1753,19 +1753,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed lighting permitted qualitative identification of products and slots in OUT-001; photometric calibration was not established.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -1861,11 +1861,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified no exposure condition preventing evaluation of required elements in OBS-001.
 
 Final Observation
 
@@ -1873,19 +1873,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review identified no exposure condition preventing evaluation of required elements in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -1921,11 +1921,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified no obstruction preventing evaluation of declared slots in OBS-001.
 
 Final Observation
 
@@ -1933,19 +1933,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review identified no obstruction preventing evaluation of declared slots in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -2041,11 +2041,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the TCP brand header was not obstructed in OBS-001.
 
 Final Observation
 
@@ -2053,19 +2053,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the TCP brand header was not obstructed in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -2161,11 +2161,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review identified the initial commercial background in OBS-001 as the comparison baseline.
 
 Final Observation
 
@@ -2173,19 +2173,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review identified no material replacement of the commercial background in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -2333,23 +2333,23 @@ Total Evaluation Cells
 
 Initial Decisions Completed
 
-15.
+23.
 
 Final Decisions Completed
 
-15.
+23.
 
 Total Decisions Completed
 
-30.
+46.
 
 Change Classifications Completed
 
-15.
+23.
 
 Human Reviewer Decisions
 
-15.
+23.
 
 Formal Acceptance Records
 

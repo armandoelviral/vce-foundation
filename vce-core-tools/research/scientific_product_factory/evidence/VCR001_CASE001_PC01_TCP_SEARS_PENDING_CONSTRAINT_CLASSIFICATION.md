@@ -209,7 +209,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -237,7 +249,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -397,7 +421,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -481,7 +517,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -537,7 +585,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -565,7 +625,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -623,7 +695,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -679,7 +763,19 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -757,9 +853,25 @@ Pending Constraints Classified
 
 20.
 
+Classified Constraints Reviewed
+
+8.
+
+Classified Constraints Remaining
+
+12.
+
 Directly Observable
 
 8.
+
+Directly Observable Reviewed
+
+8.
+
+Directly Observable Remaining
+
+0.
 
 Derived
 
@@ -791,7 +903,8 @@ Commercial Conclusions Established
 
 Pending Constraints
 
-CLASSIFIED.
+PARTIALLY ADJUDICATED
+WITHIN EM01.
 
 Evaluation Decisions
 
@@ -822,11 +935,11 @@ PROHIBITED.
 
 ## Next Required Activity
 
-Human-review
+Directly observable
 
-the directly observable
+constraint candidates
 
-constraint candidates.
+HUMAN-REVIEWED.
 
 Evaluate derived
 constraints
