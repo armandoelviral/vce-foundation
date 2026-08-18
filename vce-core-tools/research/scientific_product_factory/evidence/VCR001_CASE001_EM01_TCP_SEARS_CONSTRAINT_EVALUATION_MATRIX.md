@@ -1641,11 +1641,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Initial Decision Basis
 
-NOT RECORDED.
+No declared quantitative hanger-alignment tolerance is available for OBS-001.
 
 Final Observation
 
@@ -1653,19 +1653,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Final Decision Basis
 
-NOT RECORDED.
+No declared quantitative hanger-alignment tolerance is available for OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+INDETERMINATE.
 
 Reviewer Decision
 
-PENDING.
+EVIDENCE-ASSESSED.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Acceptance Evidence
 
@@ -1825,11 +1829,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Initial Decision Basis
 
-NOT RECORDED.
+No independent photometric calibration evidence is available for OBS-001.
 
 Final Observation
 
@@ -1837,19 +1841,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Final Decision Basis
 
-NOT RECORDED.
+No independent photometric calibration evidence is available for OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+INDETERMINATE.
 
 Reviewer Decision
 
-PENDING.
+EVIDENCE-ASSESSED.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Acceptance Evidence
 
@@ -2129,11 +2137,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Initial Decision Basis
 
-NOT RECORDED.
+No independently declared camera-angle tolerance is available for OBS-001.
 
 Final Observation
 
@@ -2141,19 +2149,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Final Decision Basis
 
-NOT RECORDED.
+No independently declared camera-angle tolerance is available for OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+INDETERMINATE.
 
 Reviewer Decision
 
-PENDING.
+EVIDENCE-ASSESSED.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Acceptance Evidence
 
@@ -2249,11 +2261,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Initial Decision Basis
 
-NOT RECORDED.
+No declared ambient-light measurement or tolerance is available for OBS-001.
 
 Final Observation
 
@@ -2261,19 +2273,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Final Decision Basis
 
-NOT RECORDED.
+No declared ambient-light measurement or tolerance is available for OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+INDETERMINATE.
 
 Reviewer Decision
 
-PENDING.
+EVIDENCE-ASSESSED.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Acceptance Evidence
 
@@ -2309,11 +2325,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Independent retailer-context corroboration is unavailable for OBS-001 because VCR-001-CASE-001-DISC-001 remains unresolved.
 
 Final Observation
 
@@ -2321,19 +2337,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+INSUFFICIENT_EVIDENCE.
 
 Final Decision Basis
 
-NOT RECORDED.
+Independent retailer-context corroboration is unavailable for OUT-001 because VCR-001-CASE-001-DISC-001 remains unresolved.
 
 Change Classification
 
-NOT_EVALUATED.
+INDETERMINATE.
 
 Reviewer Decision
 
-PENDING.
+EVIDENCE-ASSESSED.
+
+Decision Provenance
+
+DOCUMENTED_CONTEXT_DISCREPANCY.
 
 Acceptance Evidence
 
@@ -2361,23 +2381,27 @@ Total Evaluation Cells
 
 Initial Decisions Completed
 
-30.
+35.
 
 Final Decisions Completed
 
-30.
+35.
 
 Total Decisions Completed
 
-60.
+70.
 
 Change Classifications Completed
 
-30.
+35.
 
 Human Reviewer Decisions
 
 30.
+
+Evidence-Limited Assessments
+
+5.
 
 Formal Acceptance Records
 
@@ -2437,7 +2461,9 @@ CAPTURE PRESERVATION
 
 Constraint Evaluation
 
-PARTIALLY HUMAN-REVIEWED.
+COMPLETE
+WITH EXPLICIT
+EVIDENCE LIMITATIONS.
 
 Formal Acceptance
 

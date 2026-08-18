@@ -532,9 +532,17 @@ Profile Constraints
 
 35.
 
-Reviewed Constraints
+Human-Reviewed Constraints
 
 30.
+
+Evidence-Assessed Constraints
+
+5.
+
+Total Adjudicated Constraints
+
+35.
 
 Observed Improvements
 
@@ -551,6 +559,10 @@ Derived Unchanged Decisions
 Total Matrix Improved Decisions
 
 14.
+
+Evidence-Limited Decisions
+
+5.
 
 Preserved Conditions
 

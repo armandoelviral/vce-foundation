@@ -541,7 +541,23 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Final Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Change Classification
+
+INDETERMINATE.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Independent Improvement
 
@@ -653,7 +669,23 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Final Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Change Classification
+
+INDETERMINATE.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Independent Improvement
 
@@ -847,7 +879,23 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Final Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Change Classification
+
+INDETERMINATE.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Independent Improvement
 
@@ -915,7 +963,23 @@ NONE DECLARED.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Final Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Change Classification
+
+INDETERMINATE.
+
+Decision Provenance
+
+DOCUMENTED_EVIDENCE_GAP.
 
 Independent Improvement
 
@@ -943,7 +1007,23 @@ VCR-001-CASE-001-DISC-001.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Final Decision
+
+INSUFFICIENT_EVIDENCE.
+
+Change Classification
+
+INDETERMINATE.
+
+Decision Provenance
+
+DOCUMENTED_CONTEXT_DISCREPANCY.
 
 Independent Improvement
 
@@ -965,13 +1045,21 @@ Pending Constraints Classified
 
 20.
 
-Classified Constraints Reviewed
+Classified Constraints Human-Reviewed
 
 15.
 
-Classified Constraints Remaining
+Classified Constraints Evidence-Assessed
 
 5.
+
+Classified Constraints Adjudicated
+
+20.
+
+Classified Constraints Remaining
+
+0.
 
 Directly Observable
 
@@ -1001,7 +1089,15 @@ Insufficient Evidence
 
 4.
 
+Insufficient Evidence Adjudicated
+
+4.
+
 Context Disputed
+
+1.
+
+Context Disputed Adjudicated
 
 1.
 
@@ -1023,8 +1119,9 @@ Commercial Conclusions Established
 
 Pending Constraints
 
-PARTIALLY ADJUDICATED
-WITHIN EM01.
+FULLY ADJUDICATED
+WITH EXPLICIT
+EVIDENCE LIMITATIONS.
 
 Evaluation Decisions
 
