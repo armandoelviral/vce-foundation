@@ -1021,11 +1021,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Derived from reviewed slot-placement deviations in OBS-001.
 
 Final Observation
 
@@ -1033,19 +1033,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Derived from reviewed conformant product slot assignments in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Acceptance Evidence
 
@@ -1321,11 +1325,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Derived from reviewed nonconforming layered-outfit presentation in OBS-001.
 
 Final Observation
 
@@ -1333,19 +1337,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Derived from reviewed preservation of both layered outfits in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Acceptance Evidence
 
@@ -1381,11 +1389,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Derived from reviewed layered-outfit separation and product-placement deviations in OBS-001.
 
 Final Observation
 
@@ -1393,19 +1401,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Derived from reviewed conformant layering and slot placement in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Acceptance Evidence
 
@@ -1441,11 +1453,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Derived from reviewed nonconforming upper-level product sequence in OBS-001.
 
 Final Observation
 
@@ -1453,19 +1465,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Derived from reviewed conformant upper-level product sequence in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Acceptance Evidence
 
@@ -1501,11 +1517,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Derived from reviewed nonconforming short and layered-outfit placement in OBS-001.
 
 Final Observation
 
@@ -1513,19 +1529,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Derived from reviewed conformant lower-level short and layered-outfit placement in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Acceptance Evidence
 
@@ -1681,11 +1701,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Derived from the declared contextual-adaptation boundary; fixture color change alone is not a geometry violation in OBS-001.
 
 Final Observation
 
@@ -1693,19 +1713,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Derived from the declared contextual-adaptation boundary; fixture color change alone is not a geometry violation in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Acceptance Evidence
 
@@ -1981,11 +2005,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review distinguished intentional presentation layering from accidental foreground obstruction in OBS-001.
 
 Final Observation
 
@@ -1993,19 +2017,23 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review distinguished intentional layered outfits from accidental foreground obstruction in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+UNCHANGED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Acceptance Evidence
 
@@ -2333,23 +2361,23 @@ Total Evaluation Cells
 
 Initial Decisions Completed
 
-23.
+30.
 
 Final Decisions Completed
 
-23.
+30.
 
 Total Decisions Completed
 
-46.
+60.
 
 Change Classifications Completed
 
-23.
+30.
 
 Human Reviewer Decisions
 
-23.
+30.
 
 Formal Acceptance Records
 

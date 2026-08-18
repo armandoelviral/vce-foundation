@@ -181,7 +181,23 @@ LYR-002.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Independent Improvement
 
@@ -291,7 +307,23 @@ LYR-002.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Independent Improvement
 
@@ -323,7 +355,23 @@ PRD-003.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Independent Improvement
 
@@ -359,7 +407,23 @@ CLR-005.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Independent Improvement
 
@@ -393,7 +457,23 @@ LYR-002.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Independent Improvement
 
@@ -489,7 +569,23 @@ CP01-CONTEXTUAL-ADAPTATION.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Independent Improvement
 
@@ -667,7 +763,23 @@ LYR-002.
 
 Evaluation Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
+
+Decision Provenance
+
+DERIVED_FROM_REVIEWED_EVIDENCE.
 
 Independent Improvement
 
@@ -855,11 +967,11 @@ Pending Constraints Classified
 
 Classified Constraints Reviewed
 
-8.
+15.
 
 Classified Constraints Remaining
 
-12.
+5.
 
 Directly Observable
 
@@ -876,6 +988,14 @@ Directly Observable Remaining
 Derived
 
 7.
+
+Derived Constraints Reviewed
+
+7.
+
+Derived Constraints Remaining
+
+0.
 
 Insufficient Evidence
 

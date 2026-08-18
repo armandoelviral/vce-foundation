@@ -266,7 +266,19 @@ Product relocation is inferred from declared slot-placement observations.
 
 Derived Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
 
 Independent Improvement
 
@@ -292,7 +304,19 @@ Outfit separation depends on observed layered-presentation decisions.
 
 Derived Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
 
 Independent Improvement
 
@@ -320,7 +344,19 @@ Redistribution of layered outfits depends on layering and product-relocation evi
 
 Derived Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
 
 Independent Improvement
 
@@ -352,7 +388,19 @@ Upper-level geometry order derives from the reviewed upper-level color sequence.
 
 Derived Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
 
 Independent Improvement
 
@@ -382,7 +430,19 @@ Lower-level geometry order derives from short placement and outfit placement.
 
 Derived Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+NON_CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+IMPROVED.
 
 Independent Improvement
 
@@ -406,7 +466,19 @@ Fixture color and material changes require interpretation under the declared con
 
 Derived Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -434,7 +506,19 @@ Intentional layering must be distinguished from unintended foreground obstructio
 
 Derived Decision
 
-NOT_EVALUATED.
+RECORDED_IN_EM01.
+
+Initial Decision
+
+CONFORMANT.
+
+Final Decision
+
+CONFORMANT.
+
+Change Classification
+
+UNCHANGED.
 
 Independent Improvement
 
@@ -450,15 +534,27 @@ Profile Constraints
 
 Reviewed Constraints
 
-23.
+30.
 
 Observed Improvements
 
 9.
 
-Preserved Conditions
+Derived Improved Decisions
+
+5.
+
+Derived Unchanged Decisions
+
+2.
+
+Total Matrix Improved Decisions
 
 14.
+
+Preserved Conditions
+
+16.
 
 Observed Correction Groups
 
@@ -470,7 +566,7 @@ Derived Constraints
 
 Derived Decisions Produced
 
-0.
+7.
 
 Independent Operational Interventions
 
@@ -535,7 +631,9 @@ AS CANDIDATE.
 
 Derived Adjudication
 
-PENDING.
+COMPLETE
+WITHIN DECLARED
+DEPENDENCY SCOPE.
 
 Correction Chronology
 
@@ -565,11 +663,11 @@ PROHIBITED.
 
 ## Next Required Activity
 
-Evaluate the seven
+Preserve the seven
 
-derived constraints
+adjudicated derived constraints
 
-using their declared
+and their declared
 
 dependency sources.
 
