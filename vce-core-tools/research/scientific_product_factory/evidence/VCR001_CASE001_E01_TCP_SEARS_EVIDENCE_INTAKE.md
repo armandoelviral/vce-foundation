@@ -257,15 +257,15 @@ against REF-001.
 
 External Evidence Identifier
 
-ART-004.
+ART-003.
 
 SHA-256
 
-59b25908d955a6dac998f8d57ea501c14e2ccc87a9e6b371c566a5c2b53662d1.
+c408167fff60f819711528c6f29ec6e71aa9a8294ea1e71afa6833a51c895914.
 
 Byte Size
 
-99458.
+2587703.
 
 Media Type
 
@@ -319,15 +319,15 @@ the requested change.
 
 External Evidence Identifier
 
-ART-003.
+ART-004.
 
 SHA-256
 
-c408167fff60f819711528c6f29ec6e71aa9a8294ea1e71afa6833a51c895914.
+59b25908d955a6dac998f8d57ea501c14e2ccc87a9e6b371c566a5c2b53662d1.
 
 Byte Size
 
-2587703.
+99458.
 
 Media Type
 
@@ -497,6 +497,124 @@ and evidence retrieval effort.
 Measurement Status
 
 NOT MEASURED.
+
+---
+
+## Documented Context Discrepancy
+
+Identifier
+
+VCR-001-CASE-001-DISC-001.
+
+Affected Evidence
+
+INS-001.
+
+External Artifact
+
+ART-004.
+
+Recorded Source Text
+
+Instruction evidence
+
+contains a reference
+
+to Fresko.
+
+Declared Case Context
+
+Sears Mexico.
+
+Reviewer Clarification
+
+The actual commercial case
+
+is Sears Mexico.
+
+The Fresko reference
+
+is a documented error
+
+within the original
+instruction artifact.
+
+Preservation Rule
+
+INS-001
+
+shall remain unchanged.
+
+Its SHA-256 identity
+
+shall not be modified
+
+to conceal,
+
+correct,
+
+or erase
+
+the source discrepancy.
+
+Interpretation Boundary
+
+Product arrangement,
+
+slot assignment,
+
+layering,
+
+background preservation,
+
+camera preservation,
+
+fixture preservation,
+
+and lighting preservation
+
+remain evaluable
+
+within their applicable scope.
+
+The retailer name
+
+contained in INS-001
+
+shall not be used
+
+as independent evidence
+
+that the case context
+
+is Sears.
+
+Sears context
+
+rests on the reviewer
+clarification.
+
+Independent documentary
+
+confirmation of the retailer
+
+has not been established
+
+by INS-001.
+
+Disposition
+
+SOURCE DISCREPANCY
+DECLARED.
+
+Context Override
+
+HUMAN-DECLARED.
+
+Independent Context
+Corroboration
+
+NOT PROVIDED.
 
 ---
 
