@@ -601,11 +601,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the magenta polo was not located in SLOT-U01 in OBS-001.
 
 Final Observation
 
@@ -613,19 +613,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the magenta polo was located in SLOT-U01 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -661,11 +661,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the gray polo was not located in SLOT-U02 in OBS-001.
 
 Final Observation
 
@@ -673,19 +673,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the gray polo was located in SLOT-U02 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -721,11 +721,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the blue polo was not located in SLOT-U03 in OBS-001.
 
 Final Observation
 
@@ -733,19 +733,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the blue polo was located in SLOT-U03 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -781,11 +781,11 @@ OBS-001.
 
 Initial Decision
 
-NOT_EVALUATED.
+NON_CONFORMANT.
 
 Initial Decision Basis
 
-NOT RECORDED.
+Human review confirmed the orange polo was not located in SLOT-U04 in OBS-001.
 
 Final Observation
 
@@ -793,19 +793,19 @@ OUT-001.
 
 Final Decision
 
-NOT_EVALUATED.
+CONFORMANT.
 
 Final Decision Basis
 
-NOT RECORDED.
+Human review confirmed the orange polo was located in SLOT-U04 in OUT-001.
 
 Change Classification
 
-NOT_EVALUATED.
+IMPROVED.
 
 Reviewer Decision
 
-PENDING.
+HUMAN-REVIEWED.
 
 Acceptance Evidence
 
@@ -2333,23 +2333,23 @@ Total Evaluation Cells
 
 Initial Decisions Completed
 
-5.
+9.
 
 Final Decisions Completed
 
-5.
+9.
 
 Total Decisions Completed
 
-10.
+18.
 
 Change Classifications Completed
 
-5.
+9.
 
 Human Reviewer Decisions
 
-5.
+9.
 
 Formal Acceptance Records
 
