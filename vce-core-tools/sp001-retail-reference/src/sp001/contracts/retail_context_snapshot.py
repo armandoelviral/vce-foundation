@@ -3,6 +3,9 @@ from dataclasses import dataclass
 from sp001.contracts.retail_context_dimension import (
     RetailContextDimension,
 )
+from sp001.contracts.retail_context_scope import (
+    RetailContextScope,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -13,6 +16,7 @@ class RetailContextSnapshot:
     snapshot_version: int
     case_id: str
     dimensions: tuple[RetailContextDimension, ...] = ()
+    context_scope: RetailContextScope | None = None
 
     def __post_init__(self) -> None:
         if (
@@ -34,6 +38,17 @@ class RetailContextSnapshot:
         ):
             raise ValueError(
                 "snapshot_version must be a positive integer"
+            )
+
+        if (
+            self.context_scope is not None
+            and not isinstance(
+                self.context_scope,
+                RetailContextScope,
+            )
+        ):
+            raise TypeError(
+                "context_scope must be a RetailContextScope"
             )
 
         if not isinstance(self.dimensions, tuple):
