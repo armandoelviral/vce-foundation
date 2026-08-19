@@ -235,6 +235,7 @@ def test_provenance_vocabulary_is_exact() -> None:
     } == {
         "DIRECTLY_OBSERVED",
         "DERIVED",
+        "EVIDENCE_ASSESSED",
     }
 
 

@@ -12,6 +12,7 @@ class RuleProvenanceType(StrEnum):
 
     DIRECTLY_OBSERVED = "DIRECTLY_OBSERVED"
     DERIVED = "DERIVED"
+    EVIDENCE_ASSESSED = "EVIDENCE_ASSESSED"
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,6 +82,19 @@ class RetailContextRuleProvenance:
             raise ValueError(
                 "directly observed provenance "
                 "cannot declare source rules"
+            )
+
+        if (
+            self.provenance_type
+            is RuleProvenanceType.EVIDENCE_ASSESSED
+            and (
+                self.source_rule_ids
+                or self.dependency_sources
+            )
+        ):
+            raise ValueError(
+                "evidence-assessed provenance "
+                "cannot declare dependency sources"
             )
 
         seen_ids: set[str] = set()
