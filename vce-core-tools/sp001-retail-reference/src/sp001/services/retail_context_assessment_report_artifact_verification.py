@@ -9,6 +9,9 @@ from sp001.services.retail_context_assessment_report_artifact import (
 from sp001.services.retail_context_assessment_report_digest import (
     RetailContextAssessmentReportDigest,
 )
+from sp001.services.retail_context_assessment_report_payload_validation import (
+    validate_retail_context_assessment_report_payload,
+)
 
 
 def verify_retail_context_assessment_report_artifact(
@@ -107,7 +110,16 @@ def verify_retail_context_assessment_report_artifact(
         )
     ).hexdigest()
 
-    return hmac.compare_digest(
+    integrity_verified = hmac.compare_digest(
         expected,
         digest.value,
     )
+
+    if not integrity_verified:
+        return False
+
+    validate_retail_context_assessment_report_payload(
+        payload=artifact.payload,
+    )
+
+    return True
