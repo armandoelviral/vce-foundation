@@ -18,6 +18,7 @@ class RuleProvenanceGraph:
     directly_observed_count: int
     derived_count: int
     context_policy_ids: tuple[str, ...] = ()
+    evidence_assessed_count: int = 0
 
 
 def build_rule_provenance_graph(
@@ -189,6 +190,12 @@ def build_rule_provenance_graph(
         for record in records
     )
 
+    evidence_assessed_count = sum(
+        record.provenance_type
+        is RuleProvenanceType.EVIDENCE_ASSESSED
+        for record in records
+    )
+
     return RuleProvenanceGraph(
         records=records,
         total_rules=len(records),
@@ -197,4 +204,5 @@ def build_rule_provenance_graph(
         ),
         derived_count=derived_count,
         context_policy_ids=context_policy_ids,
+        evidence_assessed_count=evidence_assessed_count,
     )
