@@ -90,6 +90,18 @@ class RetailContextSnapshot:
                     f"{dimension.dimension_id}"
                 )
 
+            if (
+                self.context_definition is not None
+                and (
+                    dimension.dimension_type
+                    not in self.context_definition.dimension_types
+                )
+            ):
+                raise ValueError(
+                    "undeclared dimension_type: "
+                    f"{dimension.dimension_type}"
+                )
+
             dimension_ids.add(
                 dimension.dimension_id
             )
