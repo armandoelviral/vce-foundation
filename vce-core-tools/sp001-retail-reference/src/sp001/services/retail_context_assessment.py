@@ -17,6 +17,10 @@ from sp001.contracts.retail_context_rule_provenance_graph import (
 from sp001.contracts.retail_context_snapshot import (
     RetailContextSnapshot,
 )
+from sp001.contracts.retail_context_snapshot_completeness import (
+    SnapshotCompletenessResult,
+    evaluate_retail_context_snapshot_completeness,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,6 +30,7 @@ class RetailContextAssessmentResult:
     snapshot: RetailContextSnapshot
     provenance_graph: RuleProvenanceGraph
     summary: RuleImprovementSummary
+    context_completeness: SnapshotCompletenessResult | None = None
 
 
 def execute_retail_context_assessment(
@@ -95,8 +100,15 @@ def execute_retail_context_assessment(
                 f"{provenance.rule_id}"
             )
 
+    context_completeness = (
+        evaluate_retail_context_snapshot_completeness(
+            snapshot=snapshot,
+        )
+    )
+
     return RetailContextAssessmentResult(
         snapshot=snapshot,
         provenance_graph=provenance_graph,
         summary=summary,
+        context_completeness=context_completeness,
     )
