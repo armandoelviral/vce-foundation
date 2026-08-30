@@ -1,5 +1,6 @@
 from dataclasses import FrozenInstanceError, replace
 import hashlib
+import json
 import os
 from pathlib import Path
 
@@ -11,6 +12,9 @@ from sp001.contracts.knowledge_ingestion_registry_storage_location import (
 from sp001.services.knowledge_ingestion_registry_artifact import (
     KnowledgeIngestionRegistryArtifact,
     build_knowledge_ingestion_registry_artifact,
+)
+from sp001.services.knowledge_ingestion_registry_artifact_storage_serialization import (
+    serialize_knowledge_ingestion_registry_artifact,
 )
 from sp001.services.knowledge_ingestion_registry_atomic_write import (
     KnowledgeIngestionRegistryWriteResult,
@@ -63,7 +67,7 @@ def digest_for(
     )
 
 
-def test_atomic_write_persists_exact_utf8_payload(
+def test_atomic_write_persists_exact_canonical_artifact_envelope(
     tmp_path: Path,
 ) -> None:
     location = create_location(
@@ -77,11 +81,26 @@ def test_atomic_write_persists_exact_utf8_payload(
         artifact=artifact,
     )
 
+    expected = (
+        serialize_knowledge_ingestion_registry_artifact(
+            artifact=artifact,
+        )
+    )
+
     assert location.artifact_path.read_bytes() == (
-        artifact.payload.encode(
+        expected.encode(
             "utf-8",
         )
     )
+
+    stored = json.loads(
+        location.artifact_path.read_text(
+            encoding="utf-8",
+        )
+    )
+
+    assert stored["payload"] == artifact.payload
+    assert stored["digest"]["value"] == artifact.digest.value
 
 
 def test_atomic_write_creates_authorized_storage_root(
@@ -138,8 +157,12 @@ def test_write_result_preserves_completed_write_facts(
 
     assert result.artifact_path == location.artifact_path
     assert result.digest == artifact.digest
+    stored = serialize_knowledge_ingestion_registry_artifact(
+        artifact=artifact,
+    )
+
     assert result.bytes_written == len(
-        artifact.payload.encode(
+        stored.encode(
             "utf-8",
         )
     )
@@ -170,15 +193,14 @@ def test_atomic_write_replaces_existing_artifact(
         artifact=replacement,
     )
 
-    assert location.artifact_path.read_text(
-        encoding="utf-8",
-    ) == replacement.payload
-
-    assert "INGESTION-ORIGINAL" not in (
+    stored = json.loads(
         location.artifact_path.read_text(
             encoding="utf-8",
         )
     )
+
+    assert stored["payload"] == replacement.payload
+    assert "INGESTION-ORIGINAL" not in stored["payload"]
 
 
 def test_success_leaves_no_temporary_file(

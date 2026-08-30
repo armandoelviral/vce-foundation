@@ -9,8 +9,8 @@ from sp001.contracts.knowledge_ingestion_registry_storage_location import (
 from sp001.services.knowledge_ingestion_registry_artifact import (
     KnowledgeIngestionRegistryArtifact,
 )
-from sp001.services.knowledge_ingestion_registry_artifact_verification import (
-    verify_knowledge_ingestion_registry_artifact,
+from sp001.services.knowledge_ingestion_registry_artifact_storage_serialization import (
+    serialize_knowledge_ingestion_registry_artifact,
 )
 from sp001.services.knowledge_ingestion_registry_digest import (
     KnowledgeIngestionRegistryDigest,
@@ -89,16 +89,13 @@ def write_knowledge_ingestion_registry_artifact(
             "KnowledgeIngestionRegistryArtifact"
         )
 
-    verified = verify_knowledge_ingestion_registry_artifact(
-        artifact=artifact,
+    stored_artifact = (
+        serialize_knowledge_ingestion_registry_artifact(
+            artifact=artifact,
+        )
     )
 
-    if verified is not True:
-        raise ValueError(
-            "artifact integrity verification failed"
-        )
-
-    content = artifact.payload.encode(
+    content = stored_artifact.encode(
         "utf-8",
     )
 
