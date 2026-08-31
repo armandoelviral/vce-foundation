@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
-import unicodedata
 
-
-KNOWLEDGE_LEXICAL_NORMALIZATION_POLICY = (
-    "NFKC_CASEFOLD_WHITESPACE_V1"
+from sp001.services.knowledge_lexical_text_normalization import (
+    KNOWLEDGE_LEXICAL_NORMALIZATION_POLICY,
+    normalize_knowledge_lexical_text,
 )
 MAXIMUM_LEXICAL_QUERY_ID_LENGTH = 128
 MAXIMUM_LEXICAL_QUERY_TEXT_LENGTH = 1024
@@ -63,15 +62,8 @@ class KnowledgeLexicalQuery:
                 "1024 characters"
             )
 
-        normalized = unicodedata.normalize(
-            "NFKC",
-            unicodedata.normalize(
-                "NFKC",
-                self.raw_text,
-            ).casefold(),
-        )
-        normalized = " ".join(
-            normalized.split()
+        normalized = normalize_knowledge_lexical_text(
+            text=self.raw_text,
         )
 
         if not normalized:
@@ -85,17 +77,6 @@ class KnowledgeLexicalQuery:
                 "normalized_text must contain at most "
                 "1024 characters"
             )
-        if any(
-            unicodedata.category(
-                character
-            ) == "Cc"
-            for character in normalized
-        ):
-            raise ValueError(
-                "normalized_text must not contain "
-                "control characters"
-            )
-
         terms = tuple(
             normalized.split(" ")
         )
