@@ -23,7 +23,6 @@ STORAGE_ENVELOPE_FIELDS = frozenset(
         "schema_version",
     )
 )
-
 STORAGE_DIGEST_FIELDS = frozenset(
     (
         "algorithm",
@@ -31,6 +30,34 @@ STORAGE_DIGEST_FIELDS = frozenset(
         "value",
     )
 )
+
+
+class KnowledgeIngestionRegistryStorageError(ValueError):
+    """Base error for an invalid persisted registry artifact."""
+
+
+class MalformedRegistryStorageError(
+    KnowledgeIngestionRegistryStorageError
+):
+    """Stored text is empty or is not syntactically valid JSON."""
+
+
+class InvalidRegistryStorageStructureError(
+    KnowledgeIngestionRegistryStorageError
+):
+    """Stored JSON cannot represent a supported registry artifact."""
+
+
+class RegistryStorageIntegrityMismatchError(
+    KnowledgeIngestionRegistryStorageError
+):
+    """Stored payload bytes do not correspond to the declared digest."""
+
+
+class NoncanonicalRegistryStorageError(
+    KnowledgeIngestionRegistryStorageError
+):
+    """Stored artifact is valid but not in canonical storage form."""
 
 
 def deserialize_knowledge_ingestion_registry_artifact(
@@ -46,9 +73,8 @@ def deserialize_knowledge_ingestion_registry_artifact(
         raise TypeError(
             "stored_artifact must be a string"
         )
-
     if not stored_artifact.strip():
-        raise ValueError(
+        raise MalformedRegistryStorageError(
             "stored_artifact must not be empty"
         )
 
@@ -58,7 +84,7 @@ def deserialize_knowledge_ingestion_registry_artifact(
             object_pairs_hook=_unique_object,
         )
     except json.JSONDecodeError as error:
-        raise ValueError(
+        raise MalformedRegistryStorageError(
             "stored_artifact must contain valid JSON"
         ) from error
 
@@ -66,7 +92,7 @@ def deserialize_knowledge_ingestion_registry_artifact(
         document,
         dict,
     ):
-        raise ValueError(
+        raise InvalidRegistryStorageStructureError(
             "stored_artifact must contain a JSON object"
         )
 
@@ -79,12 +105,11 @@ def deserialize_knowledge_ingestion_registry_artifact(
     digest_document = document[
         "digest"
     ]
-
     if not isinstance(
         digest_document,
         dict,
     ):
-        raise ValueError(
+        raise InvalidRegistryStorageStructureError(
             "stored digest must be a JSON object"
         )
 
@@ -94,25 +119,31 @@ def deserialize_knowledge_ingestion_registry_artifact(
         subject="stored digest",
     )
 
-    digest = KnowledgeIngestionRegistryDigest(
-        algorithm=digest_document["algorithm"],
-        encoding=digest_document["encoding"],
-        value=digest_document["value"],
-    )
-
-    artifact = KnowledgeIngestionRegistryArtifact(
-        payload=document["payload"],
-        digest=digest,
-        media_type=document["media_type"],
-        schema_version=document["schema_version"],
-    )
-
-    verified = verify_knowledge_ingestion_registry_artifact(
-        artifact=artifact,
-    )
+    try:
+        digest = KnowledgeIngestionRegistryDigest(
+            algorithm=digest_document["algorithm"],
+            encoding=digest_document["encoding"],
+            value=digest_document["value"],
+        )
+        artifact = KnowledgeIngestionRegistryArtifact(
+            payload=document["payload"],
+            digest=digest,
+            media_type=document["media_type"],
+            schema_version=document["schema_version"],
+        )
+        verified = verify_knowledge_ingestion_registry_artifact(
+            artifact=artifact,
+        )
+    except (
+        TypeError,
+        ValueError,
+    ) as error:
+        raise InvalidRegistryStorageStructureError(
+            str(error)
+        ) from error
 
     if verified is not True:
-        raise ValueError(
+        raise RegistryStorageIntegrityMismatchError(
             "stored artifact integrity verification failed"
         )
 
@@ -124,7 +155,7 @@ def deserialize_knowledge_ingestion_registry_artifact(
         canonical.encode("UTF-8"),
         stored_artifact.encode("UTF-8"),
     ):
-        raise ValueError(
+        raise NoncanonicalRegistryStorageError(
             "stored artifact must use canonical JSON"
         )
 
@@ -138,10 +169,9 @@ def _unique_object(
 
     for key, value in pairs:
         if key in document:
-            raise ValueError(
+            raise InvalidRegistryStorageStructureError(
                 f"duplicate JSON field: {key}"
             )
-
         document[key] = value
 
     return document
@@ -156,11 +186,10 @@ def _validate_exact_fields(
     present = frozenset(
         document
     )
-
     missing = expected - present
 
     if missing:
-        raise ValueError(
+        raise InvalidRegistryStorageStructureError(
             f"missing required {subject} fields: "
             + ", ".join(
                 sorted(
@@ -172,7 +201,7 @@ def _validate_exact_fields(
     unexpected = present - expected
 
     if unexpected:
-        raise ValueError(
+        raise InvalidRegistryStorageStructureError(
             f"unexpected {subject} fields: "
             + ", ".join(
                 sorted(
