@@ -89,6 +89,19 @@ def test_malformed_json_is_rejected() -> None:
         validate_knowledge_governed_retrieval_evidence_payload(payload="{")
 
 
+def test_duplicate_json_fields_are_rejected() -> None:
+    payload = create_payload()
+    duplicated = payload.replace(
+        '{"counts":',
+        '{"counts":{},"counts":',
+        1,
+    )
+    with pytest.raises(ValueError, match="duplicate JSON field: counts"):
+        validate_knowledge_governed_retrieval_evidence_payload(
+            payload=duplicated,
+        )
+
+
 @pytest.mark.parametrize("document", ([], None, "evidence", 1, True))
 def test_non_object_root_is_rejected(document: object) -> None:
     with pytest.raises(ValueError, match="JSON object"):

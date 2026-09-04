@@ -170,7 +170,10 @@ def validate_knowledge_governed_retrieval_evidence_payload(*, payload: str) -> b
     if not payload.strip():
         raise ValueError("payload must not be empty")
     try:
-        document = json.loads(payload)
+        document = json.loads(
+            payload,
+            object_pairs_hook=_unique_object,
+        )
     except (json.JSONDecodeError, UnicodeDecodeError) as error:
         raise ValueError("payload must contain valid JSON") from error
     _validate(value=document, specification=ROOT, path="retrieval evidence")
@@ -180,6 +183,15 @@ def validate_knowledge_governed_retrieval_evidence_payload(*, payload: str) -> b
     _validate_manifest(document)
     _validate_ordering(document)
     return True
+
+
+def _unique_object(pairs: list[tuple[str, object]]) -> dict:
+    document = {}
+    for key, value in pairs:
+        if key in document:
+            raise ValueError(f"duplicate JSON field: {key}")
+        document[key] = value
+    return document
 
 
 def _validate(*, value: object, specification: object, path: str) -> None:
