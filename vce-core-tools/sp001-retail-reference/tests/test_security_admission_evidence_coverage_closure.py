@@ -17,11 +17,9 @@ from sp001.contracts.security_admission_policy_evidence_requirements import (
 )
 from tests.test_security_admission_evidence_coverage_resolution_outcome_set import (
     create_byte_length_conclusive_outcome,
-    create_byte_length_impediment_outcome,
     create_byte_length_indeterminate_outcome,
     create_coverage_identity,
     create_media_type_conclusive_outcome,
-    create_media_type_impediment_outcome,
     create_media_type_indeterminate_outcome,
     create_set,
     rebind_outcome,
@@ -178,40 +176,6 @@ def test_conclusive_and_indeterminate_outcomes_close_coverage(
     )
 
     assert closure.resolution_outcome_set is outcome_set
-
-
-@pytest.mark.parametrize(
-    ("required_domains", "factories"),
-    (
-        (
-            (Domain.MEDIA_TYPE,),
-            (create_media_type_impediment_outcome,),
-        ),
-        (
-            (Domain.BYTE_LENGTH,),
-            (create_byte_length_impediment_outcome,),
-        ),
-    ),
-)
-def test_any_impediment_prevents_coverage_closure(
-    required_domains: tuple[SecurityAdmissionEvidenceDomain, ...],
-    factories: tuple[ResolutionFactory, ...],
-) -> None:
-    outcome_set = create_resolution_set(
-        required_domains,
-        factories,
-    )
-
-    with pytest.raises(
-        ValueError,
-        match=(
-            "resolution_outcome_set must not contain "
-            "closure impediments"
-        ),
-    ):
-        SecurityAdmissionEvidenceCoverageClosure(
-            resolution_outcome_set=outcome_set,
-        )
 
 
 @pytest.mark.parametrize("invalid_value", (None, 1, True, object()))

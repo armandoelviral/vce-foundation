@@ -1,5 +1,11 @@
 from dataclasses import dataclass
 
+from sp001.contracts.security_admission_evidence_coverage_byte_length_closure_impediment import (
+    SecurityAdmissionEvidenceCoverageByteLengthClosureImpediment,
+)
+from sp001.contracts.security_admission_evidence_coverage_media_type_closure_impediment import (
+    SecurityAdmissionEvidenceCoverageMediaTypeClosureImpediment,
+)
 from sp001.contracts.security_admission_evidence_coverage_byte_length_resolution_outcome import (
     SecurityAdmissionEvidenceCoverageByteLengthResolutionOutcome,
 )
@@ -63,6 +69,18 @@ class SecurityAdmissionEvidenceCoverageResolutionOutcomeSet:
                     "or "
                     "SecurityAdmissionEvidenceCoverageByteLengthResolutionOutcome "
                     "values"
+                )
+
+            if isinstance(
+                outcome.outcome,
+                (
+                    SecurityAdmissionEvidenceCoverageMediaTypeClosureImpediment,
+                    SecurityAdmissionEvidenceCoverageByteLengthClosureImpediment,
+                ),
+            ):
+                raise ValueError(
+                    "outcomes must contain only resolved conclusive "
+                    "or indeterminate outcomes"
                 )
 
             if outcome.coverage_identity != self.coverage_identity:

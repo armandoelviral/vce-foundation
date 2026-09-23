@@ -238,13 +238,11 @@ def test_exact_references_are_preserved() -> None:
     (
         (Domain.MEDIA_TYPE, create_media_type_conclusive_outcome),
         (Domain.MEDIA_TYPE, create_media_type_indeterminate_outcome),
-        (Domain.MEDIA_TYPE, create_media_type_impediment_outcome),
         (Domain.BYTE_LENGTH, create_byte_length_conclusive_outcome),
         (Domain.BYTE_LENGTH, create_byte_length_indeterminate_outcome),
-        (Domain.BYTE_LENGTH, create_byte_length_impediment_outcome),
     ),
 )
-def test_each_domain_outcome_variant_is_preserved(
+def test_each_resolved_domain_outcome_variant_is_preserved(
     domain: SecurityAdmissionEvidenceDomain,
     factory: ResolutionFactory,
 ) -> None:
@@ -264,6 +262,37 @@ def test_each_domain_outcome_variant_is_preserved(
     assert outcome_set.outcomes is outcomes
     assert outcome_set.outcomes[0] is outcome
     assert outcome_set.outcomes[0].outcome is outcome.outcome
+
+
+@pytest.mark.parametrize(
+    ("domain", "factory"),
+    (
+        (Domain.MEDIA_TYPE, create_media_type_impediment_outcome),
+        (Domain.BYTE_LENGTH, create_byte_length_impediment_outcome),
+    ),
+)
+def test_impediment_is_rejected_before_exhaustive_set_construction(
+    domain: SecurityAdmissionEvidenceDomain,
+    factory: ResolutionFactory,
+) -> None:
+    source_outcome = factory()
+    identity = create_coverage_identity(
+        (domain,),
+        source_outcome.coverage_identity,
+    )
+    outcome = rebind_outcome(source_outcome, identity)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "outcomes must contain only resolved conclusive "
+            "or indeterminate outcomes"
+        ),
+    ):
+        SecurityAdmissionEvidenceCoverageResolutionOutcomeSet(
+            coverage_identity=identity,
+            outcomes=(outcome,),
+        )
 
 
 @pytest.mark.parametrize(
