@@ -223,6 +223,30 @@ def test_decision_authority_and_status_fields_are_absent() -> None:
     )
 
 
+def test_closure_does_not_reinspect_resolved_outcomes() -> None:
+    source = inspect.getsource(
+        SecurityAdmissionEvidenceCoverageClosure
+    )
+    tree = ast.parse(source)
+
+    inspected_attributes = {
+        node.attr
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute)
+    }
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+    }
+
+    assert "outcomes" not in inspected_attributes
+    assert "outcome" not in inspected_attributes
+    assert "any" not in called_names
+    assert "ClosureImpediment" not in source
+
+
 def test_contract_defines_validation_only() -> None:
     source = inspect.getsource(SecurityAdmissionEvidenceCoverageClosure)
     tree = ast.parse(source)
