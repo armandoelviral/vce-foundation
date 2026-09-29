@@ -10,12 +10,19 @@ from sp001.contracts.security_admission_evidence_coverage_closure_state_record i
 from sp001.contracts.security_admission_policy_evidence_requirements import (
     SecurityAdmissionEvidenceDomain,
 )
+from sp001.services import (
+    security_admission_evidence_coverage_closure_state_serialization
+    as serialization_module,
+)
 from sp001.services.security_admission_evidence_coverage_closure_state_projection import (
     project_security_admission_evidence_coverage_closure_state,
 )
 from sp001.services.security_admission_evidence_coverage_closure_state_serialization import (
     SECURITY_ADMISSION_EVIDENCE_COVERAGE_CLOSURE_STATE_SCHEMA_VERSION,
     serialize_security_admission_evidence_coverage_closure_state,
+)
+from sp001.services.security_admission_portable_integer_validation import (
+    SECURITY_ADMISSION_PORTABLE_UINT64_MAX,
 )
 from tests.test_security_admission_evidence_coverage_closure_resolution import (
     create_resolution,
@@ -303,3 +310,125 @@ def test_service_imports_no_external_capability() -> None:
     }
     assert roots == {"sp001"}
     assert imports == {"json"}
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "coverage_version",
+        "evaluation_version",
+        "candidate_version",
+        "admission_policy_version",
+    ),
+)
+def test_portable_identity_overflow_is_rejected_before_json_encoding(
+    field: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = create_record()
+    coverage_identity = (
+        record.closure_resolution.coverage_identity
+    )
+    binding = (
+        coverage_identity
+        .evaluation_record_policy_evidence_requirements_binding
+    )
+    evaluation_identity = (
+        binding.evaluation_record.evaluation_identity
+    )
+    candidate_identity = (
+        evaluation_identity
+        .evaluation_basis
+        .candidate_identity
+    )
+    policy_identity = (
+        binding
+        .policy_evidence_requirements
+        .admission_policy_identity
+    )
+    identities = {
+        "coverage_version": coverage_identity,
+        "evaluation_version": evaluation_identity,
+        "candidate_version": candidate_identity,
+        "admission_policy_version": policy_identity,
+    }
+
+    object.__setattr__(
+        identities[field],
+        field,
+        SECURITY_ADMISSION_PORTABLE_UINT64_MAX + 1,
+    )
+
+    def fail_json_encoding(
+        *args: object,
+        **kwargs: object,
+    ) -> str:
+        raise AssertionError(
+            "json.dumps must not run after portable overflow"
+        )
+
+    monkeypatch.setattr(
+        serialization_module.json,
+        "dumps",
+        fail_json_encoding,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            rf"{field} must not exceed "
+            r"portable uint64 maximum"
+        ),
+    ):
+        serialize_security_admission_evidence_coverage_closure_state(
+            record=record,
+        )
+
+
+def test_serialization_invokes_exactly_four_portable_identity_guards(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = create_record()
+    observed: list[object] = []
+
+    def observe_portable_identity(
+        *,
+        value: object,
+    ) -> None:
+        observed.append(value)
+
+    monkeypatch.setattr(
+        serialization_module,
+        "validate_security_admission_portable_contract_integers",
+        observe_portable_identity,
+    )
+
+    serialize_security_admission_evidence_coverage_closure_state(
+        record=record,
+    )
+
+    coverage_identity = record.closure_resolution.coverage_identity
+    binding = (
+        coverage_identity
+        .evaluation_record_policy_evidence_requirements_binding
+    )
+    evaluation_identity = (
+        binding.evaluation_record.evaluation_identity
+    )
+    candidate_identity = (
+        evaluation_identity
+        .evaluation_basis
+        .candidate_identity
+    )
+    policy_identity = (
+        binding
+        .policy_evidence_requirements
+        .admission_policy_identity
+    )
+
+    assert observed == [
+        coverage_identity,
+        evaluation_identity,
+        candidate_identity,
+        policy_identity,
+    ]

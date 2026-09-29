@@ -9,6 +9,9 @@ from sp001.contracts.security_admission_evidence_coverage_closure_state_record i
 from sp001.contracts.security_admission_evidence_coverage_domain_closure_state import (
     SecurityAdmissionEvidenceCoverageDomainClosureStatus,
 )
+from sp001.services.security_admission_portable_contract_integer_validation import (
+    validate_security_admission_portable_contract_integers,
+)
 
 
 SECURITY_ADMISSION_EVIDENCE_COVERAGE_CLOSURE_STATE_SCHEMA_VERSION = 1
@@ -41,6 +44,16 @@ def serialize_security_admission_evidence_coverage_closure_state(
     candidate_identity = evaluation_basis.candidate_identity
     requirements = binding.policy_evidence_requirements
     policy_identity = requirements.admission_policy_identity
+
+    for portable_identity in (
+        coverage_identity,
+        evaluation_identity,
+        candidate_identity,
+        policy_identity,
+    ):
+        validate_security_admission_portable_contract_integers(
+            value=portable_identity,
+        )
 
     resolved_domain_count = sum(
         state.status
