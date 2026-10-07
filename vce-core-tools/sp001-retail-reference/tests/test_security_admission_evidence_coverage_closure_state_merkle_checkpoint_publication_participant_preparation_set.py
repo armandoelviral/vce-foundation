@@ -219,14 +219,12 @@ def test_preparations_requires_tuple(
         )
 
 
-def test_empty_set_is_rejected() -> None:
-    with pytest.raises(
-        ValueError,
-        match="must not be empty",
-    ):
-        PreparationSet(
-            preparations=(),
-        )
+def test_empty_set_is_preserved() -> None:
+    preparation_set = PreparationSet(
+        preparations=(),
+    )
+
+    assert preparation_set.preparations == ()
 
 
 @pytest.mark.parametrize(

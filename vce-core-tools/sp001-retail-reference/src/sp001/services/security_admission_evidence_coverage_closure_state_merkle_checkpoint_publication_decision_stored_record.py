@@ -106,11 +106,6 @@ class SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDe
             raise TypeError(
                 "preparations must be a tuple"
             )
-        if not self.preparations:
-            raise ValueError(
-                "preparations must not be empty"
-            )
-
         preparation_ids: list[str] = []
 
         for preparation in self.preparations:

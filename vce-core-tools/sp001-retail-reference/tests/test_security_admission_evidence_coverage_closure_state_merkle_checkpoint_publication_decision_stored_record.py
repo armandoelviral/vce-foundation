@@ -370,17 +370,19 @@ def test_preparations_requires_tuple(
         )
 
 
-def test_preparations_rejects_empty_tuple() -> None:
+def test_empty_preparations_are_preserved() -> None:
     record = create_stored_record()
 
-    with pytest.raises(
-        ValueError,
-        match="must not be empty",
-    ):
-        replace(
-            record,
-            preparations=(),
-        )
+    changed = replace(
+        record,
+        preparations=(),
+    )
+
+    assert changed.preparations == ()
+    assert (
+        changed.participant_ids
+        == record.participant_ids
+    )
 
 
 @pytest.mark.parametrize(

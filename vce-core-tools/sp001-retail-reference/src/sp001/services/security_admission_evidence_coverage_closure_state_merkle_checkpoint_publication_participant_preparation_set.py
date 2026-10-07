@@ -28,11 +28,6 @@ class SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationPa
                 "preparations must be a tuple"
             )
 
-        if not self.preparations:
-            raise ValueError(
-                "preparations must not be empty"
-            )
-
         for preparation in self.preparations:
             if not isinstance(
                 preparation,
@@ -64,6 +59,9 @@ class SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationPa
                 "preparations must use canonical "
                 "participant identifier order"
             )
+
+        if not self.preparations:
+            return
 
         publication_intents = tuple(
             preparation
