@@ -10,6 +10,10 @@ from sp001.services.security_admission_evidence_coverage_closure_state_merkle_ch
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_intent import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationIntent,
 )
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation_store import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore,
+)
+
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_set import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantSet,
 )
@@ -27,6 +31,10 @@ DecisionRecordStore = (
 PublicationIntent = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationIntent
 )
+ConfirmationStore = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore
+)
+
 ParticipantSet = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantSet
 )
@@ -37,6 +45,7 @@ def coordinate_security_admission_evidence_coverage_closure_state_merkle_checkpo
     publication_intent: PublicationIntent,
     participant_set: ParticipantSet,
     decision_record_store: DecisionRecordStore,
+    confirmation_store: ConfirmationStore,
 ) -> DecisionRecord:
     """Record one global decision durably before applying its effects."""
 
@@ -50,6 +59,7 @@ def coordinate_security_admission_evidence_coverage_closure_state_merkle_checkpo
 
     apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_recorded_decision(
         decision_record_store=decision_record_store,
+        confirmation_store=confirmation_store,
         publication_id=publication_intent.publication_id,
     )
 

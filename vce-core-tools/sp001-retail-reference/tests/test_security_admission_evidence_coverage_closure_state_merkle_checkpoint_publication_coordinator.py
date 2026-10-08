@@ -21,6 +21,18 @@ from sp001.services.security_admission_evidence_coverage_closure_state_merkle_ch
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_intent import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationIntent,
 )
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmation,
+)
+
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation_set import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationSet,
+)
+
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation_store import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore,
+)
+
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_preparation import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantPreparation,
 )
@@ -56,6 +68,18 @@ DecisionRecordStore = (
 PublicationIntent = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationIntent
 )
+Confirmation = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmation
+)
+
+ConfirmationSet = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationSet
+)
+
+ConfirmationStore = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore
+)
+
 ParticipantPreparation = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantPreparation
 )
@@ -198,6 +222,48 @@ class Store:
         return self.create_result
 
 
+class ConfirmationStoreDouble:
+    def __init__(self) -> None:
+        self.retained = ConfirmationSet(
+            confirmations=(),
+        )
+        self.read_calls: list[str] = []
+        self.create_calls: list[Confirmation] = []
+
+    def read(
+        self,
+        *,
+        publication_id: str,
+    ) -> ConfirmationSet:
+        self.read_calls.append(publication_id)
+        return self.retained
+
+    def create(
+        self,
+        *,
+        confirmation: Confirmation,
+    ) -> bool:
+        self.create_calls.append(confirmation)
+        retained = {
+            item.participant_id: item
+            for item in self.retained.confirmations
+        }
+        retained[confirmation.participant_id] = (
+            confirmation
+        )
+        self.retained = ConfirmationSet(
+            confirmations=tuple(
+                retained[participant_id]
+                for participant_id in sorted(retained)
+            ),
+        )
+        return True
+
+
+class IncompleteConfirmationStore:
+    pass
+
+
 class IncompleteStore:
     pass
 
@@ -295,12 +361,17 @@ def coordinate(
     publication_intent: PublicationIntent,
     participants: ParticipantSet,
     store: DecisionRecordStore,
+    confirmation_store: ConfirmationStore | None = None,
 ) -> DecisionRecord:
+    if confirmation_store is None:
+        confirmation_store = ConfirmationStoreDouble()
+
     return (
         coordinate_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication(
             publication_intent=publication_intent,
             participant_set=participants,
             decision_record_store=store,
+            confirmation_store=confirmation_store,
         )
     )
 
@@ -514,7 +585,6 @@ def test_retry_uses_durable_decision_without_repreparing() -> None:
         events=events,
         commit_results=[
             committed,
-            committed,
         ],
     )
     participants = participant_set(
@@ -522,18 +592,21 @@ def test_retry_uses_durable_decision_without_repreparing() -> None:
         second,
     )
     store = Store(events=events)
+    confirmation_store = ConfirmationStoreDouble()
 
     with pytest.raises(ApplicationError):
         coordinate(
             publication_intent=intent,
             participants=participants,
             store=store,
+            confirmation_store=confirmation_store,
         )
 
     result = coordinate(
         publication_intent=intent,
         participants=participants,
         store=store,
+        confirmation_store=confirmation_store,
     )
 
     assert result is store.retained
@@ -541,8 +614,19 @@ def test_retry_uses_durable_decision_without_repreparing() -> None:
     assert first.prepare_calls == 1
     assert second.prepare_calls == 1
     assert first.commit_calls == 2
-    assert second.commit_calls == 2
+    assert second.commit_calls == 1
     assert store.create_calls == 1
+    assert confirmation_store.read_calls == [
+        intent.publication_id,
+        intent.publication_id,
+    ]
+    assert tuple(
+        confirmation.participant_id
+        for confirmation in confirmation_store.create_calls
+    ) == (
+        second.participant_id,
+        first.participant_id,
+    )
 
 
 def test_create_failure_prevents_every_final_effect() -> None:
@@ -642,6 +726,7 @@ def test_invalid_publication_intent_fails_before_effects(
             publication_intent=value,
             participant_set=object(),
             decision_record_store=object(),
+            confirmation_store=ConfirmationStoreDouble(),
         )
 
 
@@ -667,6 +752,7 @@ def test_invalid_participant_set_fails_before_effects(
             publication_intent=create_intent(),
             participant_set=value,
             decision_record_store=object(),
+            confirmation_store=ConfirmationStoreDouble(),
         )
 
 
@@ -702,6 +788,7 @@ def test_invalid_store_fails_before_effects(
             publication_intent=intent,
             participant_set=participants,
             decision_record_store=value,
+            confirmation_store=ConfirmationStoreDouble(),
         )
 
     assert events == []
@@ -716,6 +803,7 @@ def test_coordinator_has_exact_keyword_only_api() -> None:
         "publication_intent",
         "participant_set",
         "decision_record_store",
+        "confirmation_store",
     )
     assert all(
         parameter.kind
@@ -730,6 +818,7 @@ def test_coordinator_has_exact_keyword_only_api() -> None:
         "publication_intent": PublicationIntent,
         "participant_set": ParticipantSet,
         "decision_record_store": DecisionRecordStore,
+        "confirmation_store": ConfirmationStore,
         "return": DecisionRecord,
     }
 

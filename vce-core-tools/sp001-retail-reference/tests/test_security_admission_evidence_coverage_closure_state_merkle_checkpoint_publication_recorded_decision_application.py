@@ -16,6 +16,18 @@ from sp001.services.security_admission_evidence_coverage_closure_state_merkle_ch
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision_record_store import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecisionRecordStore,
 )
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmation,
+)
+
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation_set import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationSet,
+)
+
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation_store import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore,
+)
+
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_preparation import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantPreparation,
 )
@@ -49,6 +61,18 @@ DecisionRecord = (
 DecisionRecordStore = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecisionRecordStore
 )
+Confirmation = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmation
+)
+
+ConfirmationSet = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationSet
+)
+
+ConfirmationStore = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore
+)
+
 ParticipantPreparation = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantPreparation
 )
@@ -172,6 +196,91 @@ class Store:
         )
 
 
+class ConfirmationStoreDouble:
+    def __init__(
+        self,
+        *,
+        retained: ConfirmationSet | None = None,
+        events: list[str] | None = None,
+        create_results: list[object] | None = None,
+        race_confirmation: Confirmation | None = None,
+    ) -> None:
+        if retained is None:
+            retained = ConfirmationSet(
+                confirmations=(),
+            )
+
+        self.retained = retained
+        self.events = events
+        self.create_results = list(
+            create_results or ()
+        )
+        self.race_confirmation = race_confirmation
+        self.read_calls: list[str] = []
+        self.create_calls: list[Confirmation] = []
+
+    def read(
+        self,
+        *,
+        publication_id: str,
+    ) -> ConfirmationSet:
+        self.read_calls.append(publication_id)
+        if self.events is not None:
+            self.events.append("confirmation-read")
+        return self.retained
+
+    def create(
+        self,
+        *,
+        confirmation: Confirmation,
+    ) -> bool:
+        self.create_calls.append(confirmation)
+        if self.events is not None:
+            self.events.append(
+                "confirmation-create:"
+                f"{confirmation.participant_id}"
+            )
+
+        result = (
+            self.create_results.pop(0)
+            if self.create_results
+            else True
+        )
+        if isinstance(result, BaseException):
+            raise result
+        if type(result) is not bool:
+            return result
+
+        if result:
+            self._retain(confirmation)
+        elif self.race_confirmation is not None:
+            self._retain(self.race_confirmation)
+
+        return result
+
+    def _retain(
+        self,
+        confirmation: Confirmation,
+    ) -> None:
+        retained = {
+            item.participant_id: item
+            for item in self.retained.confirmations
+        }
+        retained[confirmation.participant_id] = (
+            confirmation
+        )
+        self.retained = ConfirmationSet(
+            confirmations=tuple(
+                retained[participant_id]
+                for participant_id in sorted(retained)
+            ),
+        )
+
+
+class IncompleteConfirmationStore:
+    pass
+
+
 class IncompleteStore:
     pass
 
@@ -259,10 +368,15 @@ def apply(
     *,
     store: DecisionRecordStore,
     publication_id: str,
+    confirmation_store: ConfirmationStore | None = None,
 ) -> tuple[PublicationState, ...]:
+    if confirmation_store is None:
+        confirmation_store = ConfirmationStoreDouble()
+
     return (
         apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_recorded_decision(
             decision_record_store=store,
+            confirmation_store=confirmation_store,
             publication_id=publication_id,
         )
     )
@@ -871,6 +985,7 @@ def test_decision_record_store_rejects_invalid_type(
     ):
         apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_recorded_decision(
             decision_record_store=value,
+            confirmation_store=ConfirmationStoreDouble(),
             publication_id="publication-001",
         )
 
@@ -897,6 +1012,7 @@ def test_publication_id_rejects_invalid_type(
             decision_record_store=Store(
                 retained=None,
             ),
+            confirmation_store=ConfirmationStoreDouble(),
             publication_id=value,
         )
 
@@ -934,6 +1050,7 @@ def test_application_has_exact_keyword_only_api() -> None:
 
     assert tuple(signature.parameters) == (
         "decision_record_store",
+        "confirmation_store",
         "publication_id",
     )
     assert all(
@@ -947,6 +1064,7 @@ def test_application_has_exact_keyword_only_api() -> None:
     )
     assert hints == {
         "decision_record_store": DecisionRecordStore,
+        "confirmation_store": ConfirmationStore,
         "publication_id": str,
         "return": tuple[PublicationState, ...],
     }
@@ -958,10 +1076,331 @@ def test_application_defines_no_preparation_or_decision_creation() -> None:
     )
 
     assert ".prepare(" not in source
-    assert ".create(" not in source
+    assert "decision_record_store.create" not in source
     assert "collect_" not in source
     assert "sqlite" not in source.lower()
     assert "subprocess" not in source
     assert "socket" not in source
     assert "eval(" not in source
     assert "exec(" not in source
+
+def test_previously_confirmed_participant_is_not_reapplied() -> None:
+    intent = create_intent()
+    committed = state(
+        publication_intent=intent,
+        phase=Phase.COMMITTED,
+    )
+    first = participant(
+        1,
+        publication_intent=intent,
+    )
+    second = participant(
+        2,
+        publication_intent=intent,
+        commit_results=[committed],
+    )
+    participants = participant_set(
+        first,
+        second,
+    )
+    retained_decision = decision_record(
+        publication_intent=intent,
+        participants=participants,
+        prepared_ids=(
+            first.participant_id,
+            second.participant_id,
+        ),
+    )
+    retained_confirmation = Confirmation(
+        participant_id=first.participant_id,
+        decision=Decision.COMMIT,
+        publication_state=committed,
+    )
+    confirmation_store = ConfirmationStoreDouble(
+        retained=ConfirmationSet(
+            confirmations=(
+                retained_confirmation,
+            ),
+        ),
+    )
+
+    result = apply(
+        store=Store(retained=retained_decision),
+        confirmation_store=confirmation_store,
+        publication_id=intent.publication_id,
+    )
+
+    assert result == (
+        committed,
+        committed,
+    )
+    assert first.commit_calls == []
+    assert second.commit_calls == [
+        intent.publication_id,
+    ]
+    assert tuple(
+        confirmation.participant_id
+        for confirmation in confirmation_store.create_calls
+    ) == (
+        second.participant_id,
+    )
+
+
+def test_every_confirmed_participant_eliminates_effects() -> None:
+    intent = create_intent()
+    committed = state(
+        publication_intent=intent,
+        phase=Phase.COMMITTED,
+    )
+    first = participant(
+        1,
+        publication_intent=intent,
+    )
+    second = participant(
+        2,
+        publication_intent=intent,
+    )
+    participants = participant_set(
+        first,
+        second,
+    )
+    retained_decision = decision_record(
+        publication_intent=intent,
+        participants=participants,
+        prepared_ids=(
+            first.participant_id,
+            second.participant_id,
+        ),
+    )
+    confirmation_store = ConfirmationStoreDouble(
+        retained=ConfirmationSet(
+            confirmations=(
+                Confirmation(
+                    participant_id=first.participant_id,
+                    decision=Decision.COMMIT,
+                    publication_state=committed,
+                ),
+                Confirmation(
+                    participant_id=second.participant_id,
+                    decision=Decision.COMMIT,
+                    publication_state=committed,
+                ),
+            ),
+        ),
+    )
+
+    result = apply(
+        store=Store(retained=retained_decision),
+        confirmation_store=confirmation_store,
+        publication_id=intent.publication_id,
+    )
+
+    assert result == (
+        committed,
+        committed,
+    )
+    assert first.commit_calls == []
+    assert second.commit_calls == []
+    assert confirmation_store.create_calls == []
+
+
+def test_confirmation_is_persisted_after_participant_effect() -> None:
+    events: list[str] = []
+    intent = create_intent()
+    committed = state(
+        publication_intent=intent,
+        phase=Phase.COMMITTED,
+    )
+    first = participant(
+        1,
+        publication_intent=intent,
+        commit_results=[committed],
+        events=events,
+    )
+    participants = participant_set(first)
+    retained_decision = decision_record(
+        publication_intent=intent,
+        participants=participants,
+        prepared_ids=(first.participant_id,),
+    )
+    confirmation_store = ConfirmationStoreDouble(
+        events=events,
+    )
+
+    result = apply(
+        store=Store(
+            retained=retained_decision,
+            events=events,
+        ),
+        confirmation_store=confirmation_store,
+        publication_id=intent.publication_id,
+    )
+
+    assert result == (committed,)
+    assert events == [
+        "read",
+        "confirmation-read",
+        "commit:participant-001",
+        "confirmation-create:participant-001",
+    ]
+
+
+def test_concurrent_equal_confirmation_converges() -> None:
+    intent = create_intent()
+    committed = state(
+        publication_intent=intent,
+        phase=Phase.COMMITTED,
+    )
+    first = participant(
+        1,
+        publication_intent=intent,
+        commit_results=[committed],
+    )
+    participants = participant_set(first)
+    retained_decision = decision_record(
+        publication_intent=intent,
+        participants=participants,
+        prepared_ids=(first.participant_id,),
+    )
+    raced = Confirmation(
+        participant_id=first.participant_id,
+        decision=Decision.COMMIT,
+        publication_state=committed,
+    )
+    confirmation_store = ConfirmationStoreDouble(
+        create_results=[False],
+        race_confirmation=raced,
+    )
+
+    result = apply(
+        store=Store(retained=retained_decision),
+        confirmation_store=confirmation_store,
+        publication_id=intent.publication_id,
+    )
+
+    assert result == (committed,)
+    assert confirmation_store.read_calls == [
+        intent.publication_id,
+        intent.publication_id,
+    ]
+
+
+def test_conflicting_retained_confirmation_fails_before_effects() -> None:
+    intent = create_intent()
+    other_intent = create_intent(
+        publication_id="other-publication",
+    )
+    committed = state(
+        publication_intent=other_intent,
+        phase=Phase.COMMITTED,
+    )
+    first = participant(
+        1,
+        publication_intent=intent,
+    )
+    participants = participant_set(first)
+    retained_decision = decision_record(
+        publication_intent=intent,
+        participants=participants,
+        prepared_ids=(first.participant_id,),
+    )
+    confirmation_store = ConfirmationStoreDouble(
+        retained=ConfirmationSet(
+            confirmations=(
+                Confirmation(
+                    participant_id=first.participant_id,
+                    decision=Decision.COMMIT,
+                    publication_state=committed,
+                ),
+            ),
+        ),
+    )
+
+    with pytest.raises(ValueError):
+        apply(
+            store=Store(retained=retained_decision),
+            confirmation_store=confirmation_store,
+            publication_id=intent.publication_id,
+        )
+
+    assert first.commit_calls == []
+    assert confirmation_store.create_calls == []
+
+
+def test_confirmation_write_failure_does_not_block_later_participant() -> None:
+    intent = create_intent()
+    committed = state(
+        publication_intent=intent,
+        phase=Phase.COMMITTED,
+    )
+    first = participant(
+        1,
+        publication_intent=intent,
+        commit_results=[committed],
+    )
+    second = participant(
+        2,
+        publication_intent=intent,
+        commit_results=[committed],
+    )
+    participants = participant_set(
+        first,
+        second,
+    )
+    retained_decision = decision_record(
+        publication_intent=intent,
+        participants=participants,
+        prepared_ids=(
+            first.participant_id,
+            second.participant_id,
+        ),
+    )
+    confirmation_store = ConfirmationStoreDouble(
+        create_results=[
+            RuntimeError("temporary"),
+            True,
+        ],
+    )
+
+    with pytest.raises(ApplicationError) as captured:
+        apply(
+            store=Store(retained=retained_decision),
+            confirmation_store=confirmation_store,
+            publication_id=intent.publication_id,
+        )
+
+    assert captured.value.failed_participant_ids == (
+        first.participant_id,
+    )
+    assert first.commit_calls == [
+        intent.publication_id,
+    ]
+    assert second.commit_calls == [
+        intent.publication_id,
+    ]
+    assert tuple(
+        confirmation.participant_id
+        for confirmation in confirmation_store.create_calls
+    ) == (
+        first.participant_id,
+        second.participant_id,
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        None,
+        object(),
+        IncompleteConfirmationStore(),
+    ),
+)
+def test_confirmation_store_rejects_invalid_type(
+    value: object,
+) -> None:
+    with pytest.raises(TypeError):
+        apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_recorded_decision(
+            decision_record_store=Store(retained=None),
+            confirmation_store=value,
+            publication_id="publication-001",
+        )

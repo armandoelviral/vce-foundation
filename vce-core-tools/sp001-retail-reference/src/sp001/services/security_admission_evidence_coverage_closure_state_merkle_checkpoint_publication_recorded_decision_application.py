@@ -10,6 +10,15 @@ from sp001.services.security_admission_evidence_coverage_closure_state_merkle_ch
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision_record_store import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecisionRecordStore,
 )
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmation,
+)
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation_set import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationSet,
+)
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_participant_application_confirmation_store import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore,
+)
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_phase import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationPhase,
 )
@@ -26,6 +35,15 @@ DecisionRecord = (
 )
 DecisionRecordStore = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecisionRecordStore
+)
+Confirmation = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmation
+)
+ConfirmationSet = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationSet
+)
+ConfirmationStore = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationParticipantApplicationConfirmationStore
 )
 Phase = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationPhase
@@ -61,9 +79,10 @@ class SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationRe
 def apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_recorded_decision(
     *,
     decision_record_store: DecisionRecordStore,
+    confirmation_store: ConfirmationStore,
     publication_id: str,
 ) -> tuple[PublicationState, ...]:
-    """Apply only one previously durable global publication decision."""
+    """Converge one durable global decision using durable confirmations."""
 
     if not isinstance(
         decision_record_store,
@@ -73,6 +92,17 @@ def apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_p
             "decision_record_store must implement "
             "SecurityAdmissionEvidenceCoverageClosureState"
             "MerkleCheckpointPublicationDecisionRecordStore"
+        )
+
+    if not isinstance(
+        confirmation_store,
+        ConfirmationStore,
+    ):
+        raise TypeError(
+            "confirmation_store must implement "
+            "SecurityAdmissionEvidenceCoverageClosureState"
+            "MerkleCheckpointPublicationParticipantApplication"
+            "ConfirmationStore"
         )
 
     if type(publication_id) is not str:
@@ -175,10 +205,33 @@ def apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_p
         method_name = "abort"
         expected_phase = Phase.ABORTED
 
+    retained_confirmations = _read_valid_confirmations(
+        confirmation_store=confirmation_store,
+        publication_id=publication_id,
+        decision_record=decision_record,
+        target_ids=target_ids,
+        expected_phase=expected_phase,
+    )
+    confirmations_by_id = {
+        confirmation.participant_id: confirmation
+        for confirmation in (
+            retained_confirmations.confirmations
+        )
+    }
+
     confirmed_states: list[PublicationState] = []
     failed_participant_ids: list[str] = []
 
     for participant_id in target_ids:
+        retained_confirmation = (
+            confirmations_by_id.get(participant_id)
+        )
+        if retained_confirmation is not None:
+            confirmed_states.append(
+                retained_confirmation.publication_state
+            )
+            continue
+
         participant = participants_by_id[
             participant_id
         ]
@@ -221,6 +274,54 @@ def apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_p
             )
             continue
 
+        confirmation = Confirmation(
+            participant_id=participant_id,
+            decision=decision_record.decision,
+            publication_state=state,
+        )
+
+        try:
+            created = confirmation_store.create(
+                confirmation=confirmation,
+            )
+        except Exception:
+            failed_participant_ids.append(
+                participant_id
+            )
+            continue
+
+        if type(created) is not bool:
+            failed_participant_ids.append(
+                participant_id
+            )
+            continue
+
+        if not created:
+            concurrent_confirmations = (
+                _read_valid_confirmations(
+                    confirmation_store=confirmation_store,
+                    publication_id=publication_id,
+                    decision_record=decision_record,
+                    target_ids=target_ids,
+                    expected_phase=expected_phase,
+                )
+            )
+            concurrent_by_id = {
+                retained.participant_id: retained
+                for retained in (
+                    concurrent_confirmations
+                    .confirmations
+                )
+            }
+            if (
+                concurrent_by_id.get(participant_id)
+                != confirmation
+            ):
+                failed_participant_ids.append(
+                    participant_id
+                )
+                continue
+
         confirmed_states.append(state)
 
     if failed_participant_ids:
@@ -231,3 +332,64 @@ def apply_security_admission_evidence_coverage_closure_state_merkle_checkpoint_p
         )
 
     return tuple(confirmed_states)
+
+
+def _read_valid_confirmations(
+    *,
+    confirmation_store: ConfirmationStore,
+    publication_id: str,
+    decision_record: DecisionRecord,
+    target_ids: tuple[str, ...],
+    expected_phase: Phase,
+) -> ConfirmationSet:
+    retained = confirmation_store.read(
+        publication_id=publication_id,
+    )
+
+    if not isinstance(
+        retained,
+        ConfirmationSet,
+    ):
+        raise TypeError(
+            "confirmation_store.read must return a "
+            "SecurityAdmissionEvidenceCoverageClosureState"
+            "MerkleCheckpointPublicationParticipantApplication"
+            "ConfirmationSet"
+        )
+
+    target_id_set = set(target_ids)
+
+    for confirmation in retained.confirmations:
+        if confirmation.participant_id not in target_id_set:
+            raise ValueError(
+                "durable application confirmation is outside "
+                "the targeted participant set"
+            )
+
+        if confirmation.decision is not decision_record.decision:
+            raise ValueError(
+                "durable application confirmation has a "
+                "different publication decision"
+            )
+
+        if (
+            confirmation
+            .publication_state
+            .publication_intent
+            != decision_record.publication_intent
+        ):
+            raise ValueError(
+                "durable application confirmation has a "
+                "different publication intent"
+            )
+
+        if (
+            confirmation.publication_state.phase
+            is not expected_phase
+        ):
+            raise ValueError(
+                "durable application confirmation has a "
+                "different terminal phase"
+            )
+
+    return retained
