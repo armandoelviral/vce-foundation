@@ -3,6 +3,10 @@ from typing import get_type_hints
 
 import pytest
 
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_application_completion import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationApplicationCompletion,
+)
+
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_coordinator import (
     coordinate_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication,
 )
@@ -55,6 +59,10 @@ from tests.test_security_admission_evidence_coverage_closure_state_merkle_checkp
     create_intent,
 )
 
+
+ApplicationCompletion = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationApplicationCompletion
+)
 
 Decision = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecision
@@ -362,7 +370,7 @@ def coordinate(
     participants: ParticipantSet,
     store: DecisionRecordStore,
     confirmation_store: ConfirmationStore | None = None,
-) -> DecisionRecord:
+) -> ApplicationCompletion:
     if confirmation_store is None:
         confirmation_store = ConfirmationStoreDouble()
 
@@ -401,8 +409,8 @@ def test_commit_is_persisted_before_any_commit_effect() -> None:
         store=store,
     )
 
-    assert result.decision is Decision.COMMIT
-    assert store.retained is result
+    assert result.decision_record.decision is Decision.COMMIT
+    assert store.retained is result.decision_record
     assert events == [
         "read:NONE",
         "prepare:participant-001",
@@ -411,6 +419,7 @@ def test_commit_is_persisted_before_any_commit_effect() -> None:
         "read:COMMIT",
         "commit:participant-001",
         "commit:participant-002",
+        "read:COMMIT",
     ]
 
 
@@ -442,7 +451,7 @@ def test_abort_is_persisted_before_prepared_participant_abort() -> None:
         store=store,
     )
 
-    assert result.decision is Decision.ABORT
+    assert result.decision_record.decision is Decision.ABORT
     assert events == [
         "read:NONE",
         "prepare:participant-001",
@@ -450,6 +459,7 @@ def test_abort_is_persisted_before_prepared_participant_abort() -> None:
         "create:ABORT",
         "read:ABORT",
         "abort:participant-001",
+        "read:ABORT",
     ]
     assert second.abort_calls == 0
 
@@ -485,12 +495,13 @@ def test_zero_preparation_abort_requires_no_final_effect() -> None:
         store=store,
     )
 
-    assert result.decision is Decision.ABORT
+    assert result.decision_record.decision is Decision.ABORT
     assert events == [
         "read:NONE",
         "prepare:participant-001",
         "prepare:participant-002",
         "create:ABORT",
+        "read:ABORT",
         "read:ABORT",
     ]
     assert first.abort_calls == 0
@@ -522,13 +533,14 @@ def test_existing_decision_skips_preparation_and_creation() -> None:
         store=store,
     )
 
-    assert result is retained
+    assert result.decision_record is retained
     assert first.prepare_calls == 0
     assert store.create_calls == 0
     assert events == [
         "read:COMMIT",
         "read:COMMIT",
         "commit:participant-001",
+        "read:COMMIT",
     ]
 
 
@@ -609,14 +621,15 @@ def test_retry_uses_durable_decision_without_repreparing() -> None:
         confirmation_store=confirmation_store,
     )
 
-    assert result is store.retained
-    assert result.decision is Decision.COMMIT
+    assert result.decision_record is store.retained
+    assert result.decision_record.decision is Decision.COMMIT
     assert first.prepare_calls == 1
     assert second.prepare_calls == 1
     assert first.commit_calls == 2
     assert second.commit_calls == 1
     assert store.create_calls == 1
     assert confirmation_store.read_calls == [
+        intent.publication_id,
         intent.publication_id,
         intent.publication_id,
     ]
@@ -696,8 +709,8 @@ def test_existing_abort_is_reapplied_without_preparation() -> None:
         store=store,
     )
 
-    assert result is retained
-    assert result.decision is Decision.ABORT
+    assert result.decision_record is retained
+    assert result.decision_record.decision is Decision.ABORT
     assert first.prepare_calls == 0
     assert second.prepare_calls == 0
     assert first.abort_calls == 1
@@ -794,6 +807,88 @@ def test_invalid_store_fails_before_effects(
     assert events == []
 
 
+def test_coordinator_returns_exact_durable_completion() -> None:
+    events: list[str] = []
+    intent = create_intent()
+    first = participant(
+        1,
+        publication_intent=intent,
+        events=events,
+    )
+    participants = participant_set(first)
+    store = Store(
+        events=events,
+    )
+    confirmation_store = ConfirmationStoreDouble()
+
+    result = coordinate(
+        publication_intent=intent,
+        participants=participants,
+        store=store,
+        confirmation_store=confirmation_store,
+    )
+
+    assert isinstance(
+        result,
+        ApplicationCompletion,
+    )
+    assert result.decision_record is store.retained
+    assert (
+        result.confirmation_set
+        is confirmation_store.retained
+    )
+    assert tuple(
+        confirmation.participant_id
+        for confirmation in (
+            result.confirmation_set.confirmations
+        )
+    ) == (
+        first.participant_id,
+    )
+
+
+def test_missing_completion_after_successful_application_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    events: list[str] = []
+    intent = create_intent()
+    first = participant(
+        1,
+        publication_intent=intent,
+        events=events,
+    )
+    participants = participant_set(first)
+    store = Store(
+        events=events,
+    )
+    confirmation_store = ConfirmationStoreDouble()
+
+    monkeypatch.setattr(
+        (
+            "sp001.services."
+            "security_admission_evidence_coverage_closure_state_"
+            "merkle_checkpoint_publication_coordinator."
+            "read_security_admission_evidence_coverage_closure_"
+            "state_merkle_checkpoint_publication_application_completion"
+        ),
+        lambda **kwargs: None,
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="must produce exhaustive durable completion",
+    ):
+        coordinate(
+            publication_intent=intent,
+            participants=participants,
+            store=store,
+            confirmation_store=confirmation_store,
+        )
+
+    assert store.retained is not None
+    assert confirmation_store.retained.confirmations
+
+
 def test_coordinator_has_exact_keyword_only_api() -> None:
     signature = inspect.signature(
         coordinate_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication
@@ -819,7 +914,7 @@ def test_coordinator_has_exact_keyword_only_api() -> None:
         "participant_set": ParticipantSet,
         "decision_record_store": DecisionRecordStore,
         "confirmation_store": ConfirmationStore,
-        "return": DecisionRecord,
+        "return": ApplicationCompletion,
     }
 
 
@@ -830,6 +925,7 @@ def test_coordinator_delegates_without_transport_or_retry_policy() -> None:
 
     assert source.count("record_security_admission") == 1
     assert source.count("apply_security_admission") == 1
+    assert source.count("read_security_admission") == 1
     assert ".prepare(" not in source
     assert ".commit(" not in source
     assert ".abort(" not in source

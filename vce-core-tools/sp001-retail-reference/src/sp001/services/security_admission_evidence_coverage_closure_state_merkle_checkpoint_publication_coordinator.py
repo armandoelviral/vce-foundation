@@ -1,3 +1,9 @@
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_application_completion import (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationApplicationCompletion,
+)
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_application_completion_reading import (
+    read_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_application_completion,
+)
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision_record import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecisionRecord,
 )
@@ -22,6 +28,9 @@ from sp001.services.security_admission_evidence_coverage_closure_state_merkle_ch
 )
 
 
+ApplicationCompletion = (
+    SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationApplicationCompletion
+)
 DecisionRecord = (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecisionRecord
 )
@@ -46,8 +55,8 @@ def coordinate_security_admission_evidence_coverage_closure_state_merkle_checkpo
     participant_set: ParticipantSet,
     decision_record_store: DecisionRecordStore,
     confirmation_store: ConfirmationStore,
-) -> DecisionRecord:
-    """Record one global decision durably before applying its effects."""
+) -> ApplicationCompletion:
+    """Record, apply, and reconstruct one complete durable publication."""
 
     decision_record = (
         record_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision(
@@ -63,4 +72,19 @@ def coordinate_security_admission_evidence_coverage_closure_state_merkle_checkpo
         publication_id=publication_intent.publication_id,
     )
 
-    return decision_record
+    completion = (
+        read_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_application_completion(
+            decision_record_store=decision_record_store,
+            confirmation_store=confirmation_store,
+            publication_id=(
+                publication_intent.publication_id
+            ),
+        )
+    )
+    if completion is None:
+        raise RuntimeError(
+            "successful publication application must produce "
+            "exhaustive durable completion"
+        )
+
+    return completion
