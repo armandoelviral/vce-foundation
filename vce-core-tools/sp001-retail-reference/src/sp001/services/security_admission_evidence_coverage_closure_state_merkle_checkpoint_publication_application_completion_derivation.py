@@ -4,6 +4,9 @@ from sp001.services.security_admission_evidence_coverage_closure_state_merkle_ch
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecision,
 )
+from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision_derivation import (
+    derive_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision,
+)
 from sp001.services.security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision_record import (
     SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationDecisionRecord,
 )
@@ -52,6 +55,25 @@ def derive_security_admission_evidence_coverage_closure_state_merkle_checkpoint_
             "SecurityAdmissionEvidenceCoverageClosureState"
             "MerkleCheckpointPublicationParticipantApplication"
             "ConfirmationSet"
+        )
+
+    rederived_decision_record = (
+        derive_security_admission_evidence_coverage_closure_state_merkle_checkpoint_publication_decision(
+            publication_intent=(
+                decision_record.publication_intent
+            ),
+            participant_set=(
+                decision_record.participant_set
+            ),
+            preparation_set=(
+                decision_record.preparation_set
+            ),
+        )
+    )
+    if rederived_decision_record != decision_record:
+        raise ValueError(
+            "decision_record must retain the exactly "
+            "re-derived publication decision"
         )
 
     target_ids = (

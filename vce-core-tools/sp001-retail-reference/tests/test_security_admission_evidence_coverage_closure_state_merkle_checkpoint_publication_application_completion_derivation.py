@@ -344,6 +344,25 @@ def test_contradictory_decision_record_fails_closed() -> None:
         )
 
 
+def test_contradictory_decision_with_incomplete_confirmations_fails_closed() -> None:
+    retained = commit_record()
+    contradictory = replace(
+        retained,
+        decision=Decision.ABORT,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="exactly re-derived publication decision",
+    ):
+        derive(
+            decision_record=contradictory,
+            confirmation_set=ConfirmationSet(
+                confirmations=(),
+            ),
+        )
+
+
 def test_different_confirmation_decision_fails_closed() -> None:
     decision_record = commit_record()
     exhaustive = confirmation_set(
