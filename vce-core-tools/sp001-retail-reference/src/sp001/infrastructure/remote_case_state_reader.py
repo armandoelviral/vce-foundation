@@ -1,4 +1,6 @@
 import http.client
+import re
+from collections.abc import Callable
 import json
 import math
 import socket
@@ -115,6 +117,7 @@ class RemoteCaseStateReader:
         timeout_seconds: float,
         max_response_bytes: int,
         ca_file: str | None = None,
+        credential_provider: Callable[[], str] | None = None,
     ) -> None:
         if not isinstance(endpoint, str):
             raise TypeError("endpoint must be a string")
@@ -144,6 +147,9 @@ class RemoteCaseStateReader:
             or max_response_bytes <= 0
         ):
             raise ValueError("max_response_bytes must be a positive integer")
+        if credential_provider is not None and not callable(credential_provider):
+            raise TypeError("credential_provider must be callable or None")
+        self._credential_provider = credential_provider
         self._host = parts.hostname
         self._port = parts.port
         self._path = parts.path
@@ -161,6 +167,18 @@ class RemoteCaseStateReader:
             raise TypeError("case_id must be a string")
         if not case_id.strip():
             raise ValueError("case_id must not be empty")
+        headers = {
+            "Accept": "application/json",
+            "Accept-Encoding": "identity",
+        }
+        if self._credential_provider is not None:
+            credential = self._credential_provider()
+            if (
+                not isinstance(credential, str)
+                or re.fullmatch(r"[A-Za-z0-9._~+/-]+=*", credential) is None
+            ):
+                raise ValueError("credential provider returned an invalid bearer value")
+            headers["Authorization"] = "Bearer " + credential
         connection = http.client.HTTPSConnection(
             self._host,
             port=self._port,
@@ -171,10 +189,7 @@ class RemoteCaseStateReader:
             connection.request(
                 "GET",
                 self._path + "?" + urlencode({"case_id": case_id}),
-                headers={
-                    "Accept": "application/json",
-                    "Accept-Encoding": "identity",
-                },
+                headers=headers,
             )
             response = connection.getresponse()
             status = response.status

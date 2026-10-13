@@ -12,6 +12,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+auth = [
+    "PyJWT[crypto]==2.15.1",
+]
 host = [
     "fastapi",
     "uvicorn",
