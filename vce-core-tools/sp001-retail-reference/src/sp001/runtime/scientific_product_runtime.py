@@ -1,4 +1,13 @@
+from sp001.services.case_state_subscription import CaseStateSubscription
+from sp001.services.local_case_state_reader import LocalCaseStateReader
+
 from sp001.models.capability_candidate import CapabilityCandidate
+from sp001.contracts.case_authoritative_state import CaseAuthoritativeState
+from sp001.contracts.case_authoritative_state_store import CaseAuthoritativeStateStore
+from sp001.services.case_authoritative_state_reading import (
+    read_case_authoritative_state as read_case_state,
+)
+from sp001.services.case_lifecycle_application import open_case
 from sp001.models.case import Case
 from sp001.models.expert_decision import ExpertDecision
 from sp001.models.governance_decision import GovernanceDecision
@@ -24,7 +33,14 @@ from sp001.runtime.transitions.recommendation_to_expert_decision import (
 class ScientificProductRuntime:
     """Coordinates Scientific Product lifecycle transitions."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        case_authoritative_state_store: CaseAuthoritativeStateStore | None = None,
+    ) -> None:
+        self._case_authoritative_state_store = (
+            case_authoritative_state_store
+        )
         self._objective_to_case = ObjectiveToCaseTransition()
         self._case_to_recommendation = CaseToRecommendationTransition()
         self._recommendation_to_expert_decision = (
@@ -41,10 +57,74 @@ class ScientificProductRuntime:
         case_id: str = "",
         scope: str = "",
     ) -> RuntimeResult:
-        return self._objective_to_case.execute(
+        result = self._objective_to_case.execute(
             objective,
             case_id=case_id,
             scope=scope,
+        )
+        store = self._case_authoritative_state_store
+        if store is None:
+            return result
+
+        case = result.output
+        if not result.success or not isinstance(case, Case):
+            return RuntimeResult(
+                output=None,
+                transition=result.transition,
+                success=False,
+            )
+
+        try:
+            state = open_case(
+                store=store,
+                case_id=case.case_id,
+                objective_id=case.objective_id,
+                scope=case.scope,
+                transition_id=(
+                    f"{case.case_id}:revision:1:CASE_OPENED"
+                ),
+            )
+        except (TypeError, ValueError):
+            return RuntimeResult(
+                output=None,
+                transition=result.transition,
+                success=False,
+            )
+
+        if state is None:
+            return RuntimeResult(
+                output=None,
+                transition=result.transition,
+                success=False,
+            )
+        return result
+
+    def read_case_authoritative_state(
+        self,
+        *,
+        case_id: str,
+    ) -> CaseAuthoritativeState | None:
+        store = self._case_authoritative_state_store
+        if store is None:
+            raise RuntimeError(
+                "case authoritative state store is not configured"
+            )
+        return read_case_state(store=store, case_id=case_id)
+
+    def subscribe_case_state(
+        self,
+        *,
+        case_id: str,
+    ) -> CaseStateSubscription:
+        """Create a persistent in-process read session for one case."""
+        store = self._case_authoritative_state_store
+        if store is None:
+            raise RuntimeError(
+                "case authoritative state store is not configured"
+            )
+        return CaseStateSubscription(
+            reader=LocalCaseStateReader(store=store),
+            case_id=case_id,
         )
 
     def create_recommendation(

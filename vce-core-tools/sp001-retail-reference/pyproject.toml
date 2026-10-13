@@ -12,8 +12,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+host = [
+    "fastapi",
+    "uvicorn",
+]
 dev = [
     "pytest>=9.0",
+    "httpx2",
 ]
 
 [tool.setuptools.packages.find]

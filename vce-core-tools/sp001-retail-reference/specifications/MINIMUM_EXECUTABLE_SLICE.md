@@ -114,7 +114,13 @@ Defines commands, events and identifiers shared across modules.
 
 # Persistence
 
-Initial persistence shall be in-memory.
+The Case lifecycle vertical slice shall persist current state, accepted transitions, and linked-resource references in SQLite.
+
+Each accepted Case mutation shall atomically commit the current phase, monotonic revision, transition record, and any new links in the same SQLite transaction.
+
+The SQLite adapter is scoped to this vertical slice. Existing SEC-001 publication stores remain independent.
+
+Other modules retain their existing persistence scope.
 
 Persistence interfaces shall remain explicit.
 
