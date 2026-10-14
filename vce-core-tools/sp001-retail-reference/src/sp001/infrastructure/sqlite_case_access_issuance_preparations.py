@@ -1,3 +1,4 @@
+from sp001.contracts.case_access_issuance_request import IssuanceRequestConflictError
 from dataclasses import asdict
 import json
 
@@ -145,7 +146,7 @@ class SqliteCaseAccessIssuancePreparations(SqliteCaseAccessGrants):
                 raise
 
     def prepare(self, *, preparation: CaseAccessIssuancePreparation,
-                at_time: int) -> CaseAccessIssuancePreparation:
+                at_time: int, before_commit=None) -> CaseAccessIssuancePreparation:
         if not isinstance(preparation, CaseAccessIssuancePreparation):
             raise TypeError("preparation must be a CaseAccessIssuancePreparation")
         document = _serialize(preparation)
@@ -157,7 +158,7 @@ class SqliteCaseAccessIssuancePreparations(SqliteCaseAccessGrants):
                     (preparation.request_id,),
                 ).fetchone()
                 if existing is not None and existing[0] != document:
-                    raise ValueError("request_id conflicts with prepared issuance")
+                    raise IssuanceRequestConflictError("request_id conflicts with prepared issuance")
 
                 self._validate_references(
                     connection=connection, preparation=preparation,
@@ -170,6 +171,8 @@ class SqliteCaseAccessIssuancePreparations(SqliteCaseAccessGrants):
                         VALUES (?, ?, 'PREPARED', ?)""",
                         (preparation.request_id, preparation.payload.token_id, document),
                     )
+                if before_commit is not None:
+                    before_commit()
                 connection.commit()
                 return preparation
             except BaseException:
@@ -218,3 +221,124 @@ class SqliteCaseAccessIssuancePreparations(SqliteCaseAccessGrants):
             binding_snapshot=binding_snapshot,
             grant_snapshots=tuple(snapshots), at_time=at_time,
         )
+
+    def prepare_request(self, *, request, context, policy, clock):
+        """Trusted entry point; context must come from the configured verifier."""
+        from uuid import uuid4
+        from sp001.contracts.case_access_issuance_request import CaseAccessIssuanceRequest
+        from sp001.contracts.case_access_issuance_policy import CaseAccessIssuancePolicy
+        from sp001.contracts.federated_issuance_context import (
+            ValidatedFederatedIssuanceContext,
+        )
+
+        if not isinstance(request, CaseAccessIssuanceRequest):
+            raise TypeError("request must be a CaseAccessIssuanceRequest")
+        if not isinstance(context, ValidatedFederatedIssuanceContext):
+            raise TypeError("context must be a validated federated context")
+        if not isinstance(policy, CaseAccessIssuancePolicy):
+            raise TypeError("policy must be a CaseAccessIssuancePolicy")
+        if not callable(clock):
+            raise TypeError("clock must be callable")
+
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                now = clock()
+                context.require_valid(
+                    expected_audience=policy.primary_audience, at_time=now,
+                )
+                existing = connection.execute(
+                    """SELECT document FROM case_access_issuance_preparations
+                    WHERE request_id=?""", (request.request_id,),
+                ).fetchone()
+                if existing is not None:
+                    preparation = _preparation(existing[0])
+                    if (
+                        preparation.binding.external_principal != context.principal
+                        or preparation.payload.permissions != (request.permission,)
+                        or preparation.payload.issuer != policy.access_issuer
+                        or preparation.payload.audience != policy.access_audience
+                        or preparation.signing_key_id != policy.signing_key_id
+                    ):
+                        raise IssuanceRequestConflictError("request_id conflicts with prepared issuance")
+                else:
+                    row = connection.execute(
+                        """SELECT document FROM federated_principal_bindings
+                        WHERE external_issuer=? AND external_subject=?""",
+                        (context.principal.issuer, context.principal.subject),
+                    ).fetchone()
+                    if row is None:
+                        raise PermissionError("issuance is not authorized")
+                    value = json.loads(row[0])
+                    snapshot = FederatedPrincipalBindingSnapshot(
+                        binding=_binding(value["binding"]), active=value["active"],
+                    )
+                    if not snapshot.active:
+                        raise PermissionError("issuance is not authorized")
+                    binding = snapshot.binding
+                    row = connection.execute(
+                        """SELECT g.definition,
+                        (SELECT COUNT(*) FROM case_access_grant_audit a
+                         WHERE a.grant_id=g.grant_id)
+                        FROM case_access_grants g
+                        WHERE g.issuer=? AND g.subject=? AND g.case_id=?
+                        AND g.operation=? AND g.revoked=0
+                        AND g.valid_from<=? AND g.expires_at>?
+                        ORDER BY g.expires_at DESC, g.grant_id ASC LIMIT 1""",
+                        (
+                            policy.access_issuer, binding.internal_subject,
+                            request.case_id, request.operation.value, now, now,
+                        ),
+                    ).fetchone()
+                    if row is None:
+                        raise PermissionError("issuance is not authorized")
+                    grant = _grant(json.loads(row[0]))
+                    expires_at = min(
+                        now + policy.max_lifetime_seconds,
+                        context.expires_at, grant.expires_at,
+                    )
+                    preparation = CaseAccessIssuancePreparation(
+                        request_id=request.request_id, binding=binding,
+                        payload=CaseAccessTokenPayload(
+                            issuer=policy.access_issuer,
+                            subject=binding.internal_subject,
+                            audience=policy.access_audience,
+                            issued_at=now, not_before=now, expires_at=expires_at,
+                            token_id=str(uuid4()), permissions=(request.permission,),
+                        ),
+                        signing_key_id=policy.signing_key_id,
+                        grant_references=(
+                            IssuanceGrantReference(
+                                grant_id=grant.grant_id, revision=row[1],
+                                permission=grant.permission, expires_at=grant.expires_at,
+                            ),
+                        ),
+                    )
+
+                self._validate_references(
+                    connection=connection, preparation=preparation, at_time=now,
+                )
+                if existing is None:
+                    connection.execute(
+                        """INSERT INTO case_access_issuance_preparations
+                        (request_id, token_id, status, document)
+                        VALUES (?, ?, 'PREPARED', ?)""",
+                        (
+                            preparation.request_id, preparation.payload.token_id,
+                            _serialize(preparation),
+                        ),
+                    )
+                # Recheck after work in the transaction, including before replay.
+                final_time = clock()
+                context.require_valid(
+                    expected_audience=policy.primary_audience, at_time=final_time,
+                )
+                self._validate_references(
+                    connection=connection, preparation=preparation,
+                    at_time=final_time,
+                )
+                connection.commit()
+                return preparation
+            except BaseException:
+                connection.rollback()
+                raise

@@ -56,7 +56,7 @@ class SqliteCaseAccessIssuanceCompletions(SqliteCaseAccessIssuancePreparations):
             ).fetchone()
         return None if row is None else self._completion(row)
 
-    def confirm(self, *, preparation, protected, clock):
+    def confirm(self, *, preparation, protected, clock, before_commit=None):
         if not isinstance(protected, ProtectedCaseAccessCredential):
             raise TypeError("protected must be a ProtectedCaseAccessCredential")
         if not callable(clock):
@@ -95,6 +95,8 @@ class SqliteCaseAccessIssuanceCompletions(SqliteCaseAccessIssuancePreparations):
                         protected.nonce, protected.ciphertext,
                     )
                 result = self._completion(existing)
+                if before_commit is not None:
+                    before_commit()
                 connection.commit()
                 return result
             except BaseException:
@@ -124,7 +126,7 @@ class PreparedCaseAccessCompleter:
         self._protector = protector
         self._clock = clock if clock is not None else lambda: int(time.time())
 
-    def complete(self, *, request_id: str) -> IssuedCaseAccessToken:
+    def complete(self, *, request_id: str, before_commit=None) -> IssuedCaseAccessToken:
         preparation = self._store.read_prepared(request_id=request_id)
         if preparation is None:
             raise ValueError("persisted preparation is required")
@@ -140,6 +142,7 @@ class PreparedCaseAccessCompleter:
         # Replays also revalidate current references. First completion wins.
         persisted = self._store.confirm(
             preparation=preparation, protected=protected, clock=self._clock,
+            before_commit=before_commit,
         )
         return self._protector.recover(
             preparation=preparation, protected=persisted.protected,
