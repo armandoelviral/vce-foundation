@@ -1,5 +1,6 @@
+from sp001.contracts.access_token_key_resolver import AccessTokenKeyResolver
+from sp001.infrastructure.configured_access_token_keys import ConfiguredAccessTokenKeys
 from collections.abc import Mapping
-from types import MappingProxyType
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -12,6 +13,10 @@ from sp001.contracts.case_access_context import (
 )
 
 
+class AccessTokenKeyResolutionError(RuntimeError):
+    """Trusted key provider failure, distinct from invalid credentials."""
+
+
 class JwtCaseAccessAuthenticator:
     """Verify the configured RS256 case-access profile without network calls."""
 
@@ -20,7 +25,8 @@ class JwtCaseAccessAuthenticator:
         *,
         issuer: str,
         audience: str,
-        public_keys: Mapping[str, RSAPublicKey],
+        public_keys: Mapping[str, RSAPublicKey] | None = None,
+        key_resolver: AccessTokenKeyResolver | None = None,
         max_lifetime_seconds: int,
         max_token_bytes: int,
     ) -> None:
@@ -37,20 +43,18 @@ class JwtCaseAccessAuthenticator:
                 raise TypeError(f"{name} must be an integer")
             if value <= 0:
                 raise ValueError(f"{name} must be positive")
-        if not isinstance(public_keys, Mapping) or not public_keys:
-            raise ValueError("public_keys must be a nonempty mapping")
-        keys = dict(public_keys)
-        for kid, key in keys.items():
-            if not isinstance(kid, str) or not kid.strip():
-                raise ValueError("key identifiers must be nonempty strings")
-            if not isinstance(key, RSAPublicKey):
-                raise TypeError("keys must be RSA public keys")
-            if key.key_size < 2048:
-                raise ValueError("RSA keys must be at least 2048 bits")
+        if (public_keys is None) == (key_resolver is None):
+            raise ValueError("configure exactly one key source")
+        if key_resolver is None:
+            key_resolver = ConfiguredAccessTokenKeys(
+                issuer=issuer, public_keys=public_keys
+            )
+        if not isinstance(key_resolver, AccessTokenKeyResolver):
+            raise TypeError("key_resolver must implement AccessTokenKeyResolver")
 
         self._issuer = issuer
         self._audience = audience
-        self._keys = MappingProxyType(keys)
+        self._key_resolver = key_resolver
         self._max_lifetime = max_lifetime_seconds
         self._max_bytes = max_token_bytes
 
@@ -69,12 +73,24 @@ class JwtCaseAccessAuthenticator:
             if header["alg"] != "RS256" or header["typ"] != "at+jwt":
                 return None
             kid = header["kid"]
-            if not isinstance(kid, str) or kid not in self._keys:
+            if not isinstance(kid, str) or not kid.strip():
                 return None
+            try:
+                key = self._key_resolver.resolve(
+                    issuer=self._issuer, key_id=kid, algorithm="RS256"
+                )
+            except Exception as error:
+                raise AccessTokenKeyResolutionError(
+                    "trusted key resolution failed"
+                ) from error
+            if key is None:
+                return None
+            if not isinstance(key, RSAPublicKey) or key.key_size < 2048:
+                raise RuntimeError("key resolver returned an invalid RS256 key")
 
             claims = jwt.decode(
                 credential,
-                key=self._keys[kid],
+                key=key,
                 algorithms=["RS256"],
                 issuer=self._issuer,
                 audience=self._audience,

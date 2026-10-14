@@ -1,3 +1,4 @@
+from sp001.contracts.case_access_grant_snapshot import CaseAccessGrantSnapshot
 from contextlib import contextmanager
 from dataclasses import asdict
 import json
@@ -163,6 +164,32 @@ class SqliteCaseAccessGrants:
                 ),
             ).fetchone()
             return result is not None
+
+    def read_grant_snapshot(
+        self, *, grant_id: str
+    ) -> CaseAccessGrantSnapshot | None:
+        if not isinstance(grant_id, str):
+            raise TypeError("grant_id must be a string")
+        if not grant_id.strip():
+            raise ValueError("grant_id must not be empty")
+        with self._connection() as connection:
+            row = connection.execute(
+                """SELECT g.definition, g.revoked,
+                (SELECT COUNT(*) FROM case_access_grant_audit AS a
+                 WHERE a.grant_id=g.grant_id)
+                FROM case_access_grants AS g WHERE g.grant_id=?""",
+                (grant_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        if row[1] not in (0, 1) or row[2] < 1:
+            raise ValueError("inconsistent persistent grant snapshot")
+        grant = _grant(json.loads(row[0]))
+        if grant.grant_id != grant_id:
+            raise ValueError("stored grant identity mismatch")
+        return CaseAccessGrantSnapshot(
+            grant=grant, revision=row[2], revoked=bool(row[1]),
+        )
 
     def read_audit(self) -> tuple[GrantAdministrationRecord, ...]:
         with self._connection() as connection:
