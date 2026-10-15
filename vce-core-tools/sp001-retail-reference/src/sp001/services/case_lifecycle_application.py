@@ -58,6 +58,7 @@ def open_case(
     scope: str,
     transition_id: str,
     resource_links: tuple[CaseResourceLink, ...] = (),
+    write_deadline_ns: int | None = None,
 ) -> CaseAuthoritativeState | None:
     _validate_store(store)
     _validate_text(case_id, "case_id")
@@ -83,7 +84,13 @@ def open_case(
         to_phase=Phase.CASE_OPENED,
         resource_links=links,
     )
-    return state if store.create(state=state, transition=transition) else None
+    options = (
+        {} if write_deadline_ns is None
+        else {"write_deadline_ns": write_deadline_ns}
+    )
+    return state if store.create(
+        state=state, transition=transition, **options,
+    ) else None
 
 
 def apply_case_lifecycle_transition(
@@ -94,6 +101,7 @@ def apply_case_lifecycle_transition(
     transition_id: str,
     to_phase: Phase,
     resource_links: tuple[CaseResourceLink, ...] = (),
+    write_deadline_ns: int | None = None,
 ) -> CaseAuthoritativeState | None:
     _validate_store(store)
     _validate_text(case_id, "case_id")
@@ -154,9 +162,14 @@ def apply_case_lifecycle_transition(
         to_phase=to_phase,
         resource_links=links,
     )
+    options = (
+        {} if write_deadline_ns is None
+        else {"write_deadline_ns": write_deadline_ns}
+    )
     accepted = store.compare_and_swap(
         expected_revision=expected_revision,
         next_state=next_state,
         transition=transition,
+        **options,
     )
     return next_state if accepted else None

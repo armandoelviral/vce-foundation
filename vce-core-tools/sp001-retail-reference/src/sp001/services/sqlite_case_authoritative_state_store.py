@@ -9,6 +9,7 @@ from pathlib import Path
 from sp001.contracts.case_authoritative_state import CaseAuthoritativeState
 from sp001.contracts.case_authoritative_state_store import (
     CaseAuthoritativeStateStore,
+    CaseWriteDeadlineExceeded,
 )
 from sp001.contracts.case_lifecycle_phase import CaseLifecyclePhase
 from sp001.contracts.case_lifecycle_transition_record import (
@@ -110,10 +111,6 @@ def _validate_pair(
         raise ValueError("next revision must be the exact successor")
     if transition.from_phase is not from_phase:
         raise ValueError("transition source must match current phase")
-
-
-class CaseWriteDeadlineExceeded(TimeoutError):
-    """The write budget expired; no commit was performed."""
 
 
 def _check_write_deadline(deadline_ns):

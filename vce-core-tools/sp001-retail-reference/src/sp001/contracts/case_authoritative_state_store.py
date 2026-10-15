@@ -6,9 +6,19 @@ from sp001.contracts.case_lifecycle_transition_record import (
 )
 
 
+class CaseWriteDeadlineExceeded(TimeoutError):
+    """The write budget expired; no commit was performed."""
+
+
 @runtime_checkable
 class CaseAuthoritativeStateStore(Protocol):
-    """Atomic persistence port for current state and transition history."""
+    """Atomic persistence port for current state and transition history.
+
+    write_deadline_ns is an absolute deadline in the perf_counter_ns domain,
+    local to the running process. None preserves unbudgeted behavior.
+    Expiry detected before commit raises CaseWriteDeadlineExceeded.
+    It does not guarantee interruption of blocking calls or commit duration.
+    """
 
     def read(
         self,
@@ -23,6 +33,7 @@ class CaseAuthoritativeStateStore(Protocol):
         *,
         state: CaseAuthoritativeState,
         transition: CaseLifecycleTransitionRecord,
+        write_deadline_ns: int | None = None,
     ) -> bool:
         """Atomically create revision one and its initial transition."""
         ...
@@ -33,6 +44,7 @@ class CaseAuthoritativeStateStore(Protocol):
         expected_revision: int,
         next_state: CaseAuthoritativeState,
         transition: CaseLifecycleTransitionRecord,
+        write_deadline_ns: int | None = None,
     ) -> bool:
         """Atomically append one transition and replace the current state.
 
