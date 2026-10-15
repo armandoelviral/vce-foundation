@@ -1,3 +1,6 @@
+from sp001.infrastructure.write_transaction_measurement import (
+    WriteTransactionMeasurement,
+)
 from sp001.contracts.case_access_issuance_completion import (
     CaseAccessIssuanceCompletion,
 )
@@ -18,7 +21,10 @@ from sp001.infrastructure.sqlite_case_access_issuance_preparations import (
 class SqliteCaseAccessIssuanceCompletions(SqliteCaseAccessIssuancePreparations):
     """Trusted storage capability; completion does not authenticate its caller."""
 
-    def __init__(self, *, database_path):
+    def __init__(self, *, database_path, write_observer=None):
+        if write_observer is not None and not callable(write_observer):
+            raise TypeError("write_observer must be callable")
+        self._write_observer = write_observer
         super().__init__(database_path=database_path)
         with self._connection() as connection:
             connection.executescript("""
@@ -58,43 +64,46 @@ class SqliteCaseAccessIssuanceCompletions(SqliteCaseAccessIssuancePreparations):
         if not callable(clock):
             raise TypeError("clock must be callable")
         document = _serialize(preparation)
-        with self._connection() as connection:
-            connection.execute("BEGIN IMMEDIATE")
-            try:
-                row = connection.execute(
-                    """SELECT document FROM case_access_issuance_preparations
-                    WHERE request_id=?""", (preparation.request_id,),
-                ).fetchone()
-                if row is None or row[0] != document:
-                    raise ValueError("exact persisted preparation is required")
+        with WriteTransactionMeasurement(
+            operation="issuance.confirm", observer=self._write_observer,
+        ) as measurement:
+            with self._connection() as connection:
+                measurement.begin(connection)
+                try:
+                    row = connection.execute(
+                        """SELECT document FROM case_access_issuance_preparations
+                        WHERE request_id=?""", (preparation.request_id,),
+                    ).fetchone()
+                    if row is None or row[0] != document:
+                        raise ValueError("exact persisted preparation is required")
 
-                # Obtain time after acquiring the write lock, including lock waits.
-                at_time = clock()
-                self._validate_references(
-                    connection=connection, preparation=preparation, at_time=at_time,
-                )
-                existing = connection.execute(
-                    """SELECT request_id, completed_at, protection_key_id, nonce,
-                    ciphertext FROM case_access_issuance_completions
-                    WHERE request_id=?""", (preparation.request_id,),
-                ).fetchone()
-                if existing is None:
-                    connection.execute(
-                        """INSERT INTO case_access_issuance_completions
-                        (request_id, status, completed_at, protection_key_id,
-                         nonce, ciphertext) VALUES (?, 'COMPLETED', ?, ?, ?, ?)""",
-                        (preparation.request_id, at_time, protected.protection_key_id,
-                         protected.nonce, protected.ciphertext),
+                    # Obtain time after acquiring the write lock, including lock waits.
+                    at_time = clock()
+                    self._validate_references(
+                        connection=connection, preparation=preparation, at_time=at_time,
                     )
-                    existing = (
-                        preparation.request_id, at_time, protected.protection_key_id,
-                        protected.nonce, protected.ciphertext,
-                    )
-                result = self._completion(existing)
-                if before_commit is not None:
-                    before_commit()
-                connection.commit()
-                return result
-            except BaseException:
-                connection.rollback()
-                raise
+                    existing = connection.execute(
+                        """SELECT request_id, completed_at, protection_key_id, nonce,
+                        ciphertext FROM case_access_issuance_completions
+                        WHERE request_id=?""", (preparation.request_id,),
+                    ).fetchone()
+                    if existing is None:
+                        connection.execute(
+                            """INSERT INTO case_access_issuance_completions
+                            (request_id, status, completed_at, protection_key_id,
+                             nonce, ciphertext) VALUES (?, 'COMPLETED', ?, ?, ?, ?)""",
+                            (preparation.request_id, at_time, protected.protection_key_id,
+                             protected.nonce, protected.ciphertext),
+                        )
+                        existing = (
+                            preparation.request_id, at_time, protected.protection_key_id,
+                            protected.nonce, protected.ciphertext,
+                        )
+                    result = self._completion(existing)
+                    if before_commit is not None:
+                        before_commit()
+                    measurement.commit(connection)
+                    return result
+                except BaseException:
+                    measurement.rollback(connection)
+                    raise
