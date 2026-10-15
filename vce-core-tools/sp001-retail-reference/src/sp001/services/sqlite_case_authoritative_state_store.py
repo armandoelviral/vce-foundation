@@ -319,10 +319,12 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             connection.execute("COMMIT")
             return True
         except sqlite3.IntegrityError:
-            connection.execute("ROLLBACK")
+            if connection.in_transaction:
+                connection.execute("ROLLBACK")
             return False
         except Exception:
-            connection.execute("ROLLBACK")
+            if connection.in_transaction:
+                connection.execute("ROLLBACK")
             raise
         finally:
             connection.close()
@@ -407,10 +409,12 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             connection.execute("COMMIT")
             return True
         except sqlite3.IntegrityError:
-            connection.execute("ROLLBACK")
+            if connection.in_transaction:
+                connection.execute("ROLLBACK")
             return False
         except Exception:
-            connection.execute("ROLLBACK")
+            if connection.in_transaction:
+                connection.execute("ROLLBACK")
             raise
         finally:
             connection.close()
