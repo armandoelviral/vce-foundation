@@ -1,3 +1,6 @@
+from sp001.contracts.prepared_case_access_crypto import (
+    PreparedAccessTokenSigner, PreparedAccessCredentialProtector,
+)
 from sp001.contracts.case_access_issuer import CaseAccessIssuer
 from sp001.services.case_access_issuer_facade import CaseAccessIssuerFacade
 from collections.abc import Callable
@@ -38,10 +41,55 @@ def compose_case_access_issuer(
     authorization_database_path: str | Path,
     clock: Callable[[], int] | None = None,
 ) -> CaseAccessIssuer:
+    """Compatibility composition using explicitly supplied RSA/AES keys."""
+    signer = PreparedCaseAccessSigner(
+        signing_key_id=signing_key_id, private_key=signing_private_key,
+        issuer=access_issuer, audience=access_audience,
+    )
+    protector = PreparedCredentialProtector(
+        protection_key_id=protection_key_id, key=protection_key,
+    )
+    return compose_case_access_issuer_with_capabilities(
+        primary_issuer=primary_issuer,
+        primary_audience=primary_audience,
+        primary_key_resolver=primary_key_resolver,
+        max_primary_lifetime_seconds=max_primary_lifetime_seconds,
+        max_primary_token_bytes=max_primary_token_bytes,
+        access_issuer=access_issuer,
+        access_audience=access_audience,
+        max_access_lifetime_seconds=max_access_lifetime_seconds,
+        signing_key_id=signing_key_id,
+        signer=signer,
+        protector=protector,
+        authorization_database_path=authorization_database_path,
+        clock=clock,
+    )
+
+
+def compose_case_access_issuer_with_capabilities(
+    *,
+    primary_issuer: str,
+    primary_audience: str,
+    primary_key_resolver: AccessTokenKeyResolver,
+    max_primary_lifetime_seconds: int,
+    max_primary_token_bytes: int,
+    access_issuer: str,
+    access_audience: str,
+    max_access_lifetime_seconds: int,
+    signing_key_id: str,
+    signer: PreparedAccessTokenSigner,
+    protector: PreparedAccessCredentialProtector,
+    authorization_database_path: str | Path,
+    clock: Callable[[], int] | None = None,
+) -> CaseAccessIssuer:
     """Compose internal issuance with explicit trust and injected key custody.
 
     No default bindings, grants, network discovery or public administration.
     """
+    if not isinstance(signer, PreparedAccessTokenSigner):
+        raise TypeError("signer must implement PreparedAccessTokenSigner")
+    if not isinstance(protector, PreparedAccessCredentialProtector):
+        raise TypeError("protector must implement PreparedAccessCredentialProtector")
     if clock is not None and not callable(clock):
         raise TypeError("clock must be callable")
     if not isinstance(authorization_database_path, (str, Path)):
@@ -59,13 +107,6 @@ def compose_case_access_issuer(
         key_resolver=primary_key_resolver,
         max_lifetime_seconds=max_primary_lifetime_seconds,
         max_token_bytes=max_primary_token_bytes,
-    )
-    signer = PreparedCaseAccessSigner(
-        signing_key_id=signing_key_id, private_key=signing_private_key,
-        issuer=access_issuer, audience=access_audience,
-    )
-    protector = PreparedCredentialProtector(
-        protection_key_id=protection_key_id, key=protection_key,
     )
     policy = CaseAccessIssuancePolicy(
         primary_audience=primary_audience, access_issuer=access_issuer,
