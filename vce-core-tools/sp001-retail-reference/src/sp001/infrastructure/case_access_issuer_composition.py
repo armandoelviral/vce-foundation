@@ -1,3 +1,6 @@
+from sp001.services.prepared_case_access_completion import (
+    PreparedCaseAccessCompleter,
+)
 from sp001.contracts.prepared_case_access_crypto import (
     PreparedAccessTokenSigner, PreparedAccessCredentialProtector,
 )
@@ -17,7 +20,7 @@ from sp001.infrastructure.prepared_case_access_credentials import (
     PreparedCaseAccessSigner, PreparedCredentialProtector,
 )
 from sp001.infrastructure.sqlite_case_access_issuance_completions import (
-    SqliteCaseAccessIssuanceCompletions, PreparedCaseAccessCompleter,
+    SqliteCaseAccessIssuanceCompletions,
 )
 from sp001.services.authenticated_case_access_issuance import (
     AuthenticatedCaseAccessIssuance,
