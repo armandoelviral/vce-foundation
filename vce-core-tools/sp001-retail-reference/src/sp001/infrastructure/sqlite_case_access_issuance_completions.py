@@ -3,8 +3,10 @@ from dataclasses import dataclass
 import time
 
 from sp001.contracts.case_access_token_issuance import IssuedCaseAccessToken
-from sp001.infrastructure.prepared_case_access_credentials import (
-    PreparedCaseAccessSigner, PreparedCredentialProtector,
+from sp001.contracts.prepared_case_access_crypto import (
+    PreparedAccessTokenSigner, PreparedAccessCredentialProtector,
+)
+from sp001.contracts.protected_case_access_credential import (
     ProtectedCaseAccessCredential,
 )
 from sp001.infrastructure.sqlite_case_access_issuance_preparations import (
@@ -109,16 +111,16 @@ class PreparedCaseAccessCompleter:
 
     def __init__(
         self, *, store: SqliteCaseAccessIssuanceCompletions,
-        signer: PreparedCaseAccessSigner,
-        protector: PreparedCredentialProtector,
+        signer: PreparedAccessTokenSigner,
+        protector: PreparedAccessCredentialProtector,
         clock: Callable[[], int] | None = None,
     ):
         if not isinstance(store, SqliteCaseAccessIssuanceCompletions):
             raise TypeError("store must support durable completion")
-        if not isinstance(signer, PreparedCaseAccessSigner):
-            raise TypeError("signer must be a PreparedCaseAccessSigner")
-        if not isinstance(protector, PreparedCredentialProtector):
-            raise TypeError("protector must be a PreparedCredentialProtector")
+        if not isinstance(signer, PreparedAccessTokenSigner):
+            raise TypeError("signer must implement PreparedAccessTokenSigner")
+        if not isinstance(protector, PreparedAccessCredentialProtector):
+            raise TypeError("protector must implement PreparedAccessCredentialProtector")
         if clock is not None and not callable(clock):
             raise TypeError("clock must be callable")
         self._store = store
@@ -133,20 +135,28 @@ class PreparedCaseAccessCompleter:
         historical = self._store.read_completed(request_id=request_id)
         if historical is None:
             token = self._signer.sign(preparation=preparation)
+            if not isinstance(token, IssuedCaseAccessToken):
+                raise TypeError("signer returned an invalid token")
             protected = self._protector.protect(
                 preparation=preparation, token=token,
             )
         else:
             protected = historical.protected
 
+        if not isinstance(protected, ProtectedCaseAccessCredential):
+            raise TypeError("protector returned an invalid envelope")
+
         # Replays also revalidate current references. First completion wins.
         persisted = self._store.confirm(
             preparation=preparation, protected=protected, clock=self._clock,
             before_commit=before_commit,
         )
-        return self._protector.recover(
+        recovered = self._protector.recover(
             preparation=preparation, protected=persisted.protected,
         )
+        if not isinstance(recovered, IssuedCaseAccessToken):
+            raise TypeError("protector returned an invalid token")
+        return recovered
 
     def prepare(self, *, preparation, at_time, before_commit=None):
         return self._store.prepare(
