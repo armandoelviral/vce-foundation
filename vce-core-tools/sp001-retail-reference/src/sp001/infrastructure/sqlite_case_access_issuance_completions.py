@@ -147,3 +147,17 @@ class PreparedCaseAccessCompleter:
         return self._protector.recover(
             preparation=preparation, protected=persisted.protected,
         )
+
+    def prepare(self, *, preparation, at_time, before_commit=None):
+        return self._store.prepare(
+            preparation=preparation, at_time=at_time,
+            before_commit=before_commit,
+        )
+
+    def prepare_request(self, *, request, context, policy, clock):
+        return self._store.prepare_request(
+            request=request, context=context, policy=policy, clock=clock,
+        )
+
+    def read_prepared(self, *, request_id):
+        return self._store.read_prepared(request_id=request_id)

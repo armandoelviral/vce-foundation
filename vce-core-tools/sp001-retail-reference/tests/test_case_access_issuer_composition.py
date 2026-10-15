@@ -90,7 +90,15 @@ def test_composed_issuer_uses_real_https_jwks_and_persistent_recovery(
     )
     service = compose_case_access_issuer(**configuration)
     credential = primary(primary_key)
-    service.prepare(credential=credential, preparation=preparation)
+    from sp001.contracts.case_access_issuance_request import CaseAccessIssuanceRequest
+    preparation = service.prepare_request(
+        credential=credential,
+        request=CaseAccessIssuanceRequest(
+            preparation.request_id,
+            preparation.payload.permissions[0].case_id,
+            preparation.payload.permissions[0].operation,
+        ),
+    )
     token = service.complete(
         credential=credential, request_id=preparation.request_id,
     )

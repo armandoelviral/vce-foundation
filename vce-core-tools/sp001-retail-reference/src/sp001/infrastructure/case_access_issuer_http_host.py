@@ -1,3 +1,4 @@
+from sp001.contracts.case_access_issuer import CaseAccessIssuer
 import json
 import re
 
@@ -11,7 +12,7 @@ from sp001.contracts.case_access_issuance_request import (
 )
 from sp001.infrastructure.jwt_case_access_authenticator import AccessTokenKeyResolutionError
 from sp001.services.authenticated_case_access_issuance import (
-    AuthenticatedCaseAccessIssuance, IssuanceAuthenticationRejected,
+    IssuanceAuthenticationRejected,
 )
 from sp001.services.case_access_issuance_reference_validation import (
     IssuanceReferenceValidationError,
@@ -32,11 +33,11 @@ def _invalid_constant(value):
 
 
 def create_case_access_issuer_app(
-    *, service: AuthenticatedCaseAccessIssuance,
+    *, service: CaseAccessIssuer,
     max_request_bytes: int, max_primary_credential_bytes: int,
 ) -> FastAPI:
-    if not isinstance(service, AuthenticatedCaseAccessIssuance):
-        raise TypeError("service must be an AuthenticatedCaseAccessIssuance")
+    if not isinstance(service, CaseAccessIssuer):
+        raise TypeError("service must implement CaseAccessIssuer")
     for value in (max_request_bytes, max_primary_credential_bytes):
         if type(value) is not int or value <= 0:
             raise ValueError("request limits must be positive integers")

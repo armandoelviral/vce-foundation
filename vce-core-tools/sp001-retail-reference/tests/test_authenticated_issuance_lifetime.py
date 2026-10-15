@@ -22,7 +22,7 @@ def boundary(components, now, audience="issuance-service"):
             return context
 
     return AuthenticatedCaseAccessIssuance(
-        authenticator=Authenticator(), store=store, completer=completer,
+        authenticator=Authenticator(), backend=completer,
         expected_audience="issuance-service", clock=lambda: now[0],
     )
 

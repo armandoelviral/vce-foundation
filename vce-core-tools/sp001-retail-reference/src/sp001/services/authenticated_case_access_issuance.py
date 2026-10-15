@@ -10,8 +10,8 @@ from sp001.contracts.case_access_issuance_preparation import (
 from sp001.contracts.federated_issuance_authenticator import (
     FederatedIssuanceAuthenticator,
 )
-from sp001.infrastructure.sqlite_case_access_issuance_completions import (
-    SqliteCaseAccessIssuanceCompletions, PreparedCaseAccessCompleter,
+from sp001.contracts.case_access_issuance_backend import (
+    CaseAccessIssuanceBackend,
 )
 
 
@@ -32,21 +32,15 @@ class AuthenticatedCaseAccessIssuance:
 
     def __init__(
         self, *, authenticator: FederatedIssuanceAuthenticator,
-        store: SqliteCaseAccessIssuanceCompletions,
-        completer: PreparedCaseAccessCompleter,
+        backend: CaseAccessIssuanceBackend,
         expected_audience: str,
         clock: Callable[[], int] | None = None,
         issuance_policy: CaseAccessIssuancePolicy | None = None,
     ):
         if not callable(getattr(authenticator, "authenticate", None)):
             raise TypeError("authenticator must implement authenticate")
-        if not isinstance(store, SqliteCaseAccessIssuanceCompletions):
-            raise TypeError("store must support durable completion")
-        if not isinstance(completer, PreparedCaseAccessCompleter):
-            raise TypeError("completer must support prepared completion")
-        # Both operations must use the exact same configured storage capability.
-        if completer._store is not store:
-            raise ValueError("completer and boundary must share the same store")
+        if not isinstance(backend, CaseAccessIssuanceBackend):
+            raise TypeError("backend must implement CaseAccessIssuanceBackend")
         if clock is not None and not callable(clock):
             raise TypeError("clock must be callable")
         if not isinstance(expected_audience, str) or not expected_audience.strip():
@@ -59,8 +53,7 @@ class AuthenticatedCaseAccessIssuance:
         self._issuance_policy = issuance_policy
         self._audience = expected_audience
         self._authenticator = authenticator
-        self._store = store
-        self._completer = completer
+        self._backend = backend
         self._clock = clock if clock is not None else lambda: int(time.time())
 
     def _authenticate(self, credential):
@@ -94,19 +87,19 @@ class AuthenticatedCaseAccessIssuance:
         if not isinstance(preparation, CaseAccessIssuancePreparation):
             raise TypeError("preparation must be a CaseAccessIssuancePreparation")
         self._require_identity(context.principal, preparation)
-        return self._store.prepare(
+        return self._backend.prepare(
             preparation=preparation, at_time=self._clock(),
             before_commit=lambda: self._require_valid(context),
         )
 
     def complete(self, *, credential, request_id):
         context = self._authenticate(credential)
-        preparation = self._store.read_prepared(request_id=request_id)
+        preparation = self._backend.read_prepared(request_id=request_id)
         if preparation is None:
             raise IssuanceIdentityRejected("issuance identity rejected")
         self._require_identity(context.principal, preparation)
         # Durable completion revalidates binding and grants, including on replay.
-        token = self._completer.complete(
+        token = self._backend.complete(
             request_id=request_id,
             before_commit=lambda: self._require_valid(context),
         )
@@ -119,7 +112,7 @@ class AuthenticatedCaseAccessIssuance:
             raise TypeError("request must be a CaseAccessIssuanceRequest")
         if self._issuance_policy is None:
             raise RuntimeError("limited issuance policy is not configured")
-        return self._store.prepare_request(
+        return self._backend.prepare_request(
             request=request, context=context,
             policy=self._issuance_policy, clock=self._clock,
         )

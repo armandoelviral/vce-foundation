@@ -1,3 +1,5 @@
+from sp001.contracts.case_access_issuer import CaseAccessIssuer
+from sp001.services.case_access_issuer_facade import CaseAccessIssuerFacade
 from collections.abc import Callable
 from pathlib import Path
 
@@ -35,7 +37,7 @@ def compose_case_access_issuer(
     protection_key: bytes,
     authorization_database_path: str | Path,
     clock: Callable[[], int] | None = None,
-) -> AuthenticatedCaseAccessIssuance:
+) -> CaseAccessIssuer:
     """Compose internal issuance with explicit trust and injected key custody.
 
     No default bindings, grants, network discovery or public administration.
@@ -75,7 +77,8 @@ def compose_case_access_issuer(
     completer = PreparedCaseAccessCompleter(
         store=store, signer=signer, protector=protector, clock=clock,
     )
-    return AuthenticatedCaseAccessIssuance(
-        authenticator=authenticator, store=store, completer=completer,
+    service = AuthenticatedCaseAccessIssuance(
+        authenticator=authenticator, backend=completer,
         expected_audience=primary_audience, clock=clock, issuance_policy=policy,
     )
+    return CaseAccessIssuerFacade(service=service)

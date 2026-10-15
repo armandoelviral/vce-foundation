@@ -33,7 +33,7 @@ def boundary(components, principal):
     _, store, _, _, _, _, _, completer = components
     authenticator = Authenticator(principal)
     service = AuthenticatedCaseAccessIssuance(
-        authenticator=authenticator, store=store, completer=completer,
+        authenticator=authenticator, backend=completer,
         expected_audience='issuance-service', clock=lambda: 150,
     )
     return service, authenticator

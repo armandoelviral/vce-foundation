@@ -74,7 +74,7 @@ def flow(tmp_path):
         ),
     )
     service = AuthenticatedCaseAccessIssuance(
-        authenticator=authenticator, store=store, completer=completer,
+        authenticator=authenticator, backend=completer,
         expected_audience="issuance-service",
     )
 
