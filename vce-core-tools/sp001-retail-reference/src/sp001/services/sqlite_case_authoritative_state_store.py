@@ -3,6 +3,7 @@ from sp001.infrastructure.write_transaction_measurement import (
 )
 import json
 import sqlite3
+from time import perf_counter_ns
 from pathlib import Path
 
 from sp001.contracts.case_authoritative_state import CaseAuthoritativeState
@@ -109,6 +110,21 @@ def _validate_pair(
         raise ValueError("next revision must be the exact successor")
     if transition.from_phase is not from_phase:
         raise ValueError("transition source must match current phase")
+
+
+class CaseWriteDeadlineExceeded(TimeoutError):
+    """The write budget expired; no commit was performed."""
+
+
+def _check_write_deadline(deadline_ns):
+    if deadline_ns is None:
+        return
+    if type(deadline_ns) is not int:
+        raise TypeError("write_deadline_ns must be an integer")
+    if deadline_ns < 0:
+        raise ValueError("write_deadline_ns must be nonnegative")
+    if perf_counter_ns() >= deadline_ns:
+        raise CaseWriteDeadlineExceeded("case_write_deadline_exceeded")
 
 
 class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
@@ -280,6 +296,7 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
         *,
         state: CaseAuthoritativeState,
         transition: CaseLifecycleTransitionRecord,
+        write_deadline_ns: int | None = None,
     ) -> bool:
         _validate_pair(
             state=state,
@@ -287,12 +304,14 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             expected_revision=None,
             from_phase=None,
         )
+        _check_write_deadline(write_deadline_ns)
         connection = self._connect()
         with WriteTransactionMeasurement(
             operation="case.create", observer=self._write_observer,
         ) as measurement:
             try:
                 measurement.begin(connection)
+                _check_write_deadline(write_deadline_ns)
                 connection.execute(
                     f"""
                     INSERT INTO {_STATE_TABLE} (
@@ -325,6 +344,7 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
                         _serialize_links(transition.resource_links),
                     ),
                 )
+                _check_write_deadline(write_deadline_ns)
                 measurement.commit_sql(connection)
                 return True
             except sqlite3.IntegrityError:
@@ -344,6 +364,7 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
         expected_revision: int,
         next_state: CaseAuthoritativeState,
         transition: CaseLifecycleTransitionRecord,
+        write_deadline_ns: int | None = None,
     ) -> bool:
         expected_text = _revision_text(expected_revision)
         _revision_text(expected_revision + 1)
@@ -355,12 +376,14 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
                 "transition must be a CaseLifecycleTransitionRecord"
             )
 
+        _check_write_deadline(write_deadline_ns)
         connection = self._connect()
         with WriteTransactionMeasurement(
             operation="case.compare_and_swap", observer=self._write_observer,
         ) as measurement:
             try:
                 measurement.begin(connection)
+                _check_write_deadline(write_deadline_ns)
                 row = connection.execute(
                     f"SELECT * FROM {_STATE_TABLE} WHERE case_id = ?",
                     (next_state.case_id,),
@@ -418,6 +441,7 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
                         _serialize_links(transition.resource_links),
                     ),
                 )
+                _check_write_deadline(write_deadline_ns)
                 measurement.commit_sql(connection)
                 return True
             except sqlite3.IntegrityError:
