@@ -1,3 +1,6 @@
+from sp001.infrastructure.write_transaction_measurement import (
+    WriteTransactionMeasurement,
+)
 import json
 import sqlite3
 from pathlib import Path
@@ -111,14 +114,17 @@ def _validate_pair(
 class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
     """Persist current case state and its append-only transition history."""
 
-    __slots__ = ("_database_path",)
+    __slots__ = ("_database_path", "_write_observer")
 
-    def __init__(self, *, database_path: str | Path) -> None:
+    def __init__(self, *, database_path: str | Path, write_observer=None) -> None:
+        if write_observer is not None and not callable(write_observer):
+            raise TypeError("write_observer must be callable")
         if not isinstance(database_path, (str, Path)):
             raise TypeError("database_path must be a string or pathlib.Path")
         if isinstance(database_path, str) and not database_path.strip():
             raise ValueError("database_path must not be empty")
 
+        self._write_observer = write_observer
         self._database_path = str(database_path)
         self._initialize_schema()
 
@@ -282,52 +288,55 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             from_phase=None,
         )
         connection = self._connect()
-        try:
-            connection.execute("BEGIN IMMEDIATE")
-            connection.execute(
-                f"""
-                INSERT INTO {_STATE_TABLE} (
-                    case_id, objective_id, scope, phase, revision,
-                    resource_links_serialization
-                ) VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    state.case_id,
-                    state.objective_id,
-                    state.scope,
-                    state.phase.value,
-                    _revision_text(state.revision),
-                    _serialize_links(state.resource_links),
-                ),
-            )
-            connection.execute(
-                f"""
-                INSERT INTO {_TRANSITION_TABLE} (
-                    case_id, revision, transition_id, from_phase,
-                    to_phase, resource_links_serialization
-                ) VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    transition.case_id,
-                    _revision_text(transition.revision),
-                    transition.transition_id,
-                    None,
-                    transition.to_phase.value,
-                    _serialize_links(transition.resource_links),
-                ),
-            )
-            connection.execute("COMMIT")
-            return True
-        except sqlite3.IntegrityError:
-            if connection.in_transaction:
-                connection.execute("ROLLBACK")
-            return False
-        except Exception:
-            if connection.in_transaction:
-                connection.execute("ROLLBACK")
-            raise
-        finally:
-            connection.close()
+        with WriteTransactionMeasurement(
+            operation="case.create", observer=self._write_observer,
+        ) as measurement:
+            try:
+                measurement.begin(connection)
+                connection.execute(
+                    f"""
+                    INSERT INTO {_STATE_TABLE} (
+                        case_id, objective_id, scope, phase, revision,
+                        resource_links_serialization
+                    ) VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        state.case_id,
+                        state.objective_id,
+                        state.scope,
+                        state.phase.value,
+                        _revision_text(state.revision),
+                        _serialize_links(state.resource_links),
+                    ),
+                )
+                connection.execute(
+                    f"""
+                    INSERT INTO {_TRANSITION_TABLE} (
+                        case_id, revision, transition_id, from_phase,
+                        to_phase, resource_links_serialization
+                    ) VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        transition.case_id,
+                        _revision_text(transition.revision),
+                        transition.transition_id,
+                        None,
+                        transition.to_phase.value,
+                        _serialize_links(transition.resource_links),
+                    ),
+                )
+                measurement.commit_sql(connection)
+                return True
+            except sqlite3.IntegrityError:
+                if connection.in_transaction:
+                    measurement.rollback_sql(connection)
+                return False
+            except Exception:
+                if connection.in_transaction:
+                    measurement.rollback_sql(connection)
+                raise
+            finally:
+                connection.close()
 
     def compare_and_swap(
         self,
@@ -347,74 +356,77 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             )
 
         connection = self._connect()
-        try:
-            connection.execute("BEGIN IMMEDIATE")
-            row = connection.execute(
-                f"SELECT * FROM {_STATE_TABLE} WHERE case_id = ?",
-                (next_state.case_id,),
-            ).fetchone()
-            if row is None:
-                connection.execute("ROLLBACK")
+        with WriteTransactionMeasurement(
+            operation="case.compare_and_swap", observer=self._write_observer,
+        ) as measurement:
+            try:
+                measurement.begin(connection)
+                row = connection.execute(
+                    f"SELECT * FROM {_STATE_TABLE} WHERE case_id = ?",
+                    (next_state.case_id,),
+                ).fetchone()
+                if row is None:
+                    measurement.rollback_sql(connection)
+                    return False
+
+                current = self._state_from_row(row)
+                if current.revision != expected_revision:
+                    measurement.rollback_sql(connection)
+                    return False
+
+                _validate_pair(
+                    state=next_state,
+                    transition=transition,
+                    expected_revision=expected_revision,
+                    from_phase=current.phase,
+                )
+
+                updated = connection.execute(
+                    f"""
+                    UPDATE {_STATE_TABLE}
+                    SET objective_id = ?, scope = ?, phase = ?, revision = ?,
+                        resource_links_serialization = ?
+                    WHERE case_id = ? AND revision = ?
+                    """,
+                    (
+                        next_state.objective_id,
+                        next_state.scope,
+                        next_state.phase.value,
+                        _revision_text(next_state.revision),
+                        _serialize_links(next_state.resource_links),
+                        next_state.case_id,
+                        expected_text,
+                    ),
+                )
+                if updated.rowcount != 1:
+                    measurement.rollback_sql(connection)
+                    return False
+
+                connection.execute(
+                    f"""
+                    INSERT INTO {_TRANSITION_TABLE} (
+                        case_id, revision, transition_id, from_phase,
+                        to_phase, resource_links_serialization
+                    ) VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        transition.case_id,
+                        _revision_text(transition.revision),
+                        transition.transition_id,
+                        transition.from_phase.value,
+                        transition.to_phase.value,
+                        _serialize_links(transition.resource_links),
+                    ),
+                )
+                measurement.commit_sql(connection)
+                return True
+            except sqlite3.IntegrityError:
+                if connection.in_transaction:
+                    measurement.rollback_sql(connection)
                 return False
-
-            current = self._state_from_row(row)
-            if current.revision != expected_revision:
-                connection.execute("ROLLBACK")
-                return False
-
-            _validate_pair(
-                state=next_state,
-                transition=transition,
-                expected_revision=expected_revision,
-                from_phase=current.phase,
-            )
-
-            updated = connection.execute(
-                f"""
-                UPDATE {_STATE_TABLE}
-                SET objective_id = ?, scope = ?, phase = ?, revision = ?,
-                    resource_links_serialization = ?
-                WHERE case_id = ? AND revision = ?
-                """,
-                (
-                    next_state.objective_id,
-                    next_state.scope,
-                    next_state.phase.value,
-                    _revision_text(next_state.revision),
-                    _serialize_links(next_state.resource_links),
-                    next_state.case_id,
-                    expected_text,
-                ),
-            )
-            if updated.rowcount != 1:
-                connection.execute("ROLLBACK")
-                return False
-
-            connection.execute(
-                f"""
-                INSERT INTO {_TRANSITION_TABLE} (
-                    case_id, revision, transition_id, from_phase,
-                    to_phase, resource_links_serialization
-                ) VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    transition.case_id,
-                    _revision_text(transition.revision),
-                    transition.transition_id,
-                    transition.from_phase.value,
-                    transition.to_phase.value,
-                    _serialize_links(transition.resource_links),
-                ),
-            )
-            connection.execute("COMMIT")
-            return True
-        except sqlite3.IntegrityError:
-            if connection.in_transaction:
-                connection.execute("ROLLBACK")
-            return False
-        except Exception:
-            if connection.in_transaction:
-                connection.execute("ROLLBACK")
-            raise
-        finally:
-            connection.close()
+            except Exception:
+                if connection.in_transaction:
+                    measurement.rollback_sql(connection)
+                raise
+            finally:
+                connection.close()
