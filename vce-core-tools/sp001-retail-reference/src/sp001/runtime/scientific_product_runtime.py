@@ -1,3 +1,5 @@
+from time import perf_counter_ns
+
 from sp001.services.case_state_subscription import CaseStateSubscription
 from sp001.services.local_case_state_reader import LocalCaseStateReader
 
@@ -37,7 +39,16 @@ class ScientificProductRuntime:
         self,
         *,
         case_authoritative_state_store: CaseAuthoritativeStateStore | None = None,
+        case_write_budget_ns: int | None = None,
     ) -> None:
+        if case_write_budget_ns is not None:
+            if type(case_write_budget_ns) is not int:
+                raise TypeError("case_write_budget_ns must be an integer")
+            if case_write_budget_ns <= 0:
+                raise ValueError("case_write_budget_ns must be positive")
+            if case_authoritative_state_store is None:
+                raise ValueError("case write budget requires a durable store")
+        self._case_write_budget_ns = case_write_budget_ns
         self._case_authoritative_state_store = (
             case_authoritative_state_store
         )
@@ -57,6 +68,10 @@ class ScientificProductRuntime:
         case_id: str = "",
         scope: str = "",
     ) -> RuntimeResult:
+        deadline_ns = (
+            None if self._case_write_budget_ns is None
+            else perf_counter_ns() + self._case_write_budget_ns
+        )
         result = self._objective_to_case.execute(
             objective,
             case_id=case_id,
@@ -74,6 +89,10 @@ class ScientificProductRuntime:
                 success=False,
             )
 
+        options = (
+            {} if deadline_ns is None
+            else {"write_deadline_ns": deadline_ns}
+        )
         try:
             state = open_case(
                 store=store,
@@ -83,6 +102,7 @@ class ScientificProductRuntime:
                 transition_id=(
                     f"{case.case_id}:revision:1:CASE_OPENED"
                 ),
+                **options,
             )
         except (TypeError, ValueError):
             return RuntimeResult(
