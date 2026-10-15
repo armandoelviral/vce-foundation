@@ -110,3 +110,12 @@ class SupervisedCaseStateSubscription:
         finally:
             with self._lock:
                 self._inflight = False
+
+    def close(self, *, reason="subscriber_closed"):
+        """Terminate owned visibility and invalidate pending responses."""
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError("reason must be nonempty")
+        with self._lock:
+            if not self._terminated:
+                self._terminate(reason)
+            return self._reconciler.view
