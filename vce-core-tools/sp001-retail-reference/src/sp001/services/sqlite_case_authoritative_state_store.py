@@ -124,6 +124,20 @@ def _check_write_deadline(deadline_ns):
         raise CaseWriteDeadlineExceeded("case_write_deadline_exceeded")
 
 
+def _configure_write_wait(connection, deadline_ns):
+    if deadline_ns is None:
+        return
+    _check_write_deadline(deadline_ns)
+    remaining_ns = deadline_ns - perf_counter_ns()
+    if remaining_ns <= 0:
+        raise CaseWriteDeadlineExceeded("case_write_deadline_exceeded")
+    current_ms = connection.execute("PRAGMA busy_timeout").fetchone()[0]
+    # Round up to the next millisecond; preserve any stricter connection limit.
+    remaining_ms = (remaining_ns + 999_999) // 1_000_000
+    wait_ms = min(current_ms, remaining_ms)
+    connection.execute(f"PRAGMA busy_timeout={wait_ms}")
+
+
 class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
     """Persist current case state and its append-only transition history."""
 
@@ -307,6 +321,7 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             operation="case.create", observer=self._write_observer,
         ) as measurement:
             try:
+                _configure_write_wait(connection, write_deadline_ns)
                 measurement.begin(connection)
                 _check_write_deadline(write_deadline_ns)
                 connection.execute(
@@ -348,6 +363,20 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
                 if connection.in_transaction:
                     measurement.rollback_sql(connection)
                 return False
+            except sqlite3.OperationalError as error:
+                if connection.in_transaction:
+                    measurement.rollback_sql(connection)
+                code = getattr(error, "sqlite_errorcode", None)
+                if (
+                    code is not None
+                    and code & 0xff == sqlite3.SQLITE_BUSY
+                    and write_deadline_ns is not None
+                    and perf_counter_ns() >= write_deadline_ns
+                ):
+                    raise CaseWriteDeadlineExceeded(
+                        "case_write_deadline_exceeded"
+                    ) from error
+                raise
             except Exception:
                 if connection.in_transaction:
                     measurement.rollback_sql(connection)
@@ -379,6 +408,7 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             operation="case.compare_and_swap", observer=self._write_observer,
         ) as measurement:
             try:
+                _configure_write_wait(connection, write_deadline_ns)
                 measurement.begin(connection)
                 _check_write_deadline(write_deadline_ns)
                 row = connection.execute(
@@ -445,6 +475,20 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
                 if connection.in_transaction:
                     measurement.rollback_sql(connection)
                 return False
+            except sqlite3.OperationalError as error:
+                if connection.in_transaction:
+                    measurement.rollback_sql(connection)
+                code = getattr(error, "sqlite_errorcode", None)
+                if (
+                    code is not None
+                    and code & 0xff == sqlite3.SQLITE_BUSY
+                    and write_deadline_ns is not None
+                    and perf_counter_ns() >= write_deadline_ns
+                ):
+                    raise CaseWriteDeadlineExceeded(
+                        "case_write_deadline_exceeded"
+                    ) from error
+                raise
             except Exception:
                 if connection.in_transaction:
                     measurement.rollback_sql(connection)

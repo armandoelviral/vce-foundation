@@ -36,7 +36,7 @@ def test_expiry_after_real_lock_wait_preserves_state_and_history(
     observations = []
     entered = Event()
     finished = Event()
-    now = [100]
+    now = [1_000_000_000]
     errors = []
 
     class Probe:
@@ -68,7 +68,7 @@ def test_expiry_after_real_lock_wait_preserves_state_and_history(
 
     def work():
         try:
-            invoke(adapter, operation, 200)
+            invoke(adapter, operation, 2_000_000_000)
         except BaseException as error:
             errors.append(error)
         finally:
@@ -82,7 +82,7 @@ def test_expiry_after_real_lock_wait_preserves_state_and_history(
         assert entered.wait(2)
         assert not finished.is_set()
         # Deterministic budget expiry while the independent writer owns the lock.
-        now[0] = 200
+        now[0] = 2_000_000_000
     finally:
         blocker.rollback()
         blocker.close()
@@ -104,7 +104,7 @@ def test_expiry_after_real_lock_wait_preserves_state_and_history(
     assert value.rollback_ns is not None
     assert value.commit_ns is None
 
-    assert invoke(adapter, operation, 300)
+    assert invoke(adapter, operation, 3_000_000_000)
     assert adapter.read(case_id="CASE-001").revision == (
         1 if operation == "create" else 2
     )
@@ -126,9 +126,33 @@ def test_expiry_before_commit_rolls_back_both_tables(
         adapter.read(case_id="CASE-001"),
         adapter.read_transitions(case_id="CASE-001"),
     )
-    # Before connection, after BEGIN, immediately before COMMIT.
-    times = iter((100, 100, 200))
-    monkeypatch.setattr(module, "perf_counter_ns", lambda: next(times))
+    now = [100]
+    monkeypatch.setattr(module, "perf_counter_ns", lambda: now[0])
+
+    def expire_before_commit(measurement, connection):
+        raise AssertionError("expired write must not reach COMMIT")
+
+    original_connect = adapter._connect
+
+    class Probe:
+        def __init__(self, connection):
+            self.connection = connection
+
+        def execute(self, sql, *args):
+            result = self.connection.execute(sql, *args)
+            if sql.lstrip().startswith("INSERT INTO case_lifecycle_transitions"):
+                now[0] = 200
+            return result
+
+        def __getattr__(self, name):
+            return getattr(self.connection, name)
+
+    monkeypatch.setattr(
+        type(adapter), "_connect", lambda self: Probe(original_connect()),
+    )
+    monkeypatch.setattr(
+        module.WriteTransactionMeasurement, "commit_sql", expire_before_commit,
+    )
     with pytest.raises(module.CaseWriteDeadlineExceeded):
         invoke(adapter, operation, 200)
     assert (
