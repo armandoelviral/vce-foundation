@@ -172,13 +172,13 @@ def test_signed_token_passes_host_but_permission_remains_case_specific(key):
     headers = {"Authorization": "Bearer " + token(key)}
     with TestClient(app) as client:
         allowed = client.get(
-            "/v1/case-state", params={"case_id": "CASE-001"}, headers=headers,
+            "/v1/cases/CASE-001/state", headers=headers,
         )
         denied = client.get(
-            "/v1/case-state", params={"case_id": "OTHER"}, headers=headers,
+            "/v1/cases/OTHER/state", headers=headers,
         )
         invalid = client.get(
-            "/v1/case-state", params={"case_id": "CASE-001"},
+            "/v1/cases/CASE-001/state",
             headers={"Authorization": "Bearer broken"},
         )
     assert allowed.status_code == 404

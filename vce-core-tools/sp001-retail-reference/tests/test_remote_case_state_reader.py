@@ -121,7 +121,7 @@ def test_other_statuses_and_redirects_are_invalid(status):
 
 def reader():
     return module.RemoteCaseStateReader(
-        endpoint="https://coordinator.example/v1/case-state",
+        endpoint="https://coordinator.example/v1/cases/{caseId}/state",
         timeout_seconds=1,
         max_response_bytes=4096,
     )
@@ -201,11 +201,11 @@ def test_response_limit_is_enforced(monkeypatch):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "http://coordinator.example/v1/case-state",
-        "https://user:password@coordinator.example/v1/case-state",
+        "http://coordinator.example/v1/cases/{caseId}/state",
+        "https://user:password@coordinator.example/v1/cases/{caseId}/state",
         "https://coordinator.example/wrong",
-        "https://coordinator.example/v1/case-state?case_id=A",
-        "https://coordinator.example/v1/case-state#fragment",
+        "https://coordinator.example/v1/cases/{caseId}/state?case_id=A",
+        "https://coordinator.example/v1/cases/{caseId}/state#fragment",
     ],
 )
 def test_invalid_endpoint_is_rejected(endpoint):

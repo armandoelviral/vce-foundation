@@ -181,7 +181,7 @@ def secured_host(tmp_path):
 
     def reader(provider=None):
         return RemoteCaseStateReader(
-            endpoint=f"https://localhost:{port}/v1/case-state",
+            endpoint=f"https://localhost:{port}/v1/cases/{{caseId}}/state",
             timeout_seconds=2, max_response_bytes=4096,
             ca_file=str(ca), credential_provider=provider,
         )
@@ -196,6 +196,10 @@ def secured_host(tmp_path):
             raise failures[0]
         if not server.started:
             pytest.fail("secured HTTPS host did not start")
+        access_policy["endpoint"] = (
+            f"https://localhost:{port}/v1/cases/{{caseId}}/state"
+        )
+        access_policy["ca_file"] = str(ca)
         yield reader, issue, events, access_policy
     finally:
         server.should_exit = True
@@ -315,7 +319,7 @@ def test_token_is_header_only_and_redirect_is_not_followed(monkeypatch):
 
     monkeypatch.setattr(module.http.client, "HTTPSConnection", Connection)
     reader = RemoteCaseStateReader(
-        endpoint="https://coordinator.example/v1/case-state",
+        endpoint="https://coordinator.example/v1/cases/{caseId}/state",
         timeout_seconds=1, max_response_bytes=4096,
         credential_provider=lambda: credential,
     )

@@ -75,7 +75,7 @@ def setup():
 
 def request(client, headers=None):
     return client.get(
-        "/v1/case-state", params={"case_id": "CASE-001"}, headers=headers
+        "/v1/cases/CASE-001/state", headers=headers
     )
 
 

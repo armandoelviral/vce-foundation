@@ -23,6 +23,7 @@ class ViewStatus(StrEnum):
     REQUEST_REJECTED = "REQUEST_REJECTED"
     STALE_RESPONSE = "STALE_RESPONSE"
     READ_FAILED = "READ_FAILED"
+    BLOCKED = "BLOCKED"
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,6 +40,10 @@ class CaseView:
     reason: str | None
 
 
+class SessionResponseRejected(RuntimeError):
+    """Control rejection without response payload."""
+
+
 class CaseStateReconciler:
     """One case, latest-issued-request wins; no retries or storage writes."""
 
@@ -50,6 +55,7 @@ class CaseStateReconciler:
         self._case_id = case_id
         self._sequence = 0
         self._pending: ReadRequest | None = None
+        self._terminated = False
         self._lock = RLock()
         self._view = CaseView(
             case_id, None, ViewStatus.UNCONFIRMED, None
@@ -62,6 +68,8 @@ class CaseStateReconciler:
 
     def begin_read(self) -> ReadRequest:
         with self._lock:
+            if self._terminated:
+                raise SessionResponseRejected("session_terminated")
             self._sequence += 1
             self._pending = ReadRequest(self._case_id, self._sequence)
             self._set_view(ViewStatus.UNCONFIRMED, "read_pending")
@@ -94,6 +102,8 @@ class CaseStateReconciler:
         if not isinstance(request, ReadRequest):
             raise TypeError("request must be a ReadRequest")
         with self._lock:
+            if self._terminated:
+                raise SessionResponseRejected("session_terminated")
             if request is not self._pending:
                 return False
             self._pending = None
@@ -152,3 +162,16 @@ class CaseStateReconciler:
                     ViewStatus.INVALID_RESPONSE, "unknown_read_result"
                 )
             return True
+
+    def terminate_session(self, *, reason: str) -> CaseView:
+        """Withdraw owned snapshot and invalidate pending reads."""
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError("reason must be nonempty")
+        with self._lock:
+            if not self._terminated:
+                self._terminated = True
+                self._pending = None
+                self._view = CaseView(
+                    self._case_id, None, ViewStatus.BLOCKED, reason,
+                )
+            return self._view

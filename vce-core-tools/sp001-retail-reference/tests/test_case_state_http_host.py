@@ -51,7 +51,7 @@ def test_found_serializes_complete_state_after_access_check():
         return True
 
     with client(reader, authorize) as http:
-        response = http.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = http.get("/v1/cases/CASE-001/state")
     assert response.status_code == 200
     assert response.headers["cache-control"] == "no-store"
     assert response.json() == {
@@ -78,7 +78,7 @@ def test_found_serializes_complete_state_after_access_check():
 def test_business_404_has_explicit_contract_and_requested_identity():
     reader = Reader(NotFound("CASE-001"))
     with client(reader, lambda request, case_id: True) as http:
-        response = http.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = http.get("/v1/cases/CASE-001/state")
     assert response.status_code == 404
     assert response.json() == {
         "contract_version": CONTRACT_VERSION,
@@ -100,7 +100,7 @@ def test_route_404_does_not_claim_business_absence():
 def test_denied_request_does_not_consult_reader():
     reader = Reader(NotFound("CASE-001"))
     with client(reader, lambda request, case_id: False) as http:
-        response = http.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = http.get("/v1/cases/CASE-001/state")
     assert response.status_code == 403
     assert response.json()["code"] == "ACCESS_DENIED"
     assert reader.calls == []
@@ -110,7 +110,7 @@ def test_denied_request_does_not_consult_reader():
 def test_non_boolean_policy_decision_fails_closed(decision):
     reader = Reader(Found(state()))
     with client(reader, lambda request, case_id: decision) as http:
-        response = http.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = http.get("/v1/cases/CASE-001/state")
     assert response.status_code == 500
     assert response.json()["code"] == "INVALID_ACCESS_DECISION"
     assert reader.calls == []
@@ -123,7 +123,7 @@ def test_policy_exception_does_not_read_or_expose_details():
         raise RuntimeError("secret policy detail")
 
     with client(reader, authorize) as http:
-        response = http.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = http.get("/v1/cases/CASE-001/state")
     assert response.status_code == 500
     assert response.json()["code"] == "ACCESS_POLICY_FAILED"
     assert "secret" not in response.text
@@ -133,11 +133,11 @@ def test_policy_exception_does_not_read_or_expose_details():
 @pytest.mark.parametrize(
     "url",
     [
-        "/v1/case-state",
-        "/v1/case-state?case_id=",
-        "/v1/case-state?case_id=%20",
-        "/v1/case-state?case_id=A&case_id=B",
-        "/v1/case-state?case_id=A&unexpected=B",
+        "/v1/cases/%20/state",
+        "/v1/cases/A/state?case_id=",
+        "/v1/cases/A/state?case_id=%20",
+        "/v1/cases/A/state?case_id=A&case_id=B",
+        "/v1/cases/A/state?unexpected=B",
     ],
 )
 def test_invalid_query_does_not_read_or_authorize(url):
@@ -159,7 +159,7 @@ def test_invalid_query_does_not_read_or_authorize(url):
 def test_invalid_reader_result_never_becomes_business_absence(result):
     reader = Reader(result)
     with client(reader, lambda request, case_id: True) as http:
-        response = http.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = http.get("/v1/cases/CASE-001/state")
     assert response.status_code == 502
     assert response.json()["code"] == "INVALID_READER_RESPONSE"
 
@@ -167,7 +167,7 @@ def test_invalid_reader_result_never_becomes_business_absence(result):
 def test_reader_failure_is_server_error_without_exception_details():
     reader = Reader(error=RuntimeError("private database path"))
     with client(reader, lambda request, case_id: True) as http:
-        response = http.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = http.get("/v1/cases/CASE-001/state")
     assert response.status_code == 500
     assert response.json()["code"] == "CASE_READ_FAILED"
     assert "private" not in response.text
@@ -190,9 +190,9 @@ def test_factory_does_not_read_and_apps_do_not_share_readers():
     app_b = create_case_state_app(reader=second, authorize=lambda r, c: True)
     assert first.calls == second.calls == []
     with TestClient(app_a) as http:
-        assert http.get("/v1/case-state", params={"case_id": "A"}).status_code == 404
+        assert http.get("/v1/cases/A/state").status_code == 404
     assert second.calls == []
     with TestClient(app_b) as http:
-        assert http.get("/v1/case-state", params={"case_id": "B"}).status_code == 404
+        assert http.get("/v1/cases/B/state").status_code == 404
     assert first.calls == ["A"]
     assert second.calls == ["B"]

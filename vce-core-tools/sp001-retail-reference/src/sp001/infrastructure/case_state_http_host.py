@@ -1,3 +1,6 @@
+from sp001.infrastructure.case_state_http_route import (
+    CASE_STATE_ROUTE, validate_case_path_id,
+)
 from typing import Callable
 
 from fastapi import FastAPI, Request
@@ -36,16 +39,15 @@ def create_case_state_app(
             headers={"Cache-Control": "no-store"},
         )
 
-    @app.get("/v1/case-state")
-    def read_case_state(request: Request) -> JSONResponse:
-        values = request.query_params.getlist("case_id")
-        if (
-            len(values) != 1
-            or not values[0].strip()
-            or set(request.query_params.keys()) != {"case_id"}
-        ):
+    @app.get(CASE_STATE_ROUTE)
+    def read_case_state(request: Request, caseId: str) -> JSONResponse:
+        if request.scope["query_string"]:
             return error(400, "INVALID_REQUEST")
-        case_id = values[0]
+        case_id = caseId
+        try:
+            validate_case_path_id(case_id)
+        except (TypeError, ValueError):
+            return error(400, "INVALID_REQUEST")
 
         try:
             allowed = authorize(request, case_id)

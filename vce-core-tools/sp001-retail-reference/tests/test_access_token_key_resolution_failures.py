@@ -89,7 +89,7 @@ def test_host_provider_failure_is_500_without_authorization_or_read(credential):
     )
     with TestClient(app) as client:
         response = client.get(
-            "/v1/case-state", params={"case_id": "CASE-001"},
+            "/v1/cases/CASE-001/state",
             headers={"Authorization": "Bearer " + credential},
         )
     assert response.status_code == 500

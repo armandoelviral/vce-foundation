@@ -87,7 +87,7 @@ def test_relative_database_path_is_rejected_before_creation(environment):
 def test_valid_configuration_builds_authenticated_host_without_default_grants(environment):
     app = create_app_from_environment(environment=environment)
     with TestClient(app) as client:
-        response = client.get("/v1/case-state", params={"case_id": "CASE-001"})
+        response = client.get("/v1/cases/CASE-001/state")
     assert response.status_code == 401
     assert SqliteCaseAccessGrants(
         database_path=environment["SP001_GRANTS_DATABASE_PATH"]

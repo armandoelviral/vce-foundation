@@ -69,7 +69,7 @@ def test_empty_composed_store_grants_no_access(tmp_path, key):
     app = compose(reader, key, tmp_path / "grants.sqlite3")
     with TestClient(app) as client:
         response = client.get(
-            "/v1/case-state", params={"case_id": "CASE-001"},
+            "/v1/cases/CASE-001/state",
             headers={"Authorization": "Bearer " + token(key)},
         )
     assert response.status_code == 403
@@ -145,7 +145,7 @@ def test_composed_host_observes_authorized_grant_and_revocation_over_https(tmp_p
         credential = token(key)
         subscription = CaseStateSubscription(
             reader=RemoteCaseStateReader(
-                endpoint=f"https://localhost:{port}/v1/case-state",
+                endpoint=f"https://localhost:{port}/v1/cases/{{caseId}}/state",
                 timeout_seconds=2, max_response_bytes=4096, ca_file=str(ca),
                 credential_provider=lambda: credential,
             ),

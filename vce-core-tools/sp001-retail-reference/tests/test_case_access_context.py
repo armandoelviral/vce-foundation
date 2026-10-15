@@ -107,8 +107,7 @@ def test_host_checks_access_before_authorizer_and_reader(kind, status):
     )
     with TestClient(app) as client:
         response = client.get(
-            "/v1/case-state",
-            params={"case_id": "CASE-001"},
+            "/v1/cases/CASE-001/state",
             headers={"Authorization": "Bearer test-token"},
         )
     assert response.status_code == status

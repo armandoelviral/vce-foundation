@@ -72,7 +72,7 @@ def create_authenticated_case_state_app(
 
     @app.middleware("http")
     async def authenticate_request(request: Request, call_next):
-        if request.url.path != "/v1/case-state":
+        if re.fullmatch(r"/v1/cases/[^/]+/state", request.scope["path"]) is None:
             return await call_next(request)
         values = request.headers.getlist("authorization")
         if len(values) != 1:

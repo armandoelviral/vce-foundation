@@ -77,7 +77,7 @@ def chain(monkeypatch):
 
         monkeypatch.setattr(remote.http.client, "HTTPSConnection", Connection)
         reader = remote.RemoteCaseStateReader(
-            endpoint="https://coordinator.example/v1/case-state",
+            endpoint="https://coordinator.example/v1/cases/{caseId}/state",
             timeout_seconds=1,
             max_response_bytes=4096,
         )

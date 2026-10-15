@@ -132,7 +132,7 @@ def test_environment_factory_https_read_and_revocation(tmp_path, monkeypatch):
 
         def remote(provider=None):
             return RemoteCaseStateReader(
-                endpoint=f"https://localhost:{port}/v1/case-state",
+                endpoint=f"https://localhost:{port}/v1/cases/{{caseId}}/state",
                 timeout_seconds=2, max_response_bytes=4096,
                 ca_file=str(ca), credential_provider=provider,
             )

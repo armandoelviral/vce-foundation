@@ -5,7 +5,10 @@ import json
 import math
 import socket
 import ssl
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import urlsplit
+from sp001.infrastructure.case_state_http_route import (
+    CASE_STATE_ROUTE, case_state_path,
+)
 
 from sp001.contracts.case_authoritative_state import CaseAuthoritativeState
 from sp001.contracts.case_lifecycle_phase import CaseLifecyclePhase
@@ -129,7 +132,7 @@ class RemoteCaseStateReader:
             or parts.password is not None
             or parts.query
             or parts.fragment
-            or parts.path != "/v1/case-state"
+            or parts.path != CASE_STATE_ROUTE
         ):
             raise ValueError("endpoint must be an HTTPS case-state URL")
         if any(ord(char) <= 32 or ord(char) == 127 for char in endpoint):
@@ -163,10 +166,7 @@ class RemoteCaseStateReader:
         self._tls = ssl.create_default_context(cafile=ca_file)
 
     def read(self, *, case_id: str) -> CaseStateReadResult:
-        if not isinstance(case_id, str):
-            raise TypeError("case_id must be a string")
-        if not case_id.strip():
-            raise ValueError("case_id must not be empty")
+        target = case_state_path(case_id)
         headers = {
             "Accept": "application/json",
             "Accept-Encoding": "identity",
@@ -188,7 +188,7 @@ class RemoteCaseStateReader:
         try:
             connection.request(
                 "GET",
-                self._path + "?" + urlencode({"case_id": case_id}),
+                target,
                 headers=headers,
             )
             response = connection.getresponse()

@@ -170,7 +170,7 @@ def https_host(tmp_path):
 
 def remote(port, ca=None, hostname="localhost"):
     return RemoteCaseStateReader(
-        endpoint=f"https://{hostname}:{port}/v1/case-state",
+        endpoint=f"https://{hostname}:{port}/v1/cases/{{caseId}}/state",
         timeout_seconds=2,
         max_response_bytes=4096,
         ca_file=str(ca) if ca is not None else None,
