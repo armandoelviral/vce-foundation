@@ -1,3 +1,6 @@
+from sp001.infrastructure.sqlite_write_acquisition import (
+    SpacedSqliteWriteAcquisition,
+)
 from sp001.infrastructure.write_transaction_measurement import (
     WriteTransactionMeasurement,
 )
@@ -141,9 +144,17 @@ def _configure_write_wait(connection, deadline_ns):
 class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
     """Persist current case state and its append-only transition history."""
 
-    __slots__ = ("_database_path", "_write_observer")
+    __slots__ = ("_database_path", "_write_observer", "_write_acquisition")
 
-    def __init__(self, *, database_path: str | Path, write_observer=None) -> None:
+    def __init__(
+        self, *, database_path: str | Path, write_observer=None,
+        write_acquisition: SpacedSqliteWriteAcquisition | None = None,
+    ) -> None:
+        if write_acquisition is not None and not isinstance(
+            write_acquisition, SpacedSqliteWriteAcquisition,
+        ):
+            raise TypeError("write_acquisition must be a spaced acquisition")
+        self._write_acquisition = write_acquisition
         if write_observer is not None and not callable(write_observer):
             raise TypeError("write_observer must be callable")
         if not isinstance(database_path, (str, Path)):
@@ -321,8 +332,19 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             operation="case.create", observer=self._write_observer,
         ) as measurement:
             try:
-                _configure_write_wait(connection, write_deadline_ns)
-                measurement.begin(connection)
+                if (
+                    self._write_acquisition is None
+                    or write_deadline_ns is None
+                ):
+                    _configure_write_wait(connection, write_deadline_ns)
+                    measurement.begin(connection)
+                else:
+                    measurement.begin(
+                        connection,
+                        acquisition=lambda conn: self._write_acquisition.begin(
+                            conn, deadline_ns=write_deadline_ns,
+                        ),
+                    )
                 _check_write_deadline(write_deadline_ns)
                 connection.execute(
                     f"""
@@ -408,8 +430,19 @@ class SqliteCaseAuthoritativeStateStore(CaseAuthoritativeStateStore):
             operation="case.compare_and_swap", observer=self._write_observer,
         ) as measurement:
             try:
-                _configure_write_wait(connection, write_deadline_ns)
-                measurement.begin(connection)
+                if (
+                    self._write_acquisition is None
+                    or write_deadline_ns is None
+                ):
+                    _configure_write_wait(connection, write_deadline_ns)
+                    measurement.begin(connection)
+                else:
+                    measurement.begin(
+                        connection,
+                        acquisition=lambda conn: self._write_acquisition.begin(
+                            conn, deadline_ns=write_deadline_ns,
+                        ),
+                    )
                 _check_write_deadline(write_deadline_ns)
                 row = connection.execute(
                     f"SELECT * FROM {_STATE_TABLE} WHERE case_id = ?",

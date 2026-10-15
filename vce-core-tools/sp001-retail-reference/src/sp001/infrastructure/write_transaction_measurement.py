@@ -24,9 +24,11 @@ class WriteTransactionMeasurement:
         self._started = perf_counter_ns()
         return self
 
-    def begin(self, connection):
+    def begin(self, connection, *, acquisition=None):
         started = perf_counter_ns()
         try:
+            if acquisition is not None:
+                return acquisition(connection)
             return connection.execute("BEGIN IMMEDIATE")
         finally:
             self._begin_ns = perf_counter_ns() - started
