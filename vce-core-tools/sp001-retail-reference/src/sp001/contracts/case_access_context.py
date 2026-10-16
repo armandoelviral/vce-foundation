@@ -8,6 +8,9 @@ from sp001.contracts.case_read_access import AuthenticatedPrincipal
 class CaseAccessOperation(StrEnum):
     READ_STATE = "READ_STATE"
     SUBSCRIBE_EVENTS = "SUBSCRIBE_EVENTS"
+    OPEN_CASE = "OPEN_CASE"
+    APPLY_CASE_TRANSITION = "APPLY_CASE_TRANSITION"
+    READ_LIFECYCLE_RESULT = "READ_LIFECYCLE_RESULT"
 
 
 @dataclass(frozen=True, slots=True)
