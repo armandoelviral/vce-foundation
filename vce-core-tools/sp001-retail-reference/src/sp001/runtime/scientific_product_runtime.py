@@ -1,3 +1,10 @@
+from sp001.contracts.case_lifecycle_completion import CaseLifecycleCompletion
+from sp001.contracts.case_lifecycle_execution_store import CaseLifecycleExecutionStore
+from sp001.contracts.case_lifecycle_request import (
+    CaseOpeningRequest, CaseTransitionRequest,
+)
+from sp001.services.case_lifecycle_recovery import match_case_lifecycle_completion
+
 from time import perf_counter_ns
 
 from sp001.services.case_state_subscription import CaseStateSubscription
@@ -40,13 +47,28 @@ class ScientificProductRuntime:
         *,
         case_authoritative_state_store: CaseAuthoritativeStateStore | None = None,
         case_write_budget_ns: int | None = None,
+        case_lifecycle_execution_store: CaseLifecycleExecutionStore | None = None,
     ) -> None:
+        if (
+            case_lifecycle_execution_store is not None
+            and not isinstance(
+                case_lifecycle_execution_store, CaseLifecycleExecutionStore,
+            )
+        ):
+            raise TypeError(
+                "case_lifecycle_execution_store must implement "
+                "CaseLifecycleExecutionStore"
+            )
+        self._case_lifecycle_execution_store = case_lifecycle_execution_store
         if case_write_budget_ns is not None:
             if type(case_write_budget_ns) is not int:
                 raise TypeError("case_write_budget_ns must be an integer")
             if case_write_budget_ns <= 0:
                 raise ValueError("case_write_budget_ns must be positive")
-            if case_authoritative_state_store is None:
+            if (
+                case_authoritative_state_store is None
+                and case_lifecycle_execution_store is None
+            ):
                 raise ValueError("case write budget requires a durable store")
         self._case_write_budget_ns = case_write_budget_ns
         self._case_authoritative_state_store = (
@@ -118,6 +140,44 @@ class ScientificProductRuntime:
                 success=False,
             )
         return result
+
+    def execute_case_lifecycle(
+        self,
+        *,
+        request: CaseOpeningRequest | CaseTransitionRequest,
+    ) -> CaseLifecycleCompletion | None:
+        """Trusted execution entry; does not authenticate or authorize."""
+        deadline_ns = (
+            None if self._case_write_budget_ns is None
+            else perf_counter_ns() + self._case_write_budget_ns
+        )
+        if type(request) not in (CaseOpeningRequest, CaseTransitionRequest):
+            raise TypeError("request must be an exact lifecycle request")
+        store = self._case_lifecycle_execution_store
+        if store is None:
+            raise RuntimeError("case lifecycle execution store is not configured")
+        result = store.execute(
+            request=request, write_deadline_ns=deadline_ns,
+        )
+        return match_case_lifecycle_completion(
+            request=request, completion=result,
+        )
+
+    def recover_case_lifecycle(
+        self,
+        *,
+        request: CaseOpeningRequest | CaseTransitionRequest,
+    ) -> CaseLifecycleCompletion | None:
+        """Recover the original result; does not authorize its delivery."""
+        if type(request) not in (CaseOpeningRequest, CaseTransitionRequest):
+            raise TypeError("request must be an exact lifecycle request")
+        store = self._case_lifecycle_execution_store
+        if store is None:
+            raise RuntimeError("case lifecycle execution store is not configured")
+        result = store.recover(request=request)
+        return match_case_lifecycle_completion(
+            request=request, completion=result,
+        )
 
     def read_case_authoritative_state(
         self,
