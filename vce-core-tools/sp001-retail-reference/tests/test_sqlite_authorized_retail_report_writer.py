@@ -279,3 +279,146 @@ def test_concurrent_revocation_serializes_with_report(
         )
 
     assert count(path) == (0 if revocation_first else 1)
+
+
+def test_authorized_recovery_uses_read_permission_only(tmp_path):
+    from dataclasses import replace
+
+    _, _, _, access, writer = environment(tmp_path)
+    report = make_report()
+    identity = RetailRuleEvaluationReportIdentity("REPORT")
+    writer.save_authorized(access=access, identity=identity, report=report)
+    read_access = replace(
+        access,
+        permissions=tuple(
+            permission for permission in access.permissions
+            if permission.operation is Operation.READ_RETAIL_REPORT
+        ),
+    )
+    assert writer.recover_authorized(
+        access=read_access, identity=identity, case_id="CASE",
+    ) == report
+    assert writer.recover_authorized(
+        access=read_access,
+        identity=RetailRuleEvaluationReportIdentity("ABSENT"),
+        case_id="CASE",
+    ) is None
+
+
+def test_revoked_read_grant_denies_existing_and_absent_reports(tmp_path):
+    _, grants, definitions, access, writer = environment(tmp_path)
+    identity = RetailRuleEvaluationReportIdentity("REPORT")
+    writer.save_authorized(
+        access=access, identity=identity, report=make_report(),
+    )
+    assert grants.apply(record=GrantAdministrationRecord(
+        "REVOKE-READ", access.principal, Action.REVOKE, definitions[1], 150,
+    ))
+    for requested in (identity, RetailRuleEvaluationReportIdentity("ABSENT")):
+        with pytest.raises(RetailReportAccessDenied):
+            writer.recover_authorized(
+                access=access, identity=requested, case_id="CASE",
+            )
+
+
+def test_recovery_checks_actual_report_case(tmp_path):
+    from dataclasses import replace
+
+    _, grants, _, access, writer = environment(tmp_path)
+    identity = RetailRuleEvaluationReportIdentity("REPORT")
+    writer.save_authorized(
+        access=access, identity=identity, report=make_report(),
+    )
+    permission = CaseAccessPermission("OTHER-CASE", Operation.READ_RETAIL_REPORT)
+    other_grant = CaseAccessGrant(
+        "OTHER-GRANT", access.principal, permission, 100, 300,
+    )
+    assert grants.apply(record=GrantAdministrationRecord(
+        "OTHER-EVENT", access.principal, Action.GRANT, other_grant, 100,
+    ))
+    other_access = replace(access, permissions=(permission,))
+    with pytest.raises(RetailReportAccessDenied):
+        writer.recover_authorized(
+            access=other_access, identity=identity, case_id="OTHER-CASE",
+        )
+
+
+def test_recovery_expiry_before_return_rejects_and_closes_transaction(tmp_path):
+    _, _, _, access, writer = environment(tmp_path)
+    identity = RetailRuleEvaluationReportIdentity("REPORT")
+    report = make_report()
+    writer.save_authorized(access=access, identity=identity, report=report)
+    instants = iter((150, 200))
+    reader = SqliteAuthorizedRetailReportWriter(
+        database_path=tmp_path / "shared.sqlite3",
+        expected_audience="REPORTS", clock=lambda: next(instants),
+    )
+    with pytest.raises(RetailReportAuthenticationRejected):
+        reader.recover_authorized(
+            access=access, identity=identity, case_id="CASE",
+        )
+    assert writer.recover_authorized(
+        access=access, identity=identity, case_id="CASE",
+    ) == report
+
+
+def test_revocation_after_read_snapshot_is_observed_next_time(tmp_path):
+    snapshot_established = Event()
+    resume_read = Event()
+    pause = [False]
+
+    class ReadConnection(sqlite3.Connection):
+        def execute(self, sql, parameters=()):
+            if (
+                pause[0]
+                and sql.startswith(
+                    "SELECT document FROM retail_rule_evaluation_reports"
+                )
+            ):
+                snapshot_established.set()
+                if not resume_read.wait(timeout=5):
+                    raise TimeoutError("test did not resume snapshot read")
+            return super().execute(sql, parameters)
+
+    class Reader(SqliteAuthorizedRetailReportWriter):
+        def _connect(self):
+            connection = sqlite3.connect(
+                self._path, timeout=5, isolation_level=None,
+                factory=ReadConnection,
+            )
+            connection.execute("PRAGMA synchronous=FULL")
+            return connection
+
+    path, grants, definitions, access, writer = environment(tmp_path)
+    report = make_report()
+    identity = RetailRuleEvaluationReportIdentity("REPORT")
+    writer.save_authorized(access=access, identity=identity, report=report)
+    reader = Reader(
+        database_path=path, expected_audience="REPORTS", clock=lambda: 150,
+    )
+    pause[0] = True
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(
+            reader.recover_authorized,
+            access=access, identity=identity, case_id="CASE",
+        )
+        try:
+            assert snapshot_established.wait(timeout=3)
+            assert not future.done()
+            # WAL permits this committed revocation while the read retains
+            # its already-established snapshot.
+            assert grants.apply(record=GrantAdministrationRecord(
+                "REVOKE-DURING-READ", access.principal,
+                Action.REVOKE, definitions[1], 150,
+            ))
+        finally:
+            resume_read.set()
+        assert future.result(timeout=5) == report
+
+    pause[0] = False
+    with pytest.raises(RetailReportAccessDenied):
+        reader.recover_authorized(
+            access=access, identity=identity, case_id="CASE",
+        )
+    assert count(path) == 1

@@ -65,7 +65,9 @@ class SqliteAuthorizedRetailReportWriter:
             raise
         return connection
 
-    def _authorize(self, connection, access, case_id):
+    def _authorize(
+        self, connection, access, case_id, *, recover_only=False,
+    ):
         now = self._clock()
         if type(now) is not int:
             raise TypeError("clock must return integer Unix seconds")
@@ -79,11 +81,11 @@ class SqliteAuthorizedRetailReportWriter:
         if not token_allows_retail_report(
             access=access, case_id=case_id,
             expected_audience=self._audience,
-            at_time=now, recover_only=False,
+            at_time=now, recover_only=recover_only,
         ):
             raise RetailReportAccessDenied("report access denied")
         for permission in required_retail_report_permissions(
-            case_id=case_id, recover_only=False,
+            case_id=case_id, recover_only=recover_only,
         ):
             row = connection.execute(
                 """
@@ -136,6 +138,52 @@ class SqliteAuthorizedRetailReportWriter:
             self._authorize(connection, access, report.case_id)
             connection.execute("COMMIT")
             return validated
+        except BaseException as error:
+            if connection.in_transaction:
+                try:
+                    connection.execute("ROLLBACK")
+                except BaseException as rollback_error:
+                    error.add_note(
+                        "Rollback also failed: "
+                        + type(rollback_error).__name__
+                    )
+            raise
+        finally:
+            connection.close()
+
+    def recover_authorized(self, *, access, identity, case_id):
+        """Read grants and report in one snapshot; recheck temporal validity.
+
+        Revocation committed after the snapshot is established is observed
+        by the next transaction, not retroactively by this read.
+        """
+        if not isinstance(access, ValidatedCaseAccessContext):
+            raise TypeError("access must be a ValidatedCaseAccessContext")
+        if not isinstance(identity, RetailRuleEvaluationReportIdentity):
+            raise TypeError("identity must be a report identity")
+        required_retail_report_permissions(
+            case_id=case_id, recover_only=True,
+        )
+
+        connection = self._connect()
+        try:
+            connection.execute("BEGIN")
+            self._authorize(
+                connection, access, case_id, recover_only=True,
+            )
+            row = connection.execute(
+                "SELECT document FROM retail_rule_evaluation_reports "
+                "WHERE report_id=?",
+                (identity.report_id,),
+            ).fetchone()
+            report = None if row is None else deserialize(row[0])
+            if report is not None and report.case_id != case_id:
+                raise RetailReportAccessDenied("report access denied")
+            self._authorize(
+                connection, access, case_id, recover_only=True,
+            )
+            connection.execute("COMMIT")
+            return report
         except BaseException as error:
             if connection.in_transaction:
                 try:
