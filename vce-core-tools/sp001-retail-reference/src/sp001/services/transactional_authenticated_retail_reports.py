@@ -1,3 +1,6 @@
+from sp001.services.recovered_retail_rule_evaluation_report import (
+    RecoveredRetailRuleEvaluationReport,
+)
 from collections.abc import Callable
 from typing import Protocol, runtime_checkable
 
@@ -146,5 +149,27 @@ class TransactionalAuthenticatedRetailReports:
         if type(result) is not RetailRuleEvaluationReport:
             raise TypeError("backend returned an invalid report")
         if result.case_id != case_id:
+            raise RetailReportAccessDenied("report access denied")
+        return result
+
+    def recover_with_admissions(self, *, credential, identity, case_id):
+        """Recover report and historical admissions through current access checks."""
+        if not isinstance(identity, RetailRuleEvaluationReportIdentity):
+            raise TypeError("identity must be a report identity")
+        required_retail_report_permissions(case_id=case_id, recover_only=True)
+        access = self._authenticate(credential)
+        self._check(access, case_id, True)
+        operation = getattr(
+            self._backend, "recover_with_admissions_authorized", None,
+        )
+        if not callable(operation):
+            raise TypeError("backend does not support admission recovery")
+        result = operation(access=access, identity=identity, case_id=case_id)
+        self._check(access, case_id, True)
+        if result is None:
+            return None
+        if type(result) is not RecoveredRetailRuleEvaluationReport:
+            raise TypeError("backend returned an invalid recovered report")
+        if result.report.case_id != case_id:
             raise RetailReportAccessDenied("report access denied")
         return result

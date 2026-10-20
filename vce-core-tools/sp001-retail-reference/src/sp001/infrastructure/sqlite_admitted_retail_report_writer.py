@@ -1,3 +1,6 @@
+from sp001.services.recovered_retail_rule_evaluation_report import (
+    RecoveredRetailRuleEvaluationReport,
+)
 from sp001.contracts.case_access_context import ValidatedCaseAccessContext
 from sp001.contracts.retail_evaluation_binding_reference import (
     RetailEvaluationBindingReference,
@@ -181,6 +184,65 @@ class SqliteAdmittedRetailReportWriter(SqliteAuthorizedRetailReportWriter):
             self._authorize(connection, access, report.case_id)
             connection.execute("COMMIT")
             return validated
+        except BaseException as error:
+            if connection.in_transaction:
+                try:
+                    connection.execute("ROLLBACK")
+                except BaseException as rollback_error:
+                    error.add_note(
+                        "Rollback also failed: " + type(rollback_error).__name__
+                    )
+            raise
+        finally:
+            connection.close()
+
+    def recover_with_admissions_authorized(
+        self, *, access, identity, case_id,
+    ):
+        """Read grants, report and admissions in one SQLite snapshot."""
+        if not isinstance(access, ValidatedCaseAccessContext):
+            raise TypeError("access must be a ValidatedCaseAccessContext")
+        if not isinstance(identity, RetailRuleEvaluationReportIdentity):
+            raise TypeError("identity must be a report identity")
+        if not isinstance(case_id, str):
+            raise TypeError("case_id must be a string")
+        if not case_id.strip():
+            raise ValueError("case_id must not be empty")
+        connection = self._connect()
+        try:
+            connection.execute("BEGIN")
+            self._authorize(connection, access, case_id, recover_only=True)
+            row = connection.execute(
+                "SELECT document FROM retail_rule_evaluation_reports "
+                "WHERE report_id=?", (identity.report_id,),
+            ).fetchone()
+            result = None
+            if row is not None:
+                report = deserialize_report(row[0])
+                if report.case_id != case_id:
+                    raise RetailReportAccessDenied("report access denied")
+                admissions = []
+                for evaluation in report.evaluations:
+                    stored = connection.execute(
+                        "SELECT document FROM retail_evaluation_admissions "
+                        "WHERE evaluation_id=?", (evaluation.evaluation_id,),
+                    ).fetchone()
+                    if stored is None:
+                        continue
+                    admission = deserialize_admission(stored[0])
+                    if _evaluation_document(admission.evaluation) != (
+                        _evaluation_document(evaluation)
+                    ):
+                        raise RetailEvaluationAdmissionConflict(
+                            "stored admission differs from report evaluation"
+                        )
+                    admissions.append(admission)
+                result = RecoveredRetailRuleEvaluationReport(
+                    report=report, admissions=tuple(admissions),
+                )
+            self._authorize(connection, access, case_id, recover_only=True)
+            connection.execute("COMMIT")
+            return result
         except BaseException as error:
             if connection.in_transaction:
                 try:
