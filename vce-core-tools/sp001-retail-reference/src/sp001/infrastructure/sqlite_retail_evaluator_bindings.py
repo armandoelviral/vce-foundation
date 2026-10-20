@@ -203,6 +203,25 @@ class SqliteRetailEvaluatorBindings:
         finally:
             connection.close()
 
+    def read_snapshot_in_transaction(
+        self, *, connection: sqlite3.Connection, binding_id: str,
+    ):
+        """Read through the caller-owned transaction without ending it.
+
+        The supplied connection selects the database and snapshot.
+        The caller is responsible for using the admission database.
+        """
+        if not isinstance(connection, sqlite3.Connection):
+            raise TypeError("connection must be a SQLite connection")
+        if not isinstance(binding_id, str):
+            raise TypeError("binding_id must be a string")
+        if not binding_id.strip():
+            raise ValueError("binding_id must not be empty")
+        if not connection.in_transaction:
+            raise ValueError("an active transaction is required")
+        history = self._history(connection, binding_id)
+        return history[-1].snapshot if history else None
+
     def read_snapshot(self, *, binding_id: str):
         history = self.read_history(binding_id=binding_id)
         return history[-1].snapshot if history else None
