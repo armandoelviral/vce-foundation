@@ -103,6 +103,32 @@ class TransactionalAuthenticatedRetailReports:
             raise ValueError("backend returned a different report")
         return result
 
+    def save_with_admissions(
+        self, *, credential, identity, report, binding_references,
+    ):
+        """Explicit attribution admission; no fallback to declarative saves."""
+        if not isinstance(identity, RetailRuleEvaluationReportIdentity):
+            raise TypeError("identity must be a report identity")
+        if type(report) is not RetailRuleEvaluationReport:
+            raise TypeError("report must be a RetailRuleEvaluationReport")
+        access = self._authenticate(credential)
+        self._check(access, report.case_id, False)
+        operation = getattr(
+            self._backend, "save_with_admissions_authorized", None,
+        )
+        if not callable(operation):
+            raise TypeError("backend does not support attribution admission")
+        result = operation(
+            access=access, identity=identity, report=report,
+            binding_references=binding_references,
+        )
+        self._check(access, report.case_id, False)
+        if type(result) is not RetailRuleEvaluationReport:
+            raise TypeError("backend returned an invalid report")
+        if result != report:
+            raise ValueError("backend returned a different report")
+        return result
+
     def recover(self, *, credential, identity, case_id):
         if not isinstance(identity, RetailRuleEvaluationReportIdentity):
             raise TypeError("identity must be a report identity")

@@ -5,8 +5,8 @@ from sp001.contracts.access_token_key_resolver import AccessTokenKeyResolver
 from sp001.infrastructure.jwt_case_access_authenticator import (
     JwtCaseAccessAuthenticator,
 )
-from sp001.infrastructure.sqlite_authorized_retail_report_writer import (
-    SqliteAuthorizedRetailReportWriter,
+from sp001.infrastructure.sqlite_admitted_retail_report_writer import (
+    SqliteAdmittedRetailReportWriter,
 )
 from sp001.services.transactional_authenticated_retail_reports import (
     TransactionalAuthenticatedRetailReports,
@@ -27,7 +27,7 @@ def compose_transactional_retail_reports(
 
     The JWT library also validates time using its system clock.
     The supplied Unix-second clock must agree with that clock.
-    Does not generate keys or authenticate the declared evaluation actor.
+    Does not generate keys. Evaluator admission uses save_with_admissions.
     """
     authenticator = JwtCaseAccessAuthenticator(
         issuer=issuer,
@@ -36,7 +36,7 @@ def compose_transactional_retail_reports(
         max_lifetime_seconds=max_lifetime_seconds,
         max_token_bytes=max_token_bytes,
     )
-    backend = SqliteAuthorizedRetailReportWriter(
+    backend = SqliteAdmittedRetailReportWriter(
         database_path=database_path,
         expected_audience=audience,
         clock=clock,
