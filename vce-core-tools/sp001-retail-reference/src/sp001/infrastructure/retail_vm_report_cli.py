@@ -21,6 +21,14 @@ from sp001.services.authenticated_retail_reports import (
 from sp001.services.retail_vm_report_text import render_retail_vm_report_text
 
 
+from sp001.infrastructure.retail_evidence_manifest import (
+    compare_retail_evidence_manifest,
+)
+from sp001.services.retail_vm_report_evidence_text import (
+    render_retail_vm_report_evidence_text,
+)
+
+
 def _positive_integer(value):
     parsed = int(value)
     if parsed <= 0:
@@ -48,9 +56,17 @@ def main(argv=None, *, environment=None, stdin=None, stdout=None, stderr=None):
     parser.add_argument("--max-token-bytes", required=True, type=_positive_integer)
     parser.add_argument("--case-id", required=True)
     parser.add_argument("--report-id", required=True)
+    parser.add_argument("--evidence-manifest")
+    parser.add_argument("--max-manifest-bytes", type=_positive_integer)
+    parser.add_argument("--max-evidence-bytes", type=_positive_integer)
     args = parser.parse_args(argv)
 
     try:
+        if args.evidence_manifest is not None:
+            if args.max_manifest_bytes is None or args.max_evidence_bytes is None:
+                raise ValueError("manifest read limits are required")
+        elif args.max_manifest_bytes is not None or args.max_evidence_bytes is not None:
+            raise ValueError("read limits require a manifest")
         if not Path(args.database).is_file():
             raise ValueError("database must already exist")
         pem = environment.get(args.public_key_env)
@@ -93,9 +109,20 @@ def main(argv=None, *, environment=None, stdin=None, stdout=None, stderr=None):
         if recovered is None:
             print("Reporte no encontrado para la consulta autorizada.", file=stderr)
             return 5
-        rendered = render_retail_vm_report_text(
-            identity=identity, recovered=recovered,
-        )
+        if args.evidence_manifest is None:
+            rendered = render_retail_vm_report_text(
+                identity=identity, recovered=recovered,
+            )
+        else:
+            evidence = compare_retail_evidence_manifest(
+                report=recovered.report,
+                manifest_path=Path(args.evidence_manifest),
+                max_manifest_bytes=args.max_manifest_bytes,
+                max_evidence_bytes=args.max_evidence_bytes,
+            )
+            rendered = render_retail_vm_report_evidence_text(
+                identity=identity, recovered=recovered, evidence=evidence,
+            )
     except RetailReportAuthenticationRejected:
         print("Credencial rechazada o fuera de vigencia.", file=stderr)
         return 3
