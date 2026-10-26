@@ -1,3 +1,9 @@
+from sp001.infrastructure.retail_rule_evaluation_serialization import (
+    serialize_retail_rule_evaluation_report,
+)
+from sp001.infrastructure.retail_rule_evaluation_admission_serialization import (
+    serialize_retail_rule_evaluation_admission,
+)
 import argparse
 import os
 from pathlib import Path
@@ -123,6 +129,23 @@ def main(argv=None, *, environment=None, stdin=None, stdout=None, stderr=None):
             rendered = render_retail_vm_report_evidence_text(
                 identity=identity, recovered=recovered, evidence=evidence,
             )
+        confirmed = service.recover_with_admissions(
+            credential=credential, identity=identity, case_id=args.case_id,
+        )
+        if confirmed is None:
+            raise ValueError("report disappeared before export")
+        if (
+            serialize_retail_rule_evaluation_report(confirmed.report)
+            != serialize_retail_rule_evaluation_report(recovered.report)
+            or tuple(
+                serialize_retail_rule_evaluation_admission(item)
+                for item in confirmed.admissions
+            ) != tuple(
+                serialize_retail_rule_evaluation_admission(item)
+                for item in recovered.admissions
+            )
+        ):
+            raise ValueError("recovered content changed before export")
     except RetailReportAuthenticationRejected:
         print("Credencial rechazada o fuera de vigencia.", file=stderr)
         return 3
