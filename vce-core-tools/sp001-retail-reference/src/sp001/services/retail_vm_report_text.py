@@ -33,6 +33,7 @@ def render_retail_vm_report_text(
         "",
         "Alcance: evaluaciones declaradas y admisiones locales registradas.",
         "La admisión no equivale a aprobación de la composición.",
+        "La admisión no demuestra revisión independiente.",
         "Las referencias de evidencia no acreditan archivos verificados.",
         "Este documento no verifica calibración, autenticidad ni integridad externa.",
     ]

@@ -18,16 +18,66 @@ from sp001.services.retail_vm_report_text import render_retail_vm_report_text
 
 
 @pytest.fixture
-def live_report_host(tmp_path, keys):
+def live_report_host(tmp_path, keys, request):
     database, service, _, _ = setup.environment(tmp_path, keys)
     credential = setup.token(keys[0])
     report = setup.make_report()
 
-    service.save(
-        credential=credential,
-        identity=setup.IDENTITY,
-        report=report,
-    )
+    attribution = getattr(request, "param", "declared")
+
+    if attribution == "declared":
+        service.save(
+            credential=credential,
+            identity=setup.IDENTITY,
+            report=report,
+        )
+    elif attribution == "recorded":
+        from sp001.contracts.case_read_access import AuthenticatedPrincipal
+        from sp001.contracts.retail_evaluation_binding_reference import (
+            RetailEvaluationBindingReference,
+        )
+        from sp001.contracts.retail_evaluator_binding import (
+            RetailEvaluatorBinding,
+            RetailEvaluatorBindingSnapshot,
+        )
+        from sp001.contracts.retail_evaluator_binding_change import (
+            RetailEvaluatorBindingChange,
+        )
+        from sp001.infrastructure.sqlite_retail_evaluator_bindings import (
+            SqliteRetailEvaluatorBindings,
+        )
+
+        now = int(time.time())
+        author = AuthenticatedPrincipal(setup.ISSUER, "SUBJECT")
+        binding = RetailEvaluatorBinding(
+            "BROWSER-BINDING",
+            1,
+            author,
+            report.evaluations[0].evaluator,
+            "CASE",
+            now - 10,
+            now + 300,
+        )
+        bindings = SqliteRetailEvaluatorBindings(database_path=database)
+        assert bindings.apply(change=RetailEvaluatorBindingChange(
+            "BROWSER-BINDING-EVENT",
+            RetailEvaluatorBindingSnapshot(binding, False),
+            author,
+            now,
+        ))
+
+        service.save_with_admissions(
+            credential=credential,
+            identity=setup.IDENTITY,
+            report=report,
+            binding_references=(
+                RetailEvaluationBindingReference(
+                    "EVAL", "BROWSER-BINDING", 1,
+                ),
+            ),
+        )
+    else:
+        raise ValueError("unsupported attribution test mode")
 
     recovered = service.recover_with_admissions(
         credential=credential,
