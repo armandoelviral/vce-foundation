@@ -1,3 +1,5 @@
+from sp001.infrastructure.retail_report_read_page import install_retail_report_read_page
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -103,4 +105,5 @@ def create_retail_report_read_app(*, service, max_token_bytes=16384):
             # No detalles internos ni contenido del reporte en el error.
             return response(503, "backend_unavailable")
 
+    install_retail_report_read_page(app)
     return app
