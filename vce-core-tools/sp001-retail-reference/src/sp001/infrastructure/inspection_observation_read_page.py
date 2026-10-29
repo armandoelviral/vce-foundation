@@ -36,6 +36,10 @@ autoría, revisión independiente ni cumplimiento.</p>
 </form>
 <p id="status" role="status" aria-live="polite"></p>
 <pre id="output" hidden></pre>
+<details id="technical" hidden>
+<summary>Detalle técnico — documento original</summary>
+<pre id="technical-document"></pre>
+</details>
 </main>
 </body>
 </html>
@@ -49,6 +53,8 @@ const form = document.getElementById("query");
 const output = document.getElementById("output");
 const status = document.getElementById("status");
 const credential = document.getElementById("credential");
+const technical = document.getElementById("technical");
+const technicalDocument = document.getElementById("technical-document");
 
 let generation = 0;
 let active = null;
@@ -59,6 +65,9 @@ function reset() {
     active = null;
     output.textContent = "";
     output.hidden = true;
+    technicalDocument.textContent = "";
+    technical.hidden = true;
+    technical.open = false;
     status.textContent = "";
     return generation;
 }
@@ -72,6 +81,100 @@ window.addEventListener("pagehide", () => {
     reset();
     credential.value = "";
 });
+
+
+function readableObservation(document, caseId, observationId, version) {
+    const root = JSON.parse(document);
+    if (!root || root.schema_version !== 1 || !root.observation)
+        throw new Error("Unsupported observation document.");
+    const item = root.observation;
+
+    function text(value) {
+        if (typeof value !== "string") throw new Error("Invalid text.");
+        return value;
+    }
+    function record(value, type) {
+        if (!value || value.type !== type || !value.fields ||
+            typeof value.fields !== "object" || Array.isArray(value.fields))
+            throw new Error("Invalid record.");
+        return value.fields;
+    }
+    function list(value) {
+        if (!value || value.type !== "tuple" || !Array.isArray(value.items))
+            throw new Error("Invalid list.");
+        return value.items.map(text);
+    }
+    function instant(value) {
+        if (!value || value.type !== "datetime")
+            throw new Error("Invalid datetime.");
+        return text(value.iso);
+    }
+    if (text(item.case_id) !== caseId ||
+        text(item.observation_id) !== observationId)
+        throw new Error("Unexpected identity.");
+
+    const actor = record(item.declared_observer, "RetailProcessActor");
+    const role = record(actor.role, "RetailProcessRole");
+    const methods = {
+        DIRECT_INSPECTION: "Inspección directa",
+        EVIDENCE_REVIEW: "Revisión de evidencia"
+    };
+    const actorTypes = {
+        HUMAN: "Persona", TEAM: "Equipo",
+        SYSTEM: "Sistema", ORGANIZATION: "Organización"
+    };
+    if (!methods[item.method] || !actor.actor_type ||
+        actor.actor_type.type !== "ActorType" ||
+        !actorTypes[actor.actor_type.value])
+        throw new Error("Unknown method or actor type.");
+
+    const limitations = list(item.limitations);
+    const evidence = list(item.evidence_ids);
+    const lines = [
+        "OBSERVACIÓN DESCRIPTIVA — SIN DICTAMEN",
+        "",
+        "Caso: " + caseId,
+        "Observación: " + observationId,
+        // Keep exact requested version as text. Never render the JSON number,
+        // which may exceed JavaScript's safe integer range.
+        "Versión consultada: " + version,
+        "Objeto o zona: " + text(item.subject_reference),
+        "Método declarado: " + methods[item.method],
+        "",
+        "DESCRIPCIÓN DECLARADA POR EL OPERADOR",
+        "No se ha clasificado ni validado como dictamen.",
+        text(item.description),
+        "",
+        "ALCANCE DECLARADO",
+        text(item.scope),
+        "",
+        "LIMITACIONES REGISTRADAS",
+        ...(limitations.length ? limitations : [
+            "No se registraron limitaciones; no demuestra que no existan."
+        ]),
+        "",
+        "REFERENCIAS DE EVIDENCIA",
+        ...(evidence.length ? evidence : ["Sin referencias registradas."]),
+        "Las referencias no acreditan archivos verificados.",
+        "",
+        "RESPONSABLE DECLARADO",
+        "Responsable declarado: " + text(actor.actor_id),
+        "Tipo: " + actorTypes[actor.actor_type.value],
+        "Organización: " + text(actor.organization_id),
+        "Cliente: " + text(actor.customer_id),
+        "Función: " + text(role.role_name),
+        "Identificador de función: " + text(role.role_id),
+        "Cliente de la función: " + text(role.customer_id),
+        "",
+        "FECHAS DECLARADAS",
+        "Inspección o revisión: " + instant(item.observed_at),
+        "Registro: " + instant(item.recorded_at),
+        "Estas fechas no acreditan captura de fotografía ni COMMIT.",
+        "",
+        "Esta ficha no acredita autoría, revisión independiente ni cumplimiento."
+    ];
+    return lines.join("\n");
+}
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -128,13 +231,21 @@ form.addEventListener("submit", async (event) => {
         if (response.status === 200 && data && data.status === "ok" &&
             typeof data.observation_document === "string" &&
             data.observation_document.length > 0) {
-            // Display exact document text. Do not parse/reformat its numbers
-            // or interpret declared content as an evaluation or verification.
-            output.textContent =
-                "OBSERVACIÓN DESCRIPTIVA — SIN DICTAMEN\n" +
-                "Responsable declarado; evidencia referenciada, no verificada por esta pantalla.\n\n" +
-                data.observation_document;
+
+            let readable;
+            try {
+                readable = readableObservation(
+                    data.observation_document, caseId, observationId, version,
+                );
+            } catch (_) {
+                status.textContent =
+                    "Respuesta inválida; no se muestra una observación.";
+                return;
+            }
+            output.textContent = readable;
             output.hidden = false;
+            technicalDocument.textContent = data.observation_document;
+            technical.hidden = false;
             status.textContent = "Observación recuperada.";
             return;
         }

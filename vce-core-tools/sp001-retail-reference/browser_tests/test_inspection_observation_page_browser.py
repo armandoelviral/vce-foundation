@@ -111,16 +111,23 @@ def assert_no_token_storage(page, token):
 def assert_empty(page):
     expect(page.locator("#output")).to_be_hidden()
     expect(page.locator("#output")).to_have_text("")
+    expect(page.locator("#technical")).to_be_hidden()
+    expect(page.locator("#technical-document")).to_have_text("")
 
 
 def successful_query(page, token, document):
     query(page, token)
     expect(page.locator("#status")).to_have_text("Observación recuperada.")
     expect(page.locator("#output")).to_be_visible()
+    original = json.loads(document)["observation"]
     text = page.locator("#output").text_content()
-    assert text.endswith(document)
+    assert original["description"] in text
+    assert original["scope"] in text
     assert "SIN DICTAMEN" in text
     assert "Responsable declarado" in text
+    assert document not in text
+    assert page.locator("#technical-document").text_content() == document
+    expect(page.locator("#technical-document")).to_be_hidden()
     assert_no_token_storage(page, token)
 
 
@@ -215,11 +222,17 @@ def test_stale_response_cannot_replace_newer_result(ui, old_status):
 
     def respond(route):
         old = "/OLD/" in route.request.url
-        payload = (
-            {"status": "backend_unavailable"}
-            if old and old_status == 503 else
-            {"status": "ok", "observation_document": "OLD" if old else "LATEST"}
-        )
+        if old and old_status == 503:
+            payload = {"status": "backend_unavailable"}
+        else:
+            envelope = json.loads(document)
+            item = envelope["observation"]
+            item["observation_id"] = "OLD" if old else "LATEST"
+            item["description"] = "OLD CONTENT" if old else "LATEST CONTENT"
+            payload = {
+                "status": "ok",
+                "observation_document": json.dumps(envelope),
+            }
         route.fulfill(
             status=old_status if old else 200,
             content_type="application/json", body=json.dumps(payload),
@@ -232,14 +245,15 @@ def test_stale_response_cannot_replace_newer_result(ui, old_status):
 
     query(page, token, "LATEST")
     expect(page.locator("#status")).to_have_text("Observación recuperada.")
-    expect(page.locator("#output")).to_contain_text("LATEST")
+    expect(page.locator("#output")).to_contain_text("LATEST CONTENT")
+    current_document = page.locator("#technical-document").text_content()
 
     page.evaluate("window.__release()")
     page.wait_for_function("() => window.__delivered === true")
-    # Flush the continuations of the released fetch and response processing.
     page.evaluate("() => new Promise(resolve => setTimeout(resolve, 0))")
-    expect(page.locator("#output")).to_contain_text("LATEST")
-    expect(page.locator("#output")).not_to_contain_text("OLD")
+    expect(page.locator("#output")).to_contain_text("LATEST CONTENT")
+    expect(page.locator("#output")).not_to_contain_text("OLD CONTENT")
+    assert page.locator("#technical-document").text_content() == current_document
     expect(page.locator("#status")).to_have_text("Observación recuperada.")
     assert_no_token_storage(page, token)
 
@@ -265,14 +279,82 @@ def test_clear_during_pending_query_prevents_late_display(ui):
 
 
 def test_document_is_rendered_as_text_not_html(ui):
-    page, token, _ = ui
+    page, token, document = ui
     literal = '<img id="injected" src=x onerror="window.__injected=true">'
+    envelope = json.loads(document)
+    envelope["observation"]["description"] = literal
+    changed = json.dumps(envelope)
     page.route(API, lambda route: route.fulfill(
         status=200, content_type="application/json",
-        body=json.dumps({"status": "ok", "observation_document": literal}),
+        body=json.dumps({"status": "ok", "observation_document": changed}),
     ))
     query(page, token)
     expect(page.locator("#status")).to_have_text("Observación recuperada.")
     expect(page.locator("#output")).to_contain_text(literal)
+    assert page.locator("#technical-document").text_content() == changed
     assert page.locator("#injected").count() == 0
-    assert page.evaluate("window.__injected === true") is False
+    assert page.evaluate("() => window.__injected === true") is False
+
+
+def test_readable_fields_preserve_literals_and_original_document(ui):
+    page, token, document = ui
+    envelope = json.loads(document)
+    item = envelope["observation"]
+    item["description"] = "NO SE RESPETA LINEAMIENTO — declaración sin validar."
+    item["scope"] = "  Zona frontal\nSin revisar parte posterior.  "
+    item["limitations"]["items"] = ["Sin medición.", "Zona oculta."]
+    item["evidence_ids"]["items"] = ["PHOTO-1", "----"]
+    item["declared_observer"]["fields"]["role"]["fields"]["role_name"] = "Revisor ñ"
+    changed = json.dumps(envelope, ensure_ascii=True)
+    page.route(API, lambda route: route.fulfill(
+        status=200, content_type="application/json",
+        body=json.dumps({"status": "ok", "observation_document": changed}),
+    ))
+    query(page, token)
+    expect(page.locator("#status")).to_have_text("Observación recuperada.")
+    text = page.locator("#output").text_content()
+    for literal in (
+        item["description"], item["scope"], "Sin medición.", "Zona oculta.",
+        "PHOTO-1", "----", "Revisor ñ", item["observed_at"]["iso"],
+        item["recorded_at"]["iso"], "No se ha clasificado",
+    ):
+        assert literal in text
+    assert page.locator("#technical-document").text_content() == changed
+    page.locator("#technical summary").click()
+    expect(page.locator("#technical-document")).to_be_visible()
+
+
+def test_readable_version_uses_exact_decimal_without_js_rounding(ui):
+    page, token, document = ui
+    version = 2**60 + 1
+    envelope = json.loads(document)
+    envelope["observation"]["observation_version"] = version
+    changed = json.dumps(envelope)
+    page.route(API, lambda route: route.fulfill(
+        status=200, content_type="application/json",
+        body=json.dumps({"status": "ok", "observation_document": changed}),
+    ))
+    page.locator("#case").fill("CASE")
+    page.locator("#observation").fill("OBS-1")
+    page.locator("#version").fill(str(version))
+    page.locator("#credential").fill(token)
+    page.get_by_role("button", name="Consultar", exact=True).click()
+    expect(page.locator("#status")).to_have_text("Observación recuperada.")
+    expect(page.locator("#output")).to_contain_text(
+        "Versión consultada: " + str(version)
+    )
+    assert page.locator("#technical-document").text_content() == changed
+
+
+def test_malformed_embedded_document_clears_both_views(ui):
+    page, token, document = ui
+    successful_query(page, token, document)
+    page.route(API, lambda route: route.fulfill(
+        status=200, content_type="application/json",
+        body=json.dumps({"status": "ok", "observation_document": "{}"}),
+    ))
+    query(page, token)
+    expect(page.locator("#status")).to_have_text(
+        "Respuesta inválida; no se muestra una observación."
+    )
+    assert_empty(page)
