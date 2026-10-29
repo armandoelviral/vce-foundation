@@ -73,6 +73,7 @@ Se admite una fracción de segundo de hasta seis dígitos.</p>
 <button id="retry" type="button" disabled>Reintentar envío exacto</button>
 </div>
 </form>
+<div id="field-errors" role="alert" hidden><ul></ul></div>
 <p id="status" role="status" aria-live="polite"></p>
 <pre id="receipt" hidden></pre>
 <a href="/inspection-observations">Consultar una versión guardada</a>
@@ -142,7 +143,108 @@ function dateValue(id) {
     const offset = ["Z", "-00:00"].includes(match[3]) ? "+00:00" : match[3];
     return {type: "datetime", iso: match[1] + fraction + offset, fold: 0, zone: null};
 }
+
+const fieldLabels = {
+    case_id: "Caso",
+    observation_id: "Identificador de observación",
+    observation_version: "Versión",
+    subject_reference: "Objeto o zona observada",
+    actor_id: "Responsable declarado",
+    customer_id: "Cliente u organización usuaria",
+    organization_id: "Organización del responsable",
+    role_id: "Identificador de función",
+    role_name: "Nombre de función",
+    actor_type: "Tipo de responsable",
+    method: "Método",
+    description: "Descripción",
+    scope: "Alcance",
+    observed_at: "Fecha de inspección o revisión",
+    recorded_at: "Fecha de registro",
+    evidence_ids: "Referencias de evidencia",
+    credential: "Credencial"
+};
+
+function clearFieldErrors() {
+    const box = document.getElementById("field-errors");
+    box.querySelector("ul").replaceChildren();
+    box.hidden = true;
+    for (const id of Object.keys(fieldLabels)) {
+        const field = document.getElementById(id);
+        field.removeAttribute("aria-invalid");
+        field.removeAttribute("aria-describedby");
+    }
+}
+function showFieldErrors(errors) {
+    clearFieldErrors();
+    const box = document.getElementById("field-errors");
+    const list = box.querySelector("ul");
+    for (const [id, message] of errors) {
+        const line = document.createElement("li");
+        line.id = "error-" + id;
+        line.textContent = fieldLabels[id] + ": " + message;
+        list.appendChild(line);
+        const field = document.getElementById(id);
+        field.setAttribute("aria-invalid", "true");
+        field.setAttribute("aria-describedby", line.id);
+    }
+    box.hidden = false;
+    show("Revisa los campos indicados. El borrador se conserva.");
+    document.getElementById(errors[0][0]).focus();
+}
+function validTimestamp(raw) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,6})?(Z|([+-])(\d{2}):(\d{2}))$/.exec(raw);
+    if (!match) return false;
+    const [year, month, day, hour, minute, second] =
+        match.slice(1, 7).map(Number);
+    if (year < 1 || month < 1 || month > 12 ||
+        hour > 23 || minute > 59 || second > 59) return false;
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (day < 1 || day > days[month - 1]) return false;
+    if (match[7] !== "Z" && (Number(match[9]) > 23 || Number(match[10]) > 59))
+        return false;
+    return Number.isFinite(Date.parse(raw));
+}
+function validateDraft() {
+    const errors = [];
+    for (const id of Object.keys(fieldLabels)) {
+        if (["evidence_ids", "credential"].includes(id)) continue;
+        if (!value(id).trim()) errors.push([id, "Completa este campo."]);
+    }
+    const version = value("observation_version");
+    if (version.trim() && (
+        !/^[1-9][0-9]*$/.test(version) || version.length > 1000
+    )) errors.push(["observation_version", "Escribe un entero positivo, sin espacios ni ceros iniciales."]);
+
+    const datesValid = {};
+    for (const id of ["observed_at", "recorded_at"]) {
+        datesValid[id] = validTimestamp(value(id));
+        if (value(id).trim() && !datesValid[id])
+            errors.push([id, "Usa una fecha válida: AAAA-MM-DDTHH:MM:SS±HH:MM."]);
+    }
+    // Date.parse compares to milliseconds; the server retains and validates
+    // the full microsecond precision of the canonical document.
+    if (datesValid.observed_at && datesValid.recorded_at &&
+        Date.parse(value("recorded_at")) < Date.parse(value("observed_at")))
+        errors.push(["recorded_at", "No puede ser anterior a la inspección o revisión."]);
+
+    const references = lines("evidence_ids");
+    if (value("method") === "EVIDENCE_REVIEW" && references.length === 0)
+        errors.push(["evidence_ids", "Añade al menos una referencia de la evidencia revisada."]);
+    else if (references.some(reference => !/[\p{L}\p{N}]/u.test(reference)))
+        errors.push(["evidence_ids", "Identifica la evidencia; no uses solo signos como ---- o ..."]);
+    else if (new Set(references).size !== references.length)
+        errors.push(["evidence_ids", "Elimina las referencias duplicadas."]);
+
+    if (errors.length) {
+        const error = new Error("Invalid draft.");
+        error.fieldErrors = errors;
+        throw error;
+    }
+}
+
 function prepare() {
+    validateDraft();
     const version = text("observation_version");
     if (!/^[1-9][0-9]*$/.test(version) || version.length > 1000)
         throw new Error("La versión debe ser un entero positivo sin ceros iniciales.");
@@ -199,7 +301,7 @@ async function send(attempt) {
     receipt.hidden = true;
     if (!token || !/^[\x21-\x7e]+$/.test(token)) {
         token = "";
-        show("Introduce una credencial sin espacios. El borrador se conserva.");
+        showFieldErrors([["credential", "Pega la clave de acceso, sin Bearer, comillas ni espacios."]]);
         return;
     }
     lastAttempt = attempt;
@@ -276,6 +378,7 @@ form.addEventListener("submit", event => {
     if (busy) return;
     receipt.textContent = "";
     receipt.hidden = true;
+    clearFieldErrors();
     try {
         const attempt = prepare();
         if (unconfirmed && lastAttempt && attempt.document !== lastAttempt.document) {
@@ -286,7 +389,8 @@ form.addEventListener("submit", event => {
         send(attempt);
     } catch (error) {
         credential.value = "";
-        show(error.message + " El borrador se conserva.");
+        if (error.fieldErrors) showFieldErrors(error.fieldErrors);
+        else show(error.message + " El borrador se conserva.");
     }
 });
 retryButton.addEventListener("click", () => {
