@@ -49,6 +49,13 @@ def capture_ui(live_host, keys, write_mode):
         page = context.new_page()
         try:
             page.goto(url + "/capture")
+            # Emit credentials after browser startup and page readiness.
+            write_token = jwt_setup.token(
+                keys[0], operations=(Operation.SAVE_RETAIL_OBSERVATION,),
+            )
+            read_token = jwt_setup.token(
+                keys[0], operations=(Operation.READ_RETAIL_OBSERVATION,),
+            )
             yield page, write_token, read_token, write_mode["database"]
         finally:
             page.on("dialog", lambda dialog: dialog.dismiss())
@@ -74,6 +81,9 @@ def candidate(version=1):
 
 
 def fill(page, item):
+    mode = page.locator("#view-mode")
+    if mode.text_content() == "Mostrar formulario completo":
+        mode.click()
     actor = item.declared_observer
     values = {
         "case_id": item.case_id,

@@ -18,11 +18,14 @@ FIELDS = (
     ("recorded_at", "Fecha declarada de registro, con desplazamiento UTC"),
 )
 
-_inputs = "".join(
-    f'<label for="{name}">{escape(label)}</label>'
-    f'<input id="{name}" required autocomplete="off">'
-    for name, label in FIELDS
-)
+
+def _section_inputs(names):
+    labels = dict(FIELDS)
+    return "".join(
+        f'<label for="{name}">{escape(labels[name])}</label>'
+        f'<input id="{name}" required autocomplete="off">'
+        for name in names
+    )
 
 PAGE = """<!doctype html>
 <html lang="es"><head>
@@ -35,11 +38,27 @@ PAGE = """<!doctype html>
 <h1>Captura de observación — sin dictamen</h1>
 <p>Responsable y fechas declarados. Guardar no acredita autoría,
 verificación de evidencia, aprobación ni cumplimiento.</p>
-<p>El borrador permanece en esta página ante errores. Recargar o cerrar puede
-perderlo. La credencial no forma parte del borrador.</p>
+<p>El borrador se conserva al cambiar de sección y ante errores.
+Recargar o cerrar puede perderlo.</p>
+<p id="step-status" role="status" aria-live="polite"></p>
+<button id="view-mode" type="button">Mostrar formulario completo</button>
 <form id="capture" autocomplete="off" novalidate>
 <fieldset id="draft"><legend>Datos de la observación</legend>
-""" + _inputs + """
+<section id="step-0">
+<h2>1. Caso y objeto observado</h2>
+<p>Identifica dónde y sobre qué realizaste la observación.
+La versión no se incrementa automáticamente.</p>
+""" + _section_inputs((
+    "case_id", "observation_id", "observation_version", "subject_reference",
+)) + """
+</section>
+<section id="step-1" hidden>
+<h2>2. Responsable declarado</h2>
+<p>Estos datos describen al responsable indicado; no verifican su identidad
+ni le conceden autoridad.</p>
+""" + _section_inputs((
+    "actor_id", "customer_id", "organization_id", "role_id", "role_name",
+)) + """
 <label for="actor_type">Tipo de responsable declarado</label>
 <select id="actor_type" required>
 <option value="">Seleccionar</option>
@@ -47,30 +66,47 @@ perderlo. La credencial no forma parte del borrador.</p>
 <option value="SYSTEM">Sistema</option>
 <option value="ORGANIZATION">Organización</option>
 </select>
-<label for="method">Método</label>
+</section>
+<section id="step-2" hidden>
+<h2>3. Hecho, alcance y evidencia</h2>
+<label for="method">¿Cómo realizaste la observación?</label>
 <select id="method" required>
 <option value="">Seleccionar</option>
 <option value="DIRECT_INSPECTION">Inspección directa</option>
 <option value="EVIDENCE_REVIEW">Revisión de evidencia</option>
 </select>
-<label for="description">Descripción del hecho observado</label>
+<label for="description">¿Qué observaste?</label>
+<p>Describe elementos, ubicación o condición visibles. Registrar una frase
+no la convierte en hecho verificado ni en dictamen.</p>
 <textarea id="description" rows="4" required></textarea>
-<label for="scope">Alcance de lo revisado</label>
+<label for="scope">¿Qué parte revisaste?</label>
 <textarea id="scope" rows="3" required></textarea>
-<label for="limitations">Limitaciones — una por línea</label>
+<label for="limitations">¿Qué no pudiste comprobar? — una limitación por línea</label>
 <textarea id="limitations" rows="3"></textarea>
 <label for="evidence_ids">Referencias de evidencia — una por línea</label>
 <textarea id="evidence_ids" rows="3"></textarea>
 <p>Las líneas vacías se omiten. Las referencias no suben ni verifican archivos.
-Sin limitaciones registradas no significa ausencia de limitaciones.</p>
-<p>Fechas: AAAA-MM-DDTHH:MM:SS±HH:MM.
+No registrar limitaciones no significa que no existan.</p>
+</section>
+<section id="step-3" hidden>
+<h2>4. Fechas y envío</h2>
+<p>Registra la fecha de inspección o revisión separada de la captura fotográfica.
+La fecha de registro declarada no es una confirmación de COMMIT.</p>
+""" + _section_inputs(("observed_at", "recorded_at")) + """
+<p>Formato: AAAA-MM-DDTHH:MM:SS±HH:MM.
 Se admite una fracción de segundo de hasta seis dígitos.</p>
+</section>
 </fieldset>
+<div id="access-panel" hidden>
 <label for="credential">Credencial — solo el token</label>
 <input id="credential" type="password" autocomplete="off" spellcheck="false">
+<p>La credencial no forma parte del borrador. Se elimina del campo al enviar.</p>
+</div>
 <div class="actions">
-<button id="save" type="submit">Guardar</button>
-<button id="retry" type="button" disabled>Reintentar envío exacto</button>
+<button id="previous" type="button" hidden>Anterior</button>
+<button id="next" type="button">Continuar</button>
+<button id="save" type="submit" hidden>Guardar</button>
+<button id="retry" type="button" disabled hidden>Reintentar envío exacto</button>
 </div>
 </form>
 <div id="field-errors" role="alert" hidden><ul></ul></div>
@@ -189,6 +225,7 @@ function showFieldErrors(errors) {
     }
     box.hidden = false;
     show("Revisa los campos indicados. El borrador se conserva.");
+    revealField(errors[0][0]);
     document.getElementById(errors[0][0]).focus();
 }
 function validTimestamp(raw) {
@@ -290,6 +327,7 @@ function stateBusy(active) {
     draft.disabled = active;
     saveButton.disabled = active;
     retryButton.disabled = active || !lastAttempt;
+    updateSections();
 }
 function show(message) { status.textContent = message; }
 
@@ -396,6 +434,80 @@ form.addEventListener("submit", event => {
 retryButton.addEventListener("click", () => {
     if (!busy && lastAttempt) send(lastAttempt);
 });
+
+
+let sectionIndex = 0;
+let fullForm = false;
+const sectionFields = [
+    ["case_id", "observation_id", "observation_version", "subject_reference"],
+    ["actor_id", "customer_id", "organization_id", "role_id", "role_name", "actor_type"],
+    ["method", "description", "scope", "limitations", "evidence_ids"],
+    ["observed_at", "recorded_at", "credential"]
+];
+const previousButton = document.getElementById("previous");
+const nextButton = document.getElementById("next");
+const viewModeButton = document.getElementById("view-mode");
+
+function updateSections() {
+    for (let index = 0; index < sectionFields.length; index++)
+        document.getElementById("step-" + index).hidden =
+            !fullForm && index !== sectionIndex;
+    const finalStep = fullForm || sectionIndex === 3;
+    document.getElementById("access-panel").hidden = !finalStep;
+    saveButton.hidden = !finalStep;
+    retryButton.hidden = !finalStep;
+    previousButton.hidden = fullForm || sectionIndex === 0;
+    nextButton.hidden = finalStep;
+    previousButton.disabled = busy;
+    nextButton.disabled = busy;
+    viewModeButton.disabled = busy;
+    document.getElementById("step-status").textContent = fullForm
+        ? "Formulario completo"
+        : "Sección " + (sectionIndex + 1) + " de 4";
+    viewModeButton.textContent = fullForm
+        ? "Volver a captura por secciones"
+        : "Mostrar formulario completo";
+}
+function revealField(id) {
+    const index = sectionFields.findIndex(fields => fields.includes(id));
+    if (!fullForm && index >= 0) {
+        sectionIndex = index;
+        updateSections();
+    }
+}
+viewModeButton.addEventListener("click", () => {
+    if (busy) return;
+    fullForm = !fullForm;
+    updateSections();
+});
+previousButton.addEventListener("click", () => {
+    if (busy || sectionIndex === 0) return;
+    clearFieldErrors();
+    sectionIndex -= 1;
+    updateSections();
+});
+nextButton.addEventListener("click", () => {
+    if (busy) return;
+    clearFieldErrors();
+    let errors = [];
+    try { validateDraft(); }
+    catch (error) {
+        if (!error.fieldErrors) {
+            show("No se pudo validar esta sección. El borrador se conserva.");
+            return;
+        }
+        errors = error.fieldErrors.filter(([id]) =>
+            sectionFields[sectionIndex].includes(id));
+    }
+    if (errors.length) {
+        showFieldErrors(errors);
+        return;
+    }
+    show("");
+    sectionIndex = Math.min(sectionIndex + 1, 3);
+    updateSections();
+});
+updateSections();
 """
 
 

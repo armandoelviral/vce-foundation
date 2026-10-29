@@ -79,7 +79,7 @@ def live_host(tmp_path, keys):
 
 
 @pytest.fixture
-def ui(live_host):
+def ui(live_host, keys):
     url, token, document = live_host
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -87,6 +87,8 @@ def ui(live_host):
         page = context.new_page()
         try:
             page.goto(url)
+            # Emit the query credential after browser startup.
+            token = jwt_setup.token(keys[0], operations=(setup.READ,))
             yield page, token, document
         finally:
             context.close()
