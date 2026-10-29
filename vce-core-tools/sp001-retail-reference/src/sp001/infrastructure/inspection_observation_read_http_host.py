@@ -1,3 +1,7 @@
+from sp001.infrastructure.inspection_observation_read_page import (
+    install_inspection_observation_read_page,
+)
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -121,4 +125,5 @@ def create_inspection_observation_read_app(
         except Exception:
             return response(503, "backend_unavailable")
 
+    install_inspection_observation_read_page(app)
     return app
