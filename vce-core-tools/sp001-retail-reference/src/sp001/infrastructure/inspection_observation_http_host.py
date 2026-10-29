@@ -1,3 +1,7 @@
+from sp001.infrastructure.inspection_observation_capture_page import (
+    install_inspection_observation_capture_page,
+)
+
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
@@ -144,4 +148,5 @@ def create_inspection_observation_app(
             observation_version=version,
         )
 
+    install_inspection_observation_capture_page(app)
     return app
