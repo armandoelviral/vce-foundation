@@ -1,3 +1,7 @@
+from sp001.infrastructure.inspection_observation_http_host import (
+    create_inspection_observation_app,
+)
+
 import os
 import time
 from pathlib import Path
@@ -54,6 +58,13 @@ def create_app_from_environment(*, environment):
     max_lifetime = positive_integer("MAX_LIFETIME_SECONDS")
     max_token_bytes = positive_integer("MAX_TOKEN_BYTES")
 
+    mode = environment.get(PREFIX + "ACCESS_MODE", "READ_ONLY")
+    if type(mode) is not str or mode not in ("READ_ONLY", "READ_WRITE"):
+        raise ValueError("invalid observation access mode")
+    max_request_bytes = (
+        positive_integer("MAX_REQUEST_BYTES") if mode == "READ_WRITE" else None
+    )
+
     if not database.is_file():
         raise ValueError("observation database must already exist")
     try:
@@ -76,6 +87,12 @@ def create_app_from_environment(*, environment):
         authenticator=authenticator, backend=backend,
         expected_audience=audience, clock=clock,
     )
+    if mode == "READ_WRITE":
+        return create_inspection_observation_app(
+            service=service,
+            max_token_bytes=max_token_bytes,
+            max_request_bytes=max_request_bytes,
+        )
     return create_inspection_observation_read_app(
         service=service, max_token_bytes=max_token_bytes,
     )
