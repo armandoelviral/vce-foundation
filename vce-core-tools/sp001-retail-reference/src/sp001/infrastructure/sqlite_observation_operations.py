@@ -25,6 +25,10 @@ from sp001.services.retail_observation_operation_validation import (
 )
 
 
+class ObservationOperationIntegrityFailure(ValueError):
+    """Recovered receipt or effect violates their correspondence contract."""
+
+
 class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
     """Trusted backend: caller supplies an authenticated access context.
 
@@ -174,6 +178,89 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
             self._authorize(
                 connection, access, item.case_id,
                 Operation.SAVE_RETAIL_OBSERVATION,
+            )
+            connection.execute("COMMIT")
+            return receipt
+        except BaseException as error:
+            self._rollback(connection, error)
+            raise
+        finally:
+            connection.close()
+
+    def recover_operation_authorized(self, *, access, identity):
+        """Recover receipt and effect from one authorized SQLite snapshot.
+
+        None means authorized receipt absence, not rejection of a prior attempt.
+        Database failures propagate. A valid pair is local recovered evidence,
+        not external integrity, inspection authorship or proof of power-loss
+        durability. Current READ permission is required independently of SAVE.
+        """
+        if type(access) is not ValidatedCaseAccessContext:
+            raise TypeError("access must be a validated access context")
+        if type(identity) is not Identity:
+            raise TypeError("identity must be an operation identity")
+        if identity.principal != access.principal:
+            from sp001.infrastructure.sqlite_authorized_inspection_observations import (
+                InspectionObservationAccessDenied,
+            )
+            raise InspectionObservationAccessDenied("operation access denied")
+
+        connection = self._connect()
+        try:
+            self._require_profile(connection)
+            connection.execute("BEGIN")
+            self._authorize(
+                connection, access, identity.case_id,
+                Operation.READ_RETAIL_OBSERVATION,
+            )
+            row = connection.execute("""
+                SELECT observation_id, observation_version, document, disposition
+                FROM retail_observation_operations
+                WHERE issuer=? AND subject=? AND case_id=? AND request_id=?
+            """, (
+                identity.principal.issuer, identity.principal.subject,
+                identity.case_id, identity.request_id,
+            )).fetchone()
+
+            receipt = None
+            if row is not None:
+                from sp001.infrastructure.retail_inspection_observation_serialization import (
+                    deserialize_retail_inspection_observation as deserialize,
+                )
+                try:
+                    version = int(row[1])
+                    if str(version) != row[1]:
+                        raise ValueError("noncanonical stored version")
+                    stored = StoredRetailInspectionObservation(
+                        RetailInspectionObservationIdentity(row[0], version),
+                        row[2],
+                    )
+                    receipt = Receipt(
+                        identity, stored, Disposition(row[3]),
+                    )
+                    observation = deserialize(stored.document)
+                    validate(
+                        request=Request(identity.request_id, observation),
+                        receipt=receipt, principal=access.principal,
+                    )
+                except (ValueError, TypeError, UnicodeError, RecursionError) as error:
+                    raise ObservationOperationIntegrityFailure(
+                        "stored operation receipt is inconsistent"
+                    ) from error
+
+                # Same connection and transaction: no mixed-snapshot recovery.
+                effect = connection.execute("""
+                    SELECT document FROM retail_inspection_observations
+                    WHERE observation_id=? AND observation_version=?
+                """, (row[0], row[1])).fetchone()
+                if effect is None or effect[0] != stored.document:
+                    raise ObservationOperationIntegrityFailure(
+                        "receipt and persisted effect disagree"
+                    )
+
+            self._authorize(
+                connection, access, identity.case_id,
+                Operation.READ_RETAIL_OBSERVATION,
             )
             connection.execute("COMMIT")
             return receipt
