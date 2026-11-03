@@ -1,3 +1,12 @@
+from sp001.infrastructure.observation_operation_http_host import (
+    create_observation_operation_app,
+)
+from sp001.infrastructure.sqlite_observation_operations import (
+    SqliteObservationOperations,
+)
+from sp001.services.authenticated_observation_operations import (
+    AuthenticatedObservationOperations,
+)
 from sp001.infrastructure.inspection_observation_http_host import (
     create_inspection_observation_app,
 )
@@ -59,10 +68,12 @@ def create_app_from_environment(*, environment):
     max_token_bytes = positive_integer("MAX_TOKEN_BYTES")
 
     mode = environment.get(PREFIX + "ACCESS_MODE", "READ_ONLY")
-    if type(mode) is not str or mode not in ("READ_ONLY", "READ_WRITE"):
+    if type(mode) is not str or mode not in (
+        "READ_ONLY", "READ_WRITE", "READ_WRITE_OPERATIONS",
+    ):
         raise ValueError("invalid observation access mode")
     max_request_bytes = (
-        positive_integer("MAX_REQUEST_BYTES") if mode == "READ_WRITE" else None
+        positive_integer("MAX_REQUEST_BYTES") if mode != "READ_ONLY" else None
     )
 
     if not database.is_file():
@@ -80,13 +91,28 @@ def create_app_from_environment(*, environment):
         max_lifetime_seconds=max_lifetime, max_token_bytes=max_token_bytes,
     )
     clock = lambda: int(time.time())
-    backend = SqliteAuthorizedInspectionObservations(
+    operation_mode = mode == "READ_WRITE_OPERATIONS"
+    backend_type = (
+        SqliteObservationOperations if operation_mode
+        else SqliteAuthorizedInspectionObservations
+    )
+    service_type = (
+        AuthenticatedObservationOperations if operation_mode
+        else AuthenticatedInspectionObservations
+    )
+    backend = backend_type(
         database_path=database, expected_audience=audience, clock=clock,
     )
-    service = AuthenticatedInspectionObservations(
+    service = service_type(
         authenticator=authenticator, backend=backend,
         expected_audience=audience, clock=clock,
     )
+    if operation_mode:
+        return create_observation_operation_app(
+            service=service,
+            max_token_bytes=max_token_bytes,
+            max_request_bytes=max_request_bytes,
+        )
     if mode == "READ_WRITE":
         return create_inspection_observation_app(
             service=service,
