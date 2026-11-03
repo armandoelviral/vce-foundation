@@ -118,6 +118,7 @@ Se admite una fracción de segundo de hasta seis dígitos.</p>
 
 
 SCRIPT = r"""
+const operationMode = false;
 "use strict";
 const form = document.getElementById("capture");
 const draft = document.getElementById("draft");
@@ -181,6 +182,7 @@ function dateValue(id) {
 }
 
 const fieldLabels = {
+    ...(operationMode ? {request_id: "Identificador de solicitud"} : {}),
     case_id: "Caso",
     observation_id: "Identificador de observación",
     observation_version: "Versión",
@@ -282,6 +284,14 @@ function validateDraft() {
 
 function prepare() {
     validateDraft();
+    const requestId = operationMode ? text("request_id") : null;
+    if (operationMode && (!requestId ||
+        /[\s\x00-\x1f\x7f]/u.test(requestId))) {
+        const error = new Error("Invalid request identity.");
+        error.fieldErrors = [["request_id",
+            "Indica una solicitud sin espacios ni caracteres de control."]];
+        throw error;
+    }
     const version = text("observation_version");
     if (!/^[1-9][0-9]*$/.test(version) || version.length > 1000)
         throw new Error("La versión debe ser un entero positivo sin ceros iniciales.");
@@ -315,11 +325,16 @@ function prepare() {
     const document = canonical({schema_version: 1, observation});
     return Object.freeze({
         document,
+        requestId,
+        caseId: observation.case_id,
         observationId: observation.observation_id,
         version,
         url: "/v1/cases/" + encodeURIComponent(observation.case_id) +
-            "/inspection-observations/" + encodeURIComponent(observation.observation_id) +
-            "/versions/" + version
+            (operationMode
+                ? "/inspection-observation-operations/" + encodeURIComponent(requestId)
+                : "/inspection-observations/" +
+                    encodeURIComponent(observation.observation_id) +
+                    "/versions/" + version)
     });
 }
 function stateBusy(active) {
@@ -366,11 +381,20 @@ async function send(attempt) {
         }
         if (response.status === 200 && data && data.status === "saved" &&
             data.observation_id === attempt.observationId &&
-            data.observation_version === attempt.version) {
+            data.observation_version === attempt.version &&
+            (!operationMode || (
+                data.request_id === attempt.requestId &&
+                data.case_id === attempt.caseId &&
+                ["CREATED", "REUSED"].includes(data.disposition)
+            ))) {
             unconfirmed = false;
             // If this was an older exact retry, newer draft edits remain unsaved.
             let matchesDraft = false;
-            try { matchesDraft = prepare().document === attempt.document; }
+            try {
+                const current = prepare();
+                matchesDraft = current.document === attempt.document &&
+                    current.url === attempt.url;
+            }
             catch (_) {}
             dirty = !matchesDraft;
             show(matchesDraft
@@ -378,13 +402,26 @@ async function send(attempt) {
                 : "Envío anterior confirmado. El borrador actual contiene cambios sin guardar.");
             receipt.textContent = "Observación: " + data.observation_id +
                 "\nVersión: " + data.observation_version +
+                (operationMode
+                    ? "\nSolicitud: " + data.request_id +
+                      "\nDisposición registrada: " + data.disposition +
+                      "\nConfirmación de guardado; recuperación posterior no realizada."
+                    : "") +
                 "\nSin dictamen; responsable declarado.";
             receipt.hidden = false;
             return;
         }
-        if (response.status === 409 && data && data.status === "observation_conflict") {
+        if (response.status === 409 && data &&
+            ["observation_conflict", "operation_conflict"].includes(data.status)) {
             unconfirmed = false;
-            show("Conflicto: esa identidad y versión conservan otro contenido. El borrador se conserva; no se cambia la versión automáticamente.");
+            show(data.status === "operation_conflict"
+                ? "Conflicto: esa solicitud conserva otro contenido. El borrador se conserva; no se cambia la solicitud automáticamente."
+                : "Conflicto: esa identidad y versión conservan otro contenido. El borrador se conserva; no se cambia la versión automáticamente.");
+            return;
+        }
+        if (response.status === 503 && data &&
+            data.status === "integrity_failure") {
+            show("Fallo de integridad. Guardado sin confirmar; conserva la solicitud y el borrador para revisión.");
             return;
         }
         const messages = {
@@ -419,7 +456,10 @@ form.addEventListener("submit", event => {
     clearFieldErrors();
     try {
         const attempt = prepare();
-        if (unconfirmed && lastAttempt && attempt.document !== lastAttempt.document) {
+        if (unconfirmed && lastAttempt && (
+            attempt.document !== lastAttempt.document ||
+            attempt.url !== lastAttempt.url
+        )) {
             credential.value = "";
             show("Existe un envío sin confirmar. Usa Reintentar envío exacto antes de enviar cambios.");
             return;
@@ -511,8 +551,28 @@ updateSections();
 """
 
 
-def install_inspection_observation_capture_page(app):
+def install_inspection_observation_capture_page(app, *, operation_mode=False):
     """Expose capture only when explicitly installed by the read/write factory."""
+    if type(operation_mode) is not bool:
+        raise TypeError("operation_mode must be a bool")
+    page = PAGE
+    script = SCRIPT
+    if operation_mode:
+        page = page.replace(
+            '<fieldset id="draft"><legend>Datos de la observación</legend>',
+            '<fieldset id="draft"><legend>Datos de la observación</legend>'
+            '<label for="request_id">Identificador de solicitud</label>'
+            '<input id="request_id" name="request_id" autocomplete="off">'
+            '<p>Conserva la misma solicitud y contenido para reintentar. '
+            'Una corrección requiere una decisión explícita; '
+            'no cambies la solicitud para eludir un conflicto.</p>',
+            1,
+        )
+        script = script.replace(
+            "const operationMode = false;",
+            "const operationMode = true;",
+            1,
+        )
     headers = {
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
@@ -526,11 +586,11 @@ def install_inspection_observation_capture_page(app):
 
     @app.get("/inspection-observations/capture", include_in_schema=False)
     def capture_page():
-        return HTMLResponse(PAGE, headers=headers)
+        return HTMLResponse(page, headers=headers)
 
     @app.get("/inspection-observations/capture/assets/form.js", include_in_schema=False)
     def capture_script():
-        return Response(SCRIPT, media_type="text/javascript", headers=headers)
+        return Response(script, media_type="text/javascript", headers=headers)
 
     @app.get("/inspection-observations/capture/assets/form.css", include_in_schema=False)
     def capture_style():

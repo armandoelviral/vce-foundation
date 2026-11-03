@@ -1,3 +1,7 @@
+from sp001.infrastructure.observation_operation_read_page import (
+    install_observation_operation_read_page,
+)
+
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
@@ -43,6 +47,7 @@ def create_observation_operation_app(
     app = create_inspection_observation_app(
         service=service, max_token_bytes=max_token_bytes,
         max_request_bytes=max_request_bytes,
+        operation_capture=True,
     )
 
     def response(code, status, **content):
@@ -210,4 +215,5 @@ def create_observation_operation_app(
         except Exception:
             return response(503, "backend_unavailable")
 
+    install_observation_operation_read_page(app)
     return app

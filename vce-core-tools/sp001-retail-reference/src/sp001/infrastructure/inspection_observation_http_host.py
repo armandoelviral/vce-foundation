@@ -28,6 +28,7 @@ from sp001.infrastructure.sqlite_authorized_inspection_observations import (
 def create_inspection_observation_app(
     *, service, max_token_bytes: int = 16384,
     max_request_bytes: int = 1048576,
+    operation_capture: bool = False,
 ):
     """Compose read and write routes; no observer attribution is established.
 
@@ -148,5 +149,7 @@ def create_inspection_observation_app(
             observation_version=version,
         )
 
-    install_inspection_observation_capture_page(app)
+    install_inspection_observation_capture_page(
+        app, operation_mode=operation_capture,
+    )
     return app
