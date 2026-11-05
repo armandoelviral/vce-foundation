@@ -1,3 +1,5 @@
+from hashlib import sha256
+
 from sp001.contracts.case_access_context import (
     CaseAccessOperation as Operation,
     ValidatedCaseAccessContext,
@@ -43,6 +45,7 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
         connection = self._connect()
         try:
             self._require_profile(connection)
+            connection.execute("BEGIN IMMEDIATE")
             connection.execute("""
                 CREATE TABLE IF NOT EXISTS retail_observation_operations (
                     issuer TEXT NOT NULL,
@@ -57,6 +60,30 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
                     PRIMARY KEY (issuer, subject, case_id, request_id)
                 )
             """)
+            columns = {
+                row[1] for row in connection.execute(
+                    "PRAGMA table_info(retail_observation_operations)"
+                )
+            }
+            if "photo_sha256" not in columns:
+                connection.execute(
+                    "ALTER TABLE retail_observation_operations "
+                    "ADD COLUMN photo_sha256 TEXT"
+                )
+            connection.execute("""
+                CREATE TABLE IF NOT EXISTS retail_observation_photos (
+                    case_id TEXT NOT NULL,
+                    observation_id TEXT NOT NULL,
+                    observation_version TEXT NOT NULL,
+                    content BLOB NOT NULL
+                        CHECK(typeof(content) = 'blob' AND length(content) > 0),
+                    PRIMARY KEY (case_id, observation_id, observation_version)
+                )
+            """)
+            connection.execute("COMMIT")
+        except BaseException as error:
+            self._rollback(connection, error)
+            raise
         finally:
             connection.close()
 
@@ -76,7 +103,33 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
             document,
         )
 
-    def save_operation_authorized(self, *, access, request):
+    @staticmethod
+    def _read_photo(connection, case_id, observation_key, digest):
+        if digest is None:
+            return None
+        row = connection.execute("""
+            SELECT content FROM retail_observation_photos
+            WHERE case_id=? AND observation_id=? AND observation_version=?
+        """, (case_id, *observation_key)).fetchone()
+        if (
+            row is None
+            or type(row[0]) is not bytes
+            or not row[0]
+            or sha256(row[0]).hexdigest() != digest
+        ):
+            raise ObservationOperationIntegrityFailure(
+                "stored photo is missing or differs from its receipt"
+            )
+        return row[0]
+
+    def save_operation_authorized(self, *, access, request, photo=None):
+        """Optionally store original photo bytes with a newly created version."""
+        if photo is not None:
+            if type(photo) is not bytes:
+                raise TypeError("photo must be bytes")
+            if not 0 < len(photo) <= 5 * 1024 * 1024:
+                raise ValueError("photo must contain between 1 byte and 5 MiB")
+        digest = sha256(photo).hexdigest() if photo is not None else None
         if type(access) is not ValidatedCaseAccessContext:
             raise TypeError("access must be a validated access context")
         if type(request) is not Request:
@@ -102,7 +155,8 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
             )
 
             previous = connection.execute("""
-                SELECT observation_id, observation_version, document, disposition
+                SELECT observation_id, observation_version, document, disposition,
+                       photo_sha256
                 FROM retail_observation_operations
                 WHERE issuer=? AND subject=? AND case_id=? AND request_id=?
             """, operation_key).fetchone()
@@ -141,7 +195,18 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
                     )
                 if existing is None or existing[0] != stored.document:
                     raise ValueError("receipt and persisted effect disagree")
+                historical_photo = self._read_photo(
+                    connection, item.case_id, observation_key, previous[4],
+                )
+                if historical_photo != photo:
+                    raise RetailObservationOperationConflict(
+                        "operation identity has different photo intent"
+                    )
             else:
+                if photo is not None and existing is not None:
+                    raise RetailInspectionObservationConflict(
+                        "a photo can only be attached when creating a version"
+                    )
                 if existing is None:
                     connection.execute("""
                         INSERT INTO retail_inspection_observations
@@ -166,11 +231,18 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
                     INSERT INTO retail_observation_operations
                         (issuer, subject, case_id, request_id,
                          observation_id, observation_version, document,
-                         disposition)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                         disposition, photo_sha256)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    *operation_key, *observation_key, document, disposition.value,
+                    *operation_key, *observation_key, document,
+                    disposition.value, digest,
                 ))
+                if photo is not None:
+                    connection.execute("""
+                        INSERT INTO retail_observation_photos
+                            (case_id, observation_id, observation_version, content)
+                        VALUES (?, ?, ?, ?)
+                    """, (item.case_id, *observation_key, photo))
 
             validate(
                 request=request, receipt=receipt, principal=access.principal,
@@ -187,7 +259,9 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
         finally:
             connection.close()
 
-    def recover_operation_authorized(self, *, access, identity):
+    def recover_operation_authorized(
+        self, *, access, identity, include_photo=False,
+    ):
         """Recover receipt and effect from one authorized SQLite snapshot.
 
         None means authorized receipt absence, not rejection of a prior attempt.
@@ -214,7 +288,8 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
                 Operation.READ_RETAIL_OBSERVATION,
             )
             row = connection.execute("""
-                SELECT observation_id, observation_version, document, disposition
+                SELECT observation_id, observation_version, document, disposition,
+                       photo_sha256
                 FROM retail_observation_operations
                 WHERE issuer=? AND subject=? AND case_id=? AND request_id=?
             """, (
@@ -223,6 +298,7 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
             )).fetchone()
 
             receipt = None
+            photo = None
             if row is not None:
                 from sp001.infrastructure.retail_inspection_observation_serialization import (
                     deserialize_retail_inspection_observation as deserialize,
@@ -258,11 +334,16 @@ class SqliteObservationOperations(SqliteAuthorizedInspectionObservations):
                         "receipt and persisted effect disagree"
                     )
 
+                photo = self._read_photo(
+                    connection, identity.case_id, (row[0], row[1]), row[4],
+                )
             self._authorize(
                 connection, access, identity.case_id,
                 Operation.READ_RETAIL_OBSERVATION,
             )
             connection.execute("COMMIT")
+            if include_photo and receipt is not None:
+                return receipt, photo
             return receipt
         except BaseException as error:
             self._rollback(connection, error)
