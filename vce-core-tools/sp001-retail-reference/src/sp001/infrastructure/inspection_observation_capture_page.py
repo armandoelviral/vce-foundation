@@ -48,6 +48,7 @@ Recargar o cerrar puede perderlo.</p>
 <h2>1. Caso y objeto observado</h2>
 <p>Identifica dónde y sobre qué realizaste la observación.
 La versión no se incrementa automáticamente.</p>
+<p>En «Objeto o zona observada» identifica el lugar o mueble. Ejemplo: Perimetral izquierdo, piso infantil.</p>
 """ + _section_inputs((
     "case_id", "observation_id", "observation_version", "subject_reference",
 )) + """
@@ -77,13 +78,16 @@ ni le conceden autoridad.</p>
 </select>
 <label for="description">¿Qué observaste?</label>
 <p>Describe elementos, ubicación o condición visibles. Registrar una frase
-no la convierte en hecho verificado ni en dictamen.</p>
+no la convierte en hecho verificado ni en dictamen. Ejemplo: En la repisa superior hay dos espacios sin producto.</p>
 <textarea id="description" rows="4" required></textarea>
 <label for="scope">¿Qué parte revisaste?</label>
+<p>Delimita qué parte revisaste. Ejemplo: Solo el frente de la repisa superior.</p>
 <textarea id="scope" rows="3" required></textarea>
 <label for="limitations">¿Qué no pudiste comprobar? — una limitación por línea</label>
+<p>Indica qué quedó sin comprobar. Ejemplo: No se revisó el stock de bodega.</p>
 <textarea id="limitations" rows="3"></textarea>
 <label for="evidence_ids">Referencias de evidencia — una por línea</label>
+<p>Usa el identificador o enlace de cada archivo concreto. Por ejemplo, FOTO-018 si ese identificador corresponde a una foto que puedes localizar. Evita referencias genéricas como «link de fotografías».</p>
 <textarea id="evidence_ids" rows="3"></textarea>
 <p>Las líneas vacías se omiten. Las referencias no suben ni verifican archivos.
 No registrar limitaciones no significa que no existan.</p>
@@ -95,6 +99,7 @@ La fecha de registro declarada no es una confirmación de COMMIT.</p>
 """ + _section_inputs(("observed_at", "recorded_at")) + """
 <p>Formato: AAAA-MM-DDTHH:MM:SS±HH:MM.
 Se admite una fracción de segundo de hasta seis dígitos.</p>
+<p><strong>Antes de guardar, confirma el signo y el desplazamiento UTC de ambas fechas.</strong> En <code>2026-10-31T10:30:00-06:00</code>, la hora local está seis horas detrás de UTC. Con <code>+06:00</code> estaría seis horas adelante. Usa el desplazamiento que corresponda al lugar y fecha de cada dato. El formulario no lo corrige automáticamente.</p>
 </section>
 </fieldset>
 <div id="access-panel" hidden>
