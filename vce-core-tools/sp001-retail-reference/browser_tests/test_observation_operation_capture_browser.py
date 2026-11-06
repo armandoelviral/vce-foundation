@@ -162,3 +162,74 @@ def test_empty_request_is_rejected_without_sending(capture_ui):
     assert sent == []
     assert receipts(database) == []
     assert_token_not_stored(page, token)
+
+
+def test_exact_retry_keeps_original_photo(capture_ui):
+    import base64
+    import json
+    from io import BytesIO
+
+    from PIL import Image
+
+    page, writer, reader, database = capture_ui
+    item = prepare(page)
+
+    def png(color):
+        with BytesIO() as output:
+            with Image.new("RGB", (8, 8), color) as image:
+                image.save(output, format="PNG")
+            return output.getvalue()
+
+    first_photo = png("white")
+    other_photo = png("black")
+    selector = page.locator("#observation-photo")
+    selector.set_input_files({
+        "name": "original.png", "mimeType": "image/png", "buffer": first_photo,
+    })
+    sent = []
+
+    def lose_response(route):
+        sent.append((
+            route.request.url,
+            route.request.headers["content-type"],
+            route.request.post_data,
+        ))
+        if len(sent) == 1:
+            response = route.fetch()
+            assert response.status == 200
+            route.abort()
+        else:
+            route.continue_()
+
+    pattern = "**/inspection-observation-operations/REQUEST-UI"
+    page.route(pattern, lose_response)
+    save(page, writer)
+    expect(page.locator("#status")).to_contain_text("Guardado sin confirmar")
+    before = receipts(database)
+    assert len(before) == 1
+
+    selector.set_input_files({
+        "name": "nueva.png", "mimeType": "image/png", "buffer": other_photo,
+    })
+    save(page, writer)
+    expect(page.locator("#status")).to_contain_text("Existe un envío sin confirmar")
+    assert len(sent) == 1
+
+    retry(page, writer)
+    expect(page.locator("#status")).to_contain_text("Envío anterior confirmado")
+    expect(page.locator("#receipt")).to_contain_text("CREATED")
+    assert len(sent) == 2 and sent[0] == sent[1]
+    assert sent[0][1] == "application/vnd.sp001.observation-photo+json"
+    payload = json.loads(sent[0][2])
+    assert payload["observation_document"] == serialize(item)
+    assert base64.b64decode(payload["photo_base64"], validate=True) == first_photo
+    assert selector.evaluate("(input) => input.files[0].name") == "nueva.png"
+    assert receipts(database) == before
+
+    downloaded = page.request.get(
+        sent[0][0] + "/photo",
+        headers={"Authorization": "Bearer " + reader},
+    )
+    assert downloaded.status == 200
+    assert downloaded.body() == first_photo
+    assert_token_not_stored(page, writer)

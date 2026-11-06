@@ -351,6 +351,42 @@ function stateBusy(active) {
 }
 function show(message) { status.textContent = message; }
 
+function selectedPhoto() {
+    return document.getElementById("observation-photo")?.files[0] ?? null;
+}
+
+async function freezeAttempt(draftAttempt, photoFile) {
+    if (!photoFile) {
+        return Object.freeze({
+            ...draftAttempt, photoFile,
+            contentType: "application/json", body: draftAttempt.document
+        });
+    }
+    if (photoFile.size === 0 || photoFile.size > 5 * 1024 * 1024)
+        throw new Error("Selecciona un archivo no vacío de hasta 5 MiB.");
+    let bytes;
+    try {
+        bytes = new Uint8Array(await photoFile.arrayBuffer());
+    } catch (_) {
+        throw new Error("No se pudo leer la foto seleccionada.");
+    }
+    let binary = "";
+    for (let start = 0; start < bytes.length; start += 16384)
+        binary += String.fromCharCode(...bytes.subarray(start, start + 16384));
+    return Object.freeze({
+        ...draftAttempt, photoFile,
+        contentType: "application/vnd.sp001.observation-photo+json",
+        body: JSON.stringify({
+            observation_document: draftAttempt.document,
+            photo_base64: btoa(binary)
+        })
+    });
+}
+
+document.getElementById("observation-photo")?.addEventListener("change", () => {
+    dirty = true;
+});
+
 async function send(attempt) {
     if (busy) return;
     let token = credential.value;
@@ -371,10 +407,10 @@ async function send(attempt) {
             method: "PUT",
             headers: {
                 Authorization: "Bearer " + token,
-                "Content-Type": "application/json",
+                "Content-Type": attempt.contentType,
                 Accept: "application/json"
             },
-            body: attempt.document,
+            body: attempt.body,
             credentials: "omit", cache: "no-store", redirect: "error"
         });
         token = "";
@@ -398,7 +434,7 @@ async function send(attempt) {
             try {
                 const current = prepare();
                 matchesDraft = current.document === attempt.document &&
-                    current.url === attempt.url;
+                    current.url === attempt.url && selectedPhoto() === attempt.photoFile;
             }
             catch (_) {}
             dirty = !matchesDraft;
@@ -429,6 +465,11 @@ async function send(attempt) {
             show("Fallo de integridad. Guardado sin confirmar; conserva la solicitud y el borrador para revisión.");
             return;
         }
+        if (response.status === 400 && data && data.status === "invalid_photo") {
+            unconfirmed = false;
+            show("Foto inválida. Selecciona un JPEG o PNG válido. El borrador se conserva.");
+            return;
+        }
         const messages = {
             400: ["invalid_request", "Documento inválido o distinto de la ruta."],
             413: ["request_too_large", "El documento supera el límite permitido."],
@@ -453,21 +494,34 @@ async function send(attempt) {
         stateBusy(false);
     }
 }
-form.addEventListener("submit", event => {
+form.addEventListener("submit", async event => {
     event.preventDefault();
     if (busy) return;
     receipt.textContent = "";
     receipt.hidden = true;
     clearFieldErrors();
     try {
-        const attempt = prepare();
+        const draftAttempt = prepare();
+        const photoFile = selectedPhoto();
         if (unconfirmed && lastAttempt && (
-            attempt.document !== lastAttempt.document ||
-            attempt.url !== lastAttempt.url
+            draftAttempt.document !== lastAttempt.document ||
+            draftAttempt.url !== lastAttempt.url ||
+            photoFile !== lastAttempt.photoFile
         )) {
             credential.value = "";
             show("Existe un envío sin confirmar. Usa Reintentar envío exacto antes de enviar cambios.");
             return;
+        }
+        if (unconfirmed && lastAttempt) {
+            send(lastAttempt);
+            return;
+        }
+        stateBusy(true);
+        let attempt;
+        try {
+            attempt = await freezeAttempt(draftAttempt, photoFile);
+        } finally {
+            stateBusy(false);
         }
         send(attempt);
     } catch (error) {
@@ -571,6 +625,18 @@ def install_inspection_observation_capture_page(app, *, operation_mode=False):
             '<p>Conserva la misma solicitud y contenido para reintentar. '
             'Una corrección requiere una decisión explícita; '
             'no cambies la solicitud para eludir un conflicto.</p>',
+            1,
+        )
+        page = page.replace(
+            '<textarea id="evidence_ids" rows="3"></textarea>',
+            '<textarea id="evidence_ids" rows="3"></textarea>'
+            '<label for="observation-photo">Foto adjunta (opcional)</label>'
+            '<input id="observation-photo" type="file" '
+            'accept="image/jpeg,image/png" aria-describedby="photo-help">'
+            '<p id="photo-help">JPEG o PNG, hasta 5 MiB. '
+            'La foto se adjunta al guardar una versión nueva. '
+            'Si cambias la selección después de un envío sin confirmar, '
+            'el reintento exacto vuelve a enviar la foto original.</p>',
             1,
         )
         script = script.replace(
