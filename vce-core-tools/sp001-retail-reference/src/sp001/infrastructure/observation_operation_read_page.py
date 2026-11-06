@@ -141,6 +141,144 @@ SCRIPT = _replace(
 )
 
 
+
+PAGE = _replace(
+    PAGE,
+    '<pre id="output" hidden></pre>',
+    '<pre id="output" hidden></pre>'
+    '<div id="photo-actions" hidden>'
+    '<p>Para descargar la foto de esta observación, vuelve a pegar '
+    'la credencial de lectura en el campo anterior.</p>'
+    '<button id="download-photo" type="button">Descargar foto</button>'
+    '<p id="photo-status" role="status" aria-live="polite"></p>'
+    '</div>',
+)
+
+SCRIPT = _replace(
+    SCRIPT,
+    "function reset() {",
+    "function reset() {\n"
+    "    clearPhotoDownload();",
+)
+SCRIPT = _replace(
+    SCRIPT,
+    '            status.textContent = "Recibo y observación recuperados.";',
+    '            setPhotoTarget(caseId, requestId);\n'
+    '            status.textContent = "Recibo y observación recuperados.";',
+)
+
+SCRIPT += r"""
+const photoActions = document.getElementById("photo-actions");
+const photoButton = document.getElementById("download-photo");
+const photoStatus = document.getElementById("photo-status");
+const caseField = document.getElementById("case");
+const requestField = document.getElementById("request");
+let photoTarget = null;
+let photoController = null;
+
+function clearPhotoDownload() {
+    photoTarget = null;
+    if (photoController) photoController.abort();
+    photoController = null;
+    photoButton.disabled = false;
+    photoActions.hidden = true;
+    photoStatus.textContent = "";
+}
+
+function setPhotoTarget(caseId, requestId) {
+    if (caseField.value.trim() !== caseId || requestField.value !== requestId)
+        return;
+    photoTarget = "/v1/cases/" + encodeURIComponent(caseId) +
+        "/inspection-observation-operations/" +
+        encodeURIComponent(requestId) + "/photo";
+    photoActions.hidden = false;
+}
+
+for (const field of [caseField, requestField]) {
+    field.addEventListener("input", () => {
+        reset();
+        credential.value = "";
+    });
+}
+
+photoButton.addEventListener("click", async () => {
+    if (!photoTarget || photoController) return;
+    let token = credential.value;
+    credential.value = "";
+    if (!/^[\x21-\x7e]+$/.test(token)) {
+        token = "";
+        photoStatus.textContent = "Pega la credencial de lectura sin espacios.";
+        credential.focus();
+        return;
+    }
+
+    const controller = new AbortController();
+    const target = photoTarget;
+    photoController = controller;
+    photoButton.disabled = true;
+    photoStatus.textContent = "Recuperando foto…";
+    const current = () => photoController === controller && photoTarget === target;
+
+    try {
+        const pending = fetch(target, {
+            method: "GET",
+            headers: {Authorization: "Bearer " + token},
+            credentials: "omit",
+            cache: "no-store",
+            redirect: "error",
+            signal: controller.signal
+        });
+        token = "";
+        const response = await pending;
+        if (!current()) return;
+
+        if (response.status !== 200) {
+            const data = await response.json().catch(() => null);
+            if (!current()) return;
+            const messages = {
+                "401:credential_rejected": "Credencial rechazada o vencida.",
+                "403:access_denied": "Acceso denegado para descargar la foto.",
+                "404:photo_not_found": "Esta operación no tiene foto adjunta.",
+                "404:operation_not_found": "La operación ya no está disponible.",
+                "503:integrity_failure": "Fallo de integridad: no se descargó la foto."
+            };
+            photoStatus.textContent =
+                messages[response.status + ":" + data?.status] ??
+                "No se pudo recuperar la foto.";
+            return;
+        }
+
+        if (response.headers.get("content-type") !== "application/octet-stream")
+            throw new Error("Unexpected photo response.");
+        const file = await response.blob();
+        if (!current()) return;
+        if (!file.size || file.size > 5 * 1024 * 1024)
+            throw new Error("Unexpected photo size.");
+
+        const url = URL.createObjectURL(file);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "observation-photo";
+        document.body.append(link);
+        try {
+            link.click();
+        } finally {
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+        photoStatus.textContent = "Descarga iniciada.";
+    } catch (_) {
+        if (current()) photoStatus.textContent = "No se pudo recuperar la foto.";
+    } finally {
+        token = "";
+        if (current()) {
+            photoController = null;
+            photoButton.disabled = false;
+        }
+    }
+});
+"""
+
 def install_observation_operation_read_page(app):
     """Public shell; recovered content requires authenticated API access."""
     headers = {
