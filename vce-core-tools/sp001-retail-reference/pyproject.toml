@@ -19,6 +19,7 @@ auth = [
 host = [
     "fastapi",
     "uvicorn",
+    "Pillow==13.0.0",
 ]
 dev = [
     "pytest>=9.0",

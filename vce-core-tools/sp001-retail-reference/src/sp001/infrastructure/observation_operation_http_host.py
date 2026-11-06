@@ -1,9 +1,14 @@
+import base64
+import binascii
+import json
+from io import BytesIO
+
 from sp001.infrastructure.observation_operation_read_page import (
     install_observation_operation_read_page,
 )
 
 from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from starlette.concurrency import run_in_threadpool
 
 from sp001.contracts.retail_observation_operation import (
@@ -30,6 +35,43 @@ from sp001.infrastructure.sqlite_observation_operations import (
 from sp001.services.retail_observation_operation_validation import (
     validate_retail_observation_operation as validate,
 )
+
+
+PHOTO_CONTENT_TYPE = "application/vnd.sp001.observation-photo+json"
+MAX_PHOTO_BYTES = 5 * 1024 * 1024
+MAX_PHOTO_PIXELS = 20_000_000
+MAX_PHOTO_BASE64 = 4 * ((MAX_PHOTO_BYTES + 2) // 3)
+
+
+class InvalidPhoto(ValueError):
+    """The submitted bytes cannot be accepted as a JPEG or PNG."""
+
+
+def _validate_photo(photo):
+    # Import only for photo uploads; legacy JSON operations do not decode images.
+    from PIL import Image, UnidentifiedImageError
+
+    try:
+        with Image.open(BytesIO(photo), formats=("JPEG", "PNG")) as image:
+            if image.width * image.height > MAX_PHOTO_PIXELS:
+                raise InvalidPhoto("image exceeds pixel limit")
+            if getattr(image, "n_frames", 1) != 1:
+                raise InvalidPhoto("animated images are not supported")
+            image.verify()
+        with Image.open(BytesIO(photo), formats=("JPEG", "PNG")) as image:
+            image.load()
+    except (UnidentifiedImageError, Image.DecompressionBombError,
+            OSError, SyntaxError, ValueError) as error:
+        raise InvalidPhoto("invalid or unsupported image") from error
+
+
+def _unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate envelope field")
+        result[key] = value
+    return result
 
 
 def create_observation_operation_app(
@@ -139,21 +181,53 @@ def create_observation_operation_app(
             return response(400, "invalid_request")
         types = request.headers.getlist("content-type")
         encodings = request.headers.getlist("content-encoding")
+        media_type = (
+            types[0].split(";", 1)[0].strip().lower() if len(types) == 1 else ""
+        )
+        with_photo = media_type == PHOTO_CONTENT_TYPE
         if (
-            len(types) != 1
-            or types[0].split(";", 1)[0].strip().lower() != "application/json"
+            media_type not in ("application/json", PHOTO_CONTENT_TYPE)
             or (encodings and (
                 len(encodings) != 1 or encodings[0].lower() != "identity"
             ))
         ):
             return response(415, "unsupported_content")
         body = bytearray()
+        photo = None
+        limit = max_request_bytes
+        if with_photo:
+            # Allow escaped JSON text plus the bounded base64 field.
+            limit = 6 * max_request_bytes + MAX_PHOTO_BASE64 + 256
         try:
             async for chunk in request.stream():
-                if len(body) + len(chunk) > max_request_bytes:
+                if len(body) + len(chunk) > limit:
                     return response(413, "request_too_large")
                 body.extend(chunk)
-            item = deserialize(body.decode("utf-8"))
+            document = body.decode("utf-8")
+            if with_photo:
+                envelope = json.loads(document, object_pairs_hook=_unique_object)
+                if type(envelope) is not dict or set(envelope) != {
+                    "observation_document", "photo_base64",
+                }:
+                    return response(400, "invalid_request")
+                document = envelope["observation_document"]
+                encoded = envelope["photo_base64"]
+                if type(document) is not str or type(encoded) is not str:
+                    return response(400, "invalid_request")
+                if (
+                    len(document.encode("utf-8")) > max_request_bytes
+                    or len(encoded) > MAX_PHOTO_BASE64
+                ):
+                    return response(413, "request_too_large")
+                try:
+                    photo = base64.b64decode(encoded, validate=True)
+                except (binascii.Error, ValueError):
+                    return response(400, "invalid_photo")
+                if not photo:
+                    return response(400, "invalid_photo")
+                if len(photo) > MAX_PHOTO_BYTES:
+                    return response(413, "request_too_large")
+            item = deserialize(document)
             if item.case_id != case_id:
                 return response(400, "invalid_request")
             intent = SaveRequest(request_id, item)
@@ -163,13 +237,20 @@ def create_observation_operation_app(
             return response(400, "invalid_request")
 
         try:
+            options = {}
+            if photo is not None:
+                await run_in_threadpool(_validate_photo, photo)
+                options["photo"] = photo
             receipt = await run_in_threadpool(
                 service.save_operation, credential=credential, request=intent,
+                **options,
             )
             content = receipt_content(receipt, case_id, request_id, item)
             # Save permission does not implicitly authorize document retrieval.
             content.pop("observation_document")
             return response(200, "saved", **content)
+        except InvalidPhoto:
+            return response(400, "invalid_photo")
         except Rejected:
             return response(401, "credential_rejected", save_outcome="unconfirmed")
         except Denied:
@@ -206,6 +287,47 @@ def create_observation_operation_app(
                     "operation changed during response preparation"
                 )
             return response(200, "ok", **content)
+        except Rejected:
+            return response(401, "credential_rejected")
+        except Denied:
+            return response(403, "access_denied")
+        except ObservationOperationIntegrityFailure:
+            return response(503, "integrity_failure")
+        except Exception:
+            return response(503, "backend_unavailable")
+
+    @app.get(route + "/photo")
+    def recover_photo(request: Request, case_id: str, request_id: str):
+        try:
+            credential = credential_for(request)
+        except Rejected:
+            return response(401, "credential_rejected")
+        if not valid_path(request, case_id, request_id):
+            return response(400, "invalid_request")
+        try:
+            arguments = {
+                "credential": credential, "case_id": case_id,
+                "request_id": request_id, "include_photo": True,
+            }
+            result = service.recover_operation(**arguments)
+            if result is None:
+                return response(404, "operation_not_found")
+            receipt, photo = result
+            receipt_content(receipt, case_id, request_id)
+            if photo is None:
+                return response(404, "photo_not_found")
+            if service.recover_operation(**arguments) != result:
+                raise ObservationOperationIntegrityFailure(
+                    "operation changed during photo response preparation"
+                )
+            return Response(
+                content=photo, media_type="application/octet-stream",
+                headers={
+                    "Content-Disposition": 'attachment; filename="observation-photo"',
+                    "Cache-Control": "no-store",
+                    "X-Content-Type-Options": "nosniff",
+                },
+            )
         except Rejected:
             return response(401, "credential_rejected")
         except Denied:

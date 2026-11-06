@@ -28,15 +28,16 @@ class AuthenticatedObservationOperations(AuthenticatedInspectionObservations):
             if not callable(getattr(self._backend, name, None)):
                 raise TypeError("backend must provide observation operations")
 
-    def save_operation(self, *, credential, request):
+    def save_operation(self, *, credential, request, photo=None):
         if type(request) is not Request:
             raise TypeError("request must be an observation save request")
         access = self._authenticate(credential)
         self._check(
             access, request.observation.case_id, Operation.SAVE_RETAIL_OBSERVATION,
         )
+        options = {} if photo is None else {"photo": photo}
         receipt = self._backend.save_operation_authorized(
-            access=access, request=request,
+            access=access, request=request, **options,
         )
         self._check(
             access, request.observation.case_id, Operation.SAVE_RETAIL_OBSERVATION,
@@ -44,16 +45,29 @@ class AuthenticatedObservationOperations(AuthenticatedInspectionObservations):
         validate(request=request, receipt=receipt, principal=access.principal)
         return receipt
 
-    def recover_operation(self, *, credential, case_id, request_id):
+    def recover_operation(
+        self, *, credential, case_id, request_id, include_photo=False,
+    ):
+        if type(include_photo) is not bool:
+            raise TypeError("include_photo must be a bool")
         access = self._authenticate(credential)
         identity = Identity(access.principal, case_id, request_id)
         self._check(access, case_id, Operation.READ_RETAIL_OBSERVATION)
-        receipt = self._backend.recover_operation_authorized(
-            access=access, identity=identity,
+        options = {"include_photo": True} if include_photo else {}
+        result = self._backend.recover_operation_authorized(
+            access=access, identity=identity, **options,
         )
         self._check(access, case_id, Operation.READ_RETAIL_OBSERVATION)
-        if receipt is None:
+        if result is None:
             return None
+        if include_photo:
+            if type(result) is not tuple or len(result) != 2:
+                raise TypeError("backend returned an invalid receipt and photo pair")
+            receipt, photo = result
+            if photo is not None and (type(photo) is not bytes or not photo):
+                raise TypeError("backend returned invalid photo bytes")
+        else:
+            receipt = result
         if type(receipt) is not Receipt:
             raise TypeError("backend returned an invalid operation receipt")
         if receipt.operation != identity:
@@ -63,4 +77,4 @@ class AuthenticatedObservationOperations(AuthenticatedInspectionObservations):
             request=Request(request_id, observation),
             receipt=receipt, principal=access.principal,
         )
-        return receipt
+        return (receipt, photo) if include_photo else receipt
