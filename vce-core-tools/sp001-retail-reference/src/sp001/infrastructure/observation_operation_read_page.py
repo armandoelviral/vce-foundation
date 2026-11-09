@@ -255,10 +255,18 @@ photoButton.addEventListener("click", async () => {
         if (!file.size || file.size > 5 * 1024 * 1024)
             throw new Error("Unexpected photo size.");
 
+        const prefix = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+        if (!current()) return;
+
+        const png = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+        const isPng = png.every((byte, index) => prefix[index] === byte);
+        const isJpeg = prefix[0] === 0xff && prefix[1] === 0xd8 && prefix[2] === 0xff;
+        if (!isPng && !isJpeg) throw new Error("Unexpected photo format.");
+
         const url = URL.createObjectURL(file);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "observation-photo";
+        link.download = isPng ? "observation-photo.png" : "observation-photo.jpg";
         document.body.append(link);
         try {
             link.click();

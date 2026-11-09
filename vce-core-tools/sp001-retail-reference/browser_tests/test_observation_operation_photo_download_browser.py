@@ -49,6 +49,7 @@ def test_download_from_receipt_returns_original_bytes(photo_query):
 
     download = pending.value
     assert download.failure() is None
+    assert download.suggested_filename == "observation-photo.png"
     assert Path(download.path()).read_bytes() == original
     expect(page.locator("#photo-status")).to_have_text("Descarga iniciada.")
     expect(page.locator("#credential")).to_have_value("")
