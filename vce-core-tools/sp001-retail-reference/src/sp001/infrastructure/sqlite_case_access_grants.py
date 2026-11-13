@@ -191,6 +191,58 @@ class SqliteCaseAccessGrants:
             grant=grant, revision=row[2], revoked=bool(row[1]),
         )
 
+    def read_administration_event(
+        self, *, event_id: str
+    ) -> GrantAdministrationRecord | None:
+        """Read and validate one persisted administrative event."""
+        if not isinstance(event_id, str):
+            raise TypeError("event_id must be a string")
+        if not event_id.strip():
+            raise ValueError("event_id must not be empty")
+
+        with self._connection() as connection:
+            row = connection.execute(
+                """SELECT event_id, grant_id, record
+                FROM case_access_grant_audit
+                WHERE event_id=?""",
+                (event_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        stored_event_id, stored_grant_id, stored = row
+
+        try:
+            value = json.loads(stored)
+            record = GrantAdministrationRecord(
+                event_id=value["event_id"],
+                actor=AuthenticatedPrincipal(**value["actor"]),
+                action=Action(value["action"]),
+                grant=_grant(value["grant"]),
+                recorded_at=value["recorded_at"],
+            )
+        except (ValueError, TypeError, KeyError) as exc:
+            raise ValueError(
+                "invalid persisted administrative event"
+            ) from exc
+
+        if (
+            record.event_id != event_id
+            or record.event_id != stored_event_id
+            or record.grant.grant_id != stored_grant_id
+        ):
+            raise ValueError(
+                "stored administrative event identity mismatch"
+            )
+
+        if _document(record) != stored:
+            raise ValueError(
+                "noncanonical persisted administrative event"
+            )
+
+        return record
+
     def read_audit(self) -> tuple[GrantAdministrationRecord, ...]:
         with self._connection() as connection:
             rows = connection.execute(
