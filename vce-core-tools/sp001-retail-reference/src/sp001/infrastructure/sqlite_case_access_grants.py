@@ -1,3 +1,7 @@
+from sp001.contracts.administration_event_errors import (
+    InvalidPersistedAdministrationEventError,
+)
+
 from sp001.contracts.case_access_grant_snapshot import CaseAccessGrantSnapshot
 from contextlib import contextmanager
 from dataclasses import asdict
@@ -32,10 +36,6 @@ def _grant(value) -> CaseAccessGrant:
         ),
         valid_from=value["valid_from"], expires_at=value["expires_at"],
     )
-
-
-class InvalidPersistedAdministrationEventError(ValueError):
-    """Persisted administrative event failed validation."""
 
 
 class SqliteCaseAccessGrants:
