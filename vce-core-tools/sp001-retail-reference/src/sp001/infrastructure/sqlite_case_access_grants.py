@@ -34,6 +34,10 @@ def _grant(value) -> CaseAccessGrant:
     )
 
 
+class InvalidPersistedAdministrationEventError(ValueError):
+    """Persisted administrative event failed validation."""
+
+
 class SqliteCaseAccessGrants:
     """Trusted storage capability; administration service supplies authorization."""
 
@@ -223,7 +227,7 @@ class SqliteCaseAccessGrants:
                 recorded_at=value["recorded_at"],
             )
         except (ValueError, TypeError, KeyError) as exc:
-            raise ValueError(
+            raise InvalidPersistedAdministrationEventError(
                 "invalid persisted administrative event"
             ) from exc
 
@@ -232,12 +236,12 @@ class SqliteCaseAccessGrants:
             or record.event_id != stored_event_id
             or record.grant.grant_id != stored_grant_id
         ):
-            raise ValueError(
+            raise InvalidPersistedAdministrationEventError(
                 "stored administrative event identity mismatch"
             )
 
         if _document(record) != stored:
-            raise ValueError(
+            raise InvalidPersistedAdministrationEventError(
                 "noncanonical persisted administrative event"
             )
 
