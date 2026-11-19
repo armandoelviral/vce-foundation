@@ -24,7 +24,7 @@ class CommercialIdentityRejected(PermissionError):
 
 class AuthenticatedProduct001CommercialApproval:
     def __init__(
-        self, *, authenticator, writer,
+        self, *, authenticator, writer, document_verifier,
         expected_audience: str,
         clock: Callable[[], int],
     ):
@@ -40,8 +40,12 @@ class AuthenticatedProduct001CommercialApproval:
         if not callable(clock):
             raise TypeError("clock must be callable")
 
+        if not callable(getattr(document_verifier, "verify", None)):
+            raise TypeError("document_verifier must implement verify")
+
         self._authenticator = authenticator
         self._writer = writer
+        self._document_verifier = document_verifier
         self._audience = expected_audience
         self._clock = clock
 
@@ -85,8 +89,14 @@ class AuthenticatedProduct001CommercialApproval:
                 "commercial decision principal mismatch"
             )
 
+        self._document_verifier.verify(decision=decision)
+
+        def before_commit():
+            self._require_valid(context)
+            self._document_verifier.verify(decision=decision)
+
         return self._writer.save_decision(
             decision=decision,
             authenticated_principal=context.principal,
-            before_commit=lambda: self._require_valid(context),
+            before_commit=before_commit,
         )

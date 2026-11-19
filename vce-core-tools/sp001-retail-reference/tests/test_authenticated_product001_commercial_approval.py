@@ -125,6 +125,13 @@ def context(*, audience="commercial", expires_at=200):
     )
 
 
+class AcceptingDocumentVerifier:
+    """Controlled document verifier for authentication-only tests."""
+
+    def verify(self, *, decision):
+        return None
+
+
 @pytest.fixture
 def environment(tmp_path):
     path = tmp_path / "commercial.sqlite"
@@ -141,6 +148,7 @@ def environment(tmp_path):
     service = AuthenticatedProduct001CommercialApproval(
         authenticator=authenticator,
         writer=writer,
+        document_verifier=AcceptingDocumentVerifier(),
         expected_audience="commercial",
         clock=lambda: now[0],
     )
@@ -237,6 +245,7 @@ def test_expiry_inside_transaction_rejected(environment):
     service = AuthenticatedProduct001CommercialApproval(
         authenticator=StubAuthenticator(context()),
         writer=AdvancingWriter(),
+        document_verifier=AcceptingDocumentVerifier(),
         expected_audience="commercial",
         clock=lambda: now[0],
     )
