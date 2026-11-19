@@ -14,10 +14,10 @@ from sp001.contracts.knowledge_retrieval_decision import (
 
 def call_admission(case):
     from sp001.services.product001_planogram_admission import (
-        generate_admitted_planogram_expected_state,
+        _compose_planogram_expected_state_from_decision,
     )
 
-    return generate_admitted_planogram_expected_state(
+    return _compose_planogram_expected_state_from_decision(
         expected_state_id="PRODUCT-001-EXPECTED-001",
         expected_state_version=1,
         rule=case.rule,

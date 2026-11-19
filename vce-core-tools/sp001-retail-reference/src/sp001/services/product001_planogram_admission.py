@@ -20,7 +20,7 @@ from sp001.services.retail_expected_state_generation import (
 )
 
 
-def generate_admitted_planogram_expected_state(
+def _compose_planogram_expected_state_from_decision(
     *,
     expected_state_id: str,
     expected_state_version: int,
@@ -144,4 +144,21 @@ def generate_admitted_planogram_expected_state(
         expected_state_version=expected_state_version,
         rule=rule,
         snapshot=snapshot,
+    )
+
+
+def generate_admitted_planogram_expected_state(
+    *,
+    expected_state_id,
+    expected_state_version,
+    rule,
+    snapshot,
+    retrieval_decision,
+    provenance_bindings,
+    planogram_dimension_ids,
+):
+    """Reject caller-supplied admission decisions."""
+    raise ValueError(
+        "untrusted admission authority: "
+        "caller-supplied retrieval decisions cannot authorize generation"
     )

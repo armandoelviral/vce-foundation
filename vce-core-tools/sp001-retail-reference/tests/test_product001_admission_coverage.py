@@ -6,12 +6,12 @@ import pytest
 
 from product001_admission_fixtures import make_valid_admission_case
 from sp001.services.product001_planogram_admission import (
-    generate_admitted_planogram_expected_state,
+    _compose_planogram_expected_state_from_decision,
 )
 
 
 def admit(case):
-    return generate_admitted_planogram_expected_state(
+    return _compose_planogram_expected_state_from_decision(
         expected_state_id="PRODUCT-001-COVERAGE-001",
         expected_state_version=1,
         rule=case.rule,

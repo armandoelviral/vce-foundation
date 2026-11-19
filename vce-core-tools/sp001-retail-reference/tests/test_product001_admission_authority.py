@@ -14,10 +14,6 @@ from sp001.services.product001_planogram_admission import (
 )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="AUTH-001: caller-forged INCLUDED decision is currently accepted",
-)
 def test_forged_included_decision_cannot_authorize_expected_state():
     case = make_valid_admission_case()
 

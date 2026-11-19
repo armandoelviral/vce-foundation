@@ -124,12 +124,12 @@ class Product001PlanogramAdmissionService:
     ):
         """Generate Retail state from a freshly evaluated document."""
         from sp001.services.product001_planogram_admission import (
-            generate_admitted_planogram_expected_state,
+            _compose_planogram_expected_state_from_decision,
         )
 
         decision = self.admit(request=request)
 
-        return generate_admitted_planogram_expected_state(
+        return _compose_planogram_expected_state_from_decision(
             expected_state_id=expected_state_id,
             expected_state_version=expected_state_version,
             rule=rule,
