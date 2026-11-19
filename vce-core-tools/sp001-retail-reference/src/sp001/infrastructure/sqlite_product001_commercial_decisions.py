@@ -87,6 +87,7 @@ class SqliteProduct001CommercialDecisionWriter:
     def save_decision(
         self, *, decision: Product001CommercialApprovalDecision,
         authenticated_principal: AuthenticatedPrincipal,
+        before_commit: Callable[[], None] | None = None,
     ) -> bool:
         if not isinstance(
             decision, Product001CommercialApprovalDecision
@@ -96,6 +97,9 @@ class SqliteProduct001CommercialDecisionWriter:
             authenticated_principal, AuthenticatedPrincipal
         ):
             raise TypeError("invalid authenticated principal")
+
+        if before_commit is not None and not callable(before_commit):
+            raise TypeError("before_commit must be callable")
 
         definition = _canonical(asdict(decision))
         audit = _canonical({
@@ -186,6 +190,8 @@ class SqliteProduct001CommercialDecisionWriter:
                     raise CommercialDecisionConflict(
                         "missing or inconsistent decision audit"
                     )
+                if before_commit is not None:
+                    before_commit()
                 connection.execute("COMMIT")
                 return False
 
@@ -203,6 +209,8 @@ class SqliteProduct001CommercialDecisionWriter:
                 "(decision_id, record) VALUES (?, ?)",
                 (decision.decision_id, audit),
             )
+            if before_commit is not None:
+                before_commit()
             connection.execute("COMMIT")
             return True
         except BaseException:
