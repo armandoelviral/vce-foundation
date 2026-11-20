@@ -312,3 +312,30 @@ def test_revocation_committed_before_writer_lock_denies(environment):
     assert result == ["denied"]
     assert count(path, "product001_commercial_decisions") == 0
     assert count(path, "product001_commercial_decision_audit") == 0
+
+def test_before_commit_rejection_rolls_back_new_decision(environment):
+    path, grants, writer, _ = environment
+    grants.register_grant(event_id="g1", grant=grant())
+
+    calls = []
+
+    def reject_before_commit():
+        calls.append("called")
+        raise PermissionError("revalidation rejected")
+
+    with pytest.raises(
+        PermissionError,
+        match="revalidation rejected",
+    ):
+        writer.save_decision(
+            decision=decision(),
+            authenticated_principal=PRINCIPAL,
+            before_commit=reject_before_commit,
+        )
+
+    assert calls == ["called"]
+    assert count(path, "product001_commercial_decisions") == 0
+    assert count(path, "product001_commercial_decision_audit") == 0
+
+    stored = grants.read_grant(grant_id="grant-1")
+    assert stored == (grant(), False)
