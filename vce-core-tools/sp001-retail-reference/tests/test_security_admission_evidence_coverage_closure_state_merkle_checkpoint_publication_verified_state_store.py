@@ -203,6 +203,55 @@ def test_unprovisioned_key_is_rejected_before_create(
     )
 
 
+def test_same_signed_state_depends_on_configured_binding_set(
+    tmp_path,
+) -> None:
+    state = state_for_key_index(4)
+    publication_id = state.publication_intent.publication_id
+
+    original_store = create_store(
+        tmp_path,
+        name="original.sqlite3",
+    )
+    original_verified_store = (
+        SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationVerifiedStateStore(
+            state_store=original_store,
+            binding_set=create_binding_set(size=3),
+        )
+    )
+
+    with pytest.raises(
+        SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationStateVerificationError,
+        match="signature verification failed",
+    ):
+        original_verified_store.create(state=state)
+
+    assert original_store.read(
+        publication_id=publication_id,
+    ) is None
+
+    substituted_store = create_store(
+        tmp_path,
+        name="substituted.sqlite3",
+    )
+    substituted_verified_store = (
+        SecurityAdmissionEvidenceCoverageClosureStateMerkleCheckpointPublicationVerifiedStateStore(
+            state_store=substituted_store,
+            binding_set=create_binding_set(size=4),
+        )
+    )
+
+    assert substituted_verified_store.create(state=state) is True
+
+    assert substituted_verified_store.read(
+        publication_id=publication_id,
+    ) == state
+
+    assert original_store.read(
+        publication_id=publication_id,
+    ) is None
+
+
 def test_tampered_signature_is_rejected_before_create(
     tmp_path,
 ) -> None:
