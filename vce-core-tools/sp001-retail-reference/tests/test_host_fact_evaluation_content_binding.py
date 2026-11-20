@@ -89,6 +89,45 @@ def test_matching_content_and_identifiers():
 def test_same_assertion_id_with_different_content():
     assert verify(a=assertion(observer_id="O2")) is False
 
+def test_coordinated_assertion_and_binding_replacement_is_content_consistent():
+    original = assertion()
+    original_binding = binding(original)
+    original_evaluation = evaluation()
+
+    assert verify(
+        b=original_binding,
+        a=original,
+        e=original_evaluation,
+    ) is True
+
+    substituted = assertion(
+        observer_id="ATTACKER-CLAIMED-OBSERVER",
+        declared_status=DeclaredHostFactStatus.SATISFIED,
+    )
+
+    assert substituted.assertion_id == original.assertion_id
+
+    assert (
+        digest_host_fact_assertion(substituted)
+        != digest_host_fact_assertion(original)
+    )
+
+    # An isolated modification is detected.
+    assert verify(
+        b=original_binding,
+        a=substituted,
+        e=original_evaluation,
+    ) is False
+
+    # The adversary also replaces the untrusted content reference.
+    substituted_binding = binding(substituted)
+
+    # This verifies correspondence, not observer authenticity.
+    assert verify(
+        b=substituted_binding,
+        a=substituted,
+        e=original_evaluation,
+    ) is True
 
 def test_different_evaluation_record_id():
     assert verify(e=evaluation(evaluation_record_id="ER2")) is False
