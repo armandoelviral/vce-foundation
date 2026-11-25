@@ -266,3 +266,56 @@ def test_absent_and_conflicting_commitment_references_are_distinct(committed_req
                 (json.dumps(record, sort_keys=True, separators=(",", ":")),),
             )
         assert verify_commercial_evidence(**options) is result
+
+
+def test_gate_receipt_recovers_committed_result_after_response_is_lost(committed_request):
+    from hashlib import sha256
+
+    from sp001.contracts.product001_mvp1_commercial_receipt import (
+        CommercialReceiptV1,
+        verify_commercial_receipt,
+    )
+    from sp001.services.product001_mvp1_commercial_receipt_issuer import (
+        Mvp1CommercialReceiptIssuer,
+    )
+
+    make_app, request_with, database, clock, certificate, _, authority_key = committed_request
+    signing_key = Ed25519PrivateKey.generate()
+    options = dict(
+        database_path=database,
+        gate_id="gate-lab",
+        signing_key=signing_key,
+        trusted_issuer_id="issuer",
+        trusted_authority_key=authority_key,
+    )
+    assert Mvp1CommercialReceiptIssuer(**options).recover(
+        certificate,
+    ) is CommercialEvidenceStatus.INDETERMINATE
+
+    # Drop the delivery after the HTTP call commits and close the Gate instance.
+    with TestClient(make_app()) as client:
+        assert client.post(PATH, headers=HEADERS, json=request_with(certificate)).status_code == 200
+    original = read_only_audit(database)
+
+    clock[0] = certificate.context.materialize_deadline
+    receipt = Mvp1CommercialReceiptIssuer(**options).recover(certificate)
+    assert isinstance(receipt, CommercialReceiptV1)
+    assert receipt == Mvp1CommercialReceiptIssuer(**options).recover(certificate)
+    assert receipt.statement.audit_sequence == original[0]
+    assert receipt.statement.audit_digest == sha256(original[2].encode("ascii")).hexdigest()
+    verification = dict(
+        certificate=certificate, trusted_gate_id="gate-lab",
+        trusted_gate_key=signing_key.public_key(),
+    )
+    verify_commercial_receipt(receipt, **verification)
+    with pytest.raises(PermissionError, match="invalid commercial receipt signature"):
+        verify_commercial_receipt(
+            replace(receipt, statement=replace(receipt.statement, audit_digest="0" * 64)),
+            **verification,
+        )
+    with pytest.raises(PermissionError, match="invalid commercial receipt signature"):
+        verify_commercial_receipt(receipt, **(
+            verification | {"trusted_gate_key": Ed25519PrivateKey.generate().public_key()}
+        ))
+    assert read_only_audit(database) == original
+    assert decision_counts(database) == (1, 1)

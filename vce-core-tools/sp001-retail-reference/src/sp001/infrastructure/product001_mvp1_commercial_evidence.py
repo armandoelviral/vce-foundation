@@ -1,7 +1,7 @@
 """Independent, read-only verification of a historical commercial record."""
 
 from contextlib import closing
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from enum import StrEnum
 import json
 from pathlib import Path
@@ -27,6 +27,12 @@ class CommercialEvidenceStatus(StrEnum):
     INDETERMINATE = "INDETERMINATE"
 
 
+@dataclass(frozen=True, slots=True)
+class VerifiedCommercialAudit:
+    sequence: int
+    canonical_record: str
+
+
 def _canonical_object(serialized: str) -> dict:
     value = json.loads(serialized)
     if not isinstance(value, dict) or _canonical(value) != serialized:
@@ -38,13 +44,13 @@ def _canonical(value: dict) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
 
 
-def verify_commercial_evidence(
+def read_verified_commercial_audit(
     *,
     database_path: str | Path,
     certificate: CommitmentCertificateV1,
     trusted_key: Ed25519PublicKey,
     trusted_issuer_id: str,
-) -> CommercialEvidenceStatus:
+) -> VerifiedCommercialAudit | CommercialEvidenceStatus:
     """Verify correspondence in a supplied database snapshot.
 
     The caller provisions issuer and key independently. The result carries
@@ -66,7 +72,7 @@ def verify_commercial_evidence(
         with closing(sqlite3.connect(target, uri=True)) as db:
             row = db.execute(
                 """
-                SELECT decision.grant_id, decision.definition, audit.record
+                SELECT decision.grant_id, decision.definition, audit.sequence, audit.record
                 FROM product001_commercial_decisions AS decision
                 LEFT JOIN product001_commercial_decision_audit AS audit USING (decision_id)
                 WHERE decision.decision_id = ?
@@ -78,7 +84,7 @@ def verify_commercial_evidence(
     if row is None:
         return CommercialEvidenceStatus.INDETERMINATE
 
-    grant_id, definition, record = row
+    grant_id, definition, sequence, record = row
     try:
         decision = decode_product001_mvp1_decision(_canonical_object(definition))
         digest = decision_digest_from_canonical_bytes(authorization_payload(decision))
@@ -92,6 +98,8 @@ def verify_commercial_evidence(
         if record is None:
             return CommercialEvidenceStatus.INDETERMINATE
 
+        if type(sequence) is not int or sequence <= 0:
+            return CommercialEvidenceStatus.REJECTED
         audit = _canonical_object(record)
         expected = {
             "action": "RECORD_DECISION",
@@ -112,4 +120,22 @@ def verify_commercial_evidence(
             return CommercialEvidenceStatus.REJECTED
     except (TypeError, ValueError, RecursionError):
         return CommercialEvidenceStatus.REJECTED
-    return CommercialEvidenceStatus.VERIFIED
+    return VerifiedCommercialAudit(sequence, record)
+
+
+def verify_commercial_evidence(
+    *,
+    database_path: str | Path,
+    certificate: CommitmentCertificateV1,
+    trusted_key: Ed25519PublicKey,
+    trusted_issuer_id: str,
+) -> CommercialEvidenceStatus:
+    result = read_verified_commercial_audit(
+        database_path=database_path,
+        certificate=certificate,
+        trusted_key=trusted_key,
+        trusted_issuer_id=trusted_issuer_id,
+    )
+    if isinstance(result, VerifiedCommercialAudit):
+        return CommercialEvidenceStatus.VERIFIED
+    return result
