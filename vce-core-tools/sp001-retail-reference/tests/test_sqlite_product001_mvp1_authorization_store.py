@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from dataclasses import replace
 from pathlib import Path
+import sqlite3
 from tempfile import TemporaryDirectory
 from threading import Barrier
 import unittest
@@ -62,6 +63,10 @@ class AuthorizationStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(PermissionError, "revoked"):
             self.store.consume(self.cert, **self.context)
         self.assertIsNone(self.store.recover(**self.identity))
+        self.assertFalse(self.store.revoke(**self.identity))
+        history = self.store.read_history(**self.identity)
+        self.assertTrue(history.complete)
+        self.assertEqual([event.kind for event in history.transitions], ["REVOKED"])
 
     def test_consumption_first_recovers_original_after_revocation_and_expiry(self):
         original = self.store.consume(self.cert, **self.context)
@@ -70,6 +75,12 @@ class AuthorizationStoreTests(unittest.TestCase):
         self.assertEqual(original.materialize_deadline, 100)
         self.assertEqual(original.decision_bytes, self.context["decision_bytes"])
         self.assertEqual(self.store.recover(**self.identity), original)
+        reopened = SqliteMvp1AuthorizationStore(**self.config, read_only=True)
+        history = reopened.read_history(**self.identity)
+        consumed, revoked = history.transitions
+        self.assertTrue(history.complete)
+        self.assertEqual((consumed.kind, revoked.kind), ("CONSUMED", "REVOKED"))
+        self.assertLess(consumed.sequence, revoked.sequence)
         with self.assertRaises(PermissionError):
             self.store.consume(self.cert, **self.context)
 
@@ -103,6 +114,7 @@ class AuthorizationStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "before commit"):
             failing.consume(self.cert, **self.context)
         self.assertIsNone(self.store.recover(**self.identity))
+        self.assertEqual(self.store.read_history(**self.identity).transitions, ())
         self.store.consume(self.cert, **self.context)
         self.assertIsNotNone(self.store.recover(**self.identity))
 
@@ -129,3 +141,22 @@ class AuthorizationStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(PermissionError, "deadline expired"):
             self.store.consume(self.cert, **self.context)
         self.assertIsNone(self.store.recover(**self.identity))
+
+
+    def test_preexisting_consumption_preserves_recovery_without_inventing_order(self):
+        original = self.store.consume(self.cert, **self.context)
+        with sqlite3.connect(self.config["database_path"]) as connection:
+            connection.execute("DROP TABLE mvp1_authorization_transitions")
+
+        read_only = SqliteMvp1AuthorizationStore(**self.config, read_only=True)
+        history = read_only.read_history(**self.identity)
+        self.assertFalse(history.complete)
+        self.assertEqual(history.transitions, ())
+        self.assertEqual(read_only.recover(**self.identity), original)
+
+        reopened = SqliteMvp1AuthorizationStore(**self.config)
+        self.assertTrue(reopened.revoke(**self.identity))
+        history = reopened.read_history(**self.identity)
+        self.assertFalse(history.complete)
+        self.assertEqual([event.kind for event in history.transitions], ["REVOKED"])
+        self.assertEqual(reopened.recover(**self.identity), original)

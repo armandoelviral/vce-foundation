@@ -32,6 +32,19 @@ class DurableAuthorizationIntent:
     decision_bytes: bytes
 
 
+@dataclass(frozen=True, slots=True)
+class AuthorizationTransition:
+    sequence: int
+    kind: str
+
+
+@dataclass(frozen=True, slots=True)
+class AuthorizationHistory:
+    authorization_digest: str
+    transitions: tuple[AuthorizationTransition, ...]
+    complete: bool
+
+
 class SqliteMvp1AuthorizationStore:
     """Internal authority API backed by a dedicated database.
 
@@ -47,6 +60,7 @@ class SqliteMvp1AuthorizationStore:
         issuer_id: str,
         public_key: Ed25519PublicKey,
         clock=lambda: int(time()),
+        read_only: bool = False,
     ):
         if not issuer_id or type(issuer_id) is not str:
             raise ValueError("issuer identity required")
@@ -56,6 +70,11 @@ class SqliteMvp1AuthorizationStore:
         self._issuer_id = issuer_id
         self._public_key = public_key
         self._clock = clock
+        if type(read_only) is not bool:
+            raise TypeError("read_only must be a boolean")
+        self._read_only = read_only
+        if read_only:
+            return
         with closing(self._connect()) as connection:
             connection.executescript("""
                 CREATE TABLE IF NOT EXISTS mvp1_authorizations (
@@ -77,9 +96,21 @@ class SqliteMvp1AuthorizationStore:
                     FOREIGN KEY (issuer_id, organization_id, operation_id)
                         REFERENCES mvp1_authorizations
                 );
+                CREATE TABLE IF NOT EXISTS mvp1_authorization_transitions (
+                    sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+                    issuer_id TEXT NOT NULL,
+                    organization_id TEXT NOT NULL,
+                    operation_id TEXT NOT NULL,
+                    kind TEXT NOT NULL CHECK (kind IN ('CONSUMED', 'REVOKED')),
+                    UNIQUE (issuer_id, organization_id, operation_id, kind),
+                    FOREIGN KEY (issuer_id, organization_id, operation_id)
+                        REFERENCES mvp1_authorizations
+                );
             """)
 
     def _connect(self, *, read_only=False):
+        if self._read_only and not read_only:
+            raise PermissionError("authority register opened for recovery only")
         target = self._path.as_uri() + ("?mode=ro" if read_only else "")
         connection = sqlite3.connect(target, isolation_level=None, uri=True)
         try:
@@ -153,6 +184,7 @@ class SqliteMvp1AuthorizationStore:
                 "WHERE issuer_id=? AND organization_id=? AND operation_id=?",
                 identity,
             )
+            self._append_transition(connection, identity, "REVOKED")
         return True
 
     def consume(
@@ -185,7 +217,50 @@ class SqliteMvp1AuthorizationStore:
                 "INSERT INTO mvp1_authorization_intents VALUES (?, ?, ?, ?, ?)",
                 (*identity, str(cert.materialize_deadline), decision_bytes),
             )
+            self._append_transition(connection, identity, "CONSUMED")
         return intent
+
+    @staticmethod
+    def _append_transition(connection, identity, kind):
+        connection.execute(
+            "INSERT INTO mvp1_authorization_transitions "
+            "(issuer_id, organization_id, operation_id, kind) VALUES (?, ?, ?, ?)",
+            (*identity, kind),
+        )
+
+    def read_history(
+        self, *, organization_id, operation_id, expected_digest,
+    ) -> AuthorizationHistory | None:
+        """Read observed transitions in local sequence order, with coverage."""
+        identity = (self._issuer_id, organization_id, operation_id)
+        with closing(self._connect(read_only=True)) as connection:
+            connection.execute("BEGIN")
+            state = self._state(connection, identity, expected_digest)
+            if state is None:
+                return None
+            has_history_table = connection.execute(
+                "SELECT 1 FROM sqlite_master "
+                "WHERE type='table' AND name='mvp1_authorization_transitions'",
+            ).fetchone()
+            rows = ()
+            if has_history_table:
+                rows = connection.execute(
+                    "SELECT sequence, kind FROM mvp1_authorization_transitions "
+                    "WHERE issuer_id=? AND organization_id=? AND operation_id=? "
+                    "ORDER BY sequence",
+                    identity,
+                ).fetchall()
+            kinds = {kind for _, kind in rows}
+            expected_kinds = set()
+            if state[2]:
+                expected_kinds.add("REVOKED")
+            if self._read_intent(connection, identity) is not None:
+                expected_kinds.add("CONSUMED")
+            return AuthorizationHistory(
+                authorization_digest=state[0],
+                transitions=tuple(AuthorizationTransition(*row) for row in rows),
+                complete=kinds == expected_kinds,
+            )
 
     @staticmethod
     def _read_intent(connection, identity):

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.sp001.gate-lab</string>
+	<key>UserName</key>
+	<string>_sp001gate</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/private/var/db/sp001-gate/venv/bin/python</string>
+		<string>/private/var/db/sp001-gate/runtime/tools/product001_mvp1_gate_lab.py</string>
+		<string>serve</string>
+		<string>/private/var/db/sp001-gate/lab-state</string>
+		<string>--commercial-uid</string>
+		<string>601</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+</dict>
+</plist>
