@@ -42,7 +42,12 @@ from sp001.infrastructure.product001_commercial_approval_composition import (
 )
 from sp001.infrastructure.product001_mvp1_gate_bootstrap import (
     GateReceiptConfiguration,
+    _read_trust_configuration,
     create_product001_mvp1_deployed_gate,
+)
+from sp001.infrastructure.jwt_federated_issuance_authenticator import JwtFederatedIssuanceAuthenticator
+from sp001.infrastructure.product001_mvp1_intelligence_lab import (
+    IntelligenceLabGate, mount_intelligence_lab,
 )
 from sp001.infrastructure.sqlite_product001_commercial_approval import (
     SqliteProduct001CommercialApproval,
@@ -246,12 +251,14 @@ def recover(state: Path) -> None:
 
 def serve(
     state: Path, commercial_uid: int, *, enable_receipts=False, interrupt_before_receipt=False,
+    enable_intelligence=False,
 ) -> None:
     key = load_pem_public_key((state / "access-public.pem").read_bytes())
+    resolver = ConfiguredAccessTokenKeys(issuer=ISSUER, public_keys={KEY_ID: key})
     service = compose_product001_commercial_approval(
         issuer=ISSUER,
         audience=AUDIENCE,
-        key_resolver=ConfiguredAccessTokenKeys(issuer=ISSUER, public_keys={KEY_ID: key}),
+        key_resolver=resolver,
         max_lifetime_seconds=CREDENTIAL_TTL_SECONDS,
         max_token_bytes=8192,
         database_path=state / "commercial.sqlite",
@@ -277,6 +284,18 @@ def serve(
         receipt_configuration=receipts,
         after_commit=interrupt if interrupt_before_receipt else None,
     )
+    if enable_intelligence:
+        trust = _read_trust_configuration(
+            state.parent / "intelligence-trust.json", gate_uid=os.geteuid(),
+        )
+        mount_intelligence_lab(app, IntelligenceLabGate(
+            database_path=state.parent / "intelligence.sqlite",
+            authenticator=JwtFederatedIssuanceAuthenticator(
+                issuer=ISSUER, audience=AUDIENCE, key_resolver=resolver,
+                max_lifetime_seconds=CREDENTIAL_TTL_SECONDS, max_token_bytes=8192,
+            ),
+            audience=AUDIENCE, trust=trust,
+        ))
     uvicorn.run(app, host="127.0.0.1", port=PORT, access_log=False)
 
 
@@ -291,7 +310,10 @@ def main() -> None:
     parser.add_argument("--revocation-order", choices=("before-consume", "after-consume"))
     parser.add_argument("--enable-receipts", action="store_true")
     parser.add_argument("--interrupt-before-receipt", action="store_true")
+    parser.add_argument("--enable-intelligence", action="store_true")
     args = parser.parse_args()
+    if args.enable_intelligence and args.action != "serve":
+        parser.error("--enable-intelligence requires serve")
     if args.enable_receipts and args.action != "serve":
         parser.error("--enable-receipts requires serve")
     if args.interrupt_before_receipt and not args.enable_receipts:
@@ -331,6 +353,7 @@ def main() -> None:
         serve(
             args.state, args.commercial_uid, enable_receipts=args.enable_receipts,
             interrupt_before_receipt=args.interrupt_before_receipt,
+            enable_intelligence=args.enable_intelligence,
         )
 
 
