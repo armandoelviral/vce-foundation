@@ -60,7 +60,7 @@ class AuthenticatedProduct001CommercialApproval:
                 "credential audience or lifetime rejected"
             ) from exc
 
-    def record(self, *, credential, decision):
+    def record(self, *, credential, decision, commitment=None):
         if not isinstance(credential, str) or not credential.strip():
             raise CommercialAuthenticationRejected(
                 "credential rejected"
@@ -95,8 +95,10 @@ class AuthenticatedProduct001CommercialApproval:
             self._require_valid(context)
             self._document_verifier.verify(decision=decision)
 
+        evidence = {} if commitment is None else {"commitment": commitment}
         return self._writer.save_decision(
             decision=decision,
             authenticated_principal=context.principal,
             before_commit=before_commit,
+            **evidence,
         )

@@ -61,10 +61,14 @@ class Product001MVP1ProtectedApproval:
         if not isinstance(decision, Product001CommercialApprovalDecision):
             raise TypeError("invalid commercial decision")
 
-        self.__verify_authorization(authorization=authorization, decision=decision)
+        commitment = self.__verify_authorization(
+            authorization=authorization, decision=decision,
+        )
+        evidence = {} if commitment is None else {"commitment": commitment}
         return self.__authenticated_service.record(
             credential=credential,
             decision=decision,
+            **evidence,
         )
 
 

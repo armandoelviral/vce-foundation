@@ -1,6 +1,8 @@
 from base64 import b64encode
+from contextlib import closing
 from dataclasses import asdict, replace
 import json
+import sqlite3
 
 import pytest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -10,6 +12,10 @@ from sp001.contracts.product001_documentary_commitment import (
     Product001DocumentaryCommitmentKey,
 )
 from sp001.contracts.product001_mvp1_authorization_eligibility import authorization_digest
+from sp001.contracts.product001_mvp1_commitment_certificate import (
+    commitment_certificate_digest,
+    commitment_signing_payload,
+)
 from sp001.contracts.product001_mvp1_contextual_authorization import (
     ContextualAuthorizationV1,
     authorization_signing_payload,
@@ -45,7 +51,7 @@ HEADERS = {"Authorization": "Bearer valid"}
 def committed_request(tmp_path):
     decision = matching_decision()
     publish(tmp_path, decision)
-    database, authenticated = build_environment(tmp_path)
+    database, _ = build_environment(tmp_path)
     document = Product001DocumentaryCommitmentKey(
         organization_id=decision.document_scope.organization_id,
         source_identity=decision.document_identity,
@@ -79,43 +85,103 @@ def committed_request(tmp_path):
         organization_id=document.organization_id, operation_id=decision.decision_id,
         authorization_digest=authorization_digest(authorization),
     )
-    expected = {(document.organization_id, decision.decision_id): certificate.context}
     clock = [150]
-    protected = compose_product001_mvp1_protected_approval(
-        authenticated_service=authenticated,
-        commitment_admission=MVP1CommitmentAdmission(
-            public_key=commitment_key.public_key(),
-            resolve_context=lambda org, op: expected.get((org, op)),
-            clock=lambda: clock[0],
-        ),
-    )
-    request = {
-        "decision": json.loads(decision_bytes)["decision"],
-        "certificate": {
-            "version": 1,
-            "context": asdict(certificate.context),
-            "signature_b64": b64encode(certificate.signature).decode("ascii"),
-        },
-    }
-    app = create_product001_mvp1_http_app(
-        protected_service=protected, enable_commitment_route=True,
-    )
-    return app, request, database, clock
+
+    def make_app(expected=certificate.context, *, verifier=None):
+        _, reopened_service = build_environment(tmp_path, verifier=verifier)
+        protected = compose_product001_mvp1_protected_approval(
+            authenticated_service=reopened_service,
+            commitment_admission=MVP1CommitmentAdmission(
+                public_key=commitment_key.public_key(),
+                resolve_context=lambda org, op: expected,
+                clock=lambda: clock[0],
+            ),
+        )
+        return create_product001_mvp1_http_app(
+            protected_service=protected, enable_commitment_route=True,
+        )
+
+    def request_with(proof):
+        return {
+            "decision": json.loads(decision_bytes)["decision"],
+            "certificate": {
+                "version": 1,
+                "context": asdict(proof.context),
+                "signature_b64": b64encode(proof.signature).decode("ascii"),
+            },
+        }
+
+    def sign_alternative():
+        context = replace(certificate.context, authorization_digest="f" * 64)
+        return replace(
+            certificate, context=context,
+            signature=commitment_key.sign(commitment_signing_payload(context)),
+        )
+
+    return make_app, request_with, database, clock, certificate, sign_alternative
+
+
+def read_only_audit(database):
+    with closing(sqlite3.connect(database.as_uri() + "?mode=ro", uri=True)) as db:
+        return db.execute(
+            "SELECT sequence, decision_id, record FROM product001_commercial_decision_audit"
+        ).fetchone()
 
 
 def test_committed_certificate_records_once_over_http(committed_request):
-    app, request, database, _ = committed_request
-    with TestClient(app) as client:
-        for recorded in (True, False):
-            response = client.post(PATH, headers=HEADERS, json=request)
-            assert response.status_code == 200, response.text
-            assert response.json() == {"recorded": recorded}
+    make_app, request_with, database, _, certificate, sign_alternative = committed_request
+    with TestClient(make_app()) as client:
+        response = client.post(PATH, headers=HEADERS, json=request_with(certificate))
+        assert response.status_code == 200, response.text
+        assert response.json() == {"recorded": True}
+
+    original = read_only_audit(database)
+    _, decision_id, record = original
+    assert decision_id == certificate.context.operation_id
+    assert json.loads(record)["commitment"] == {
+        "version": 1,
+        "certificate_digest": commitment_certificate_digest(certificate),
+        "context": asdict(certificate.context),
+    }
+
+    with TestClient(make_app()) as rebuilt_gate:
+        response = rebuilt_gate.post(PATH, headers=HEADERS, json=request_with(certificate))
+        assert response.json() == {"recorded": False}
+
+    alternative = sign_alternative()
+    with TestClient(make_app(alternative.context)) as configured_gate:
+        response = configured_gate.post(PATH, headers=HEADERS, json=request_with(alternative))
+        assert response.status_code == 409
+
+    assert read_only_audit(database) == original
     assert decision_counts(database) == (1, 1)
 
 
+
+def test_commitment_audit_rolls_back_with_decision(committed_request):
+    make_app, request_with, database, _, certificate, _ = committed_request
+
+    class RejectAtCommit:
+        calls = 0
+
+        def verify(self, *, decision):
+            self.calls += 1
+            if self.calls == 2:
+                raise PermissionError("document changed before commit")
+
+    verifier = RejectAtCommit()
+    with TestClient(make_app(verifier=verifier)) as client:
+        response = client.post(PATH, headers=HEADERS, json=request_with(certificate))
+        assert response.status_code == 403
+    assert verifier.calls == 2
+    assert read_only_audit(database) is None
+    assert decision_counts(database) == (0, 0)
+
+
 def test_invalid_requests_leave_no_writes(committed_request):
-    app, request, database, clock = committed_request
-    with TestClient(app) as client:
+    make_app, request_with, database, clock, certificate, _ = committed_request
+    request = request_with(certificate)
+    with TestClient(make_app()) as client:
         assert client.post(PATH, json=request).status_code == 401
         changed = request | {"decision": request["decision"] | {"evidence_reference": "other"}}
         assert client.post(PATH, headers=HEADERS, json=changed).status_code == 403

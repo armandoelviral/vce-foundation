@@ -1,6 +1,7 @@
 """Portable proof of a durable MVP1 commitment issued by the authority."""
 
 from dataclasses import asdict, dataclass
+from hashlib import sha256
 import json
 import re
 
@@ -54,6 +55,15 @@ def commitment_signing_payload(context: CommitmentContextV1) -> bytes:
         ensure_ascii=True,
         allow_nan=False,
     ).encode("ascii")
+
+
+def commitment_certificate_digest(certificate: CommitmentCertificateV1) -> str:
+    """Identify the exact signed certificate independently of its wire encoding."""
+    return sha256(
+        b"SP001/PRODUCT001/MVP1/COMMITMENT_DIGEST/V1\0"
+        + commitment_signing_payload(certificate.context)
+        + certificate.signature
+    ).hexdigest()
 
 
 def verify_commitment_certificate(

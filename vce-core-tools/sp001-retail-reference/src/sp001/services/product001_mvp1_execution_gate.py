@@ -80,6 +80,7 @@ class MVP1CommitmentAdmission:
             decision_bytes=authorization_payload(decision),
             now=self.clock(),
         )
+        return authorization
 
 
 def configure_mvp1_admission(*, authority_public_key, commitment_admission):
@@ -138,8 +139,12 @@ class Product001MVP1ExecutionGate:
         if decision.principal != authenticated_principal:
             raise PermissionError("principal mismatch")
 
-        self._verify_authorization(authorization=authorization, decision=decision)
+        commitment = self._verify_authorization(
+            authorization=authorization, decision=decision,
+        )
+        evidence = {} if commitment is None else {"commitment": commitment}
         return self._writer.save_decision(
             decision=decision,
             authenticated_principal=authenticated_principal,
+            **evidence,
         )

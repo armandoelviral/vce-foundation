@@ -13,6 +13,10 @@ from sp001.contracts.product001_commercial_approval_decision import (
 from sp001.contracts.product001_commercial_approval_grant import (
     Product001CommercialApprovalOperation,
 )
+from sp001.contracts.product001_mvp1_commitment_certificate import (
+    CommitmentCertificateV1,
+    commitment_certificate_digest,
+)
 from sp001.infrastructure.sqlite_product001_commercial_approval import (
     SqliteProduct001CommercialApproval,
     _restore_grant,
@@ -88,6 +92,7 @@ class SqliteProduct001CommercialDecisionWriter:
         self, *, decision: Product001CommercialApprovalDecision,
         authenticated_principal: AuthenticatedPrincipal,
         before_commit: Callable[[], None] | None = None,
+        commitment: CommitmentCertificateV1 | None = None,
     ) -> bool:
         if not isinstance(
             decision, Product001CommercialApprovalDecision
@@ -102,12 +107,27 @@ class SqliteProduct001CommercialDecisionWriter:
             raise TypeError("before_commit must be callable")
 
         definition = _canonical(asdict(decision))
-        audit = _canonical({
+        audit_record = {
             "action": "RECORD_DECISION",
             "decision_id": decision.decision_id,
             "grant_id": decision.authorization_grant_id,
             "definition": definition,
-        })
+        }
+        if commitment is not None:
+            if type(commitment) is not CommitmentCertificateV1:
+                raise TypeError("invalid commitment certificate")
+            context = commitment.context
+            if (
+                context.operation_id != decision.decision_id
+                or context.organization_id != decision.document_scope.organization_id
+            ):
+                raise CommercialDecisionConflict("commitment identity does not match decision")
+            audit_record["commitment"] = {
+                "version": 1,
+                "certificate_digest": commitment_certificate_digest(commitment),
+                "context": asdict(context),
+            }
+        audit = _canonical(audit_record)
 
         connection = self._connect()
         try:
