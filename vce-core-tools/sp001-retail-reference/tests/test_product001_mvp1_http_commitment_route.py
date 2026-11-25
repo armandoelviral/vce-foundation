@@ -91,7 +91,7 @@ def committed_request(tmp_path):
     )
     clock = [150]
 
-    def make_app(expected=certificate.context, *, verifier=None):
+    def make_app(expected=certificate.context, *, verifier=None, receipt_issuer=None):
         _, reopened_service = build_environment(tmp_path, verifier=verifier)
         protected = compose_product001_mvp1_protected_approval(
             authenticated_service=reopened_service,
@@ -103,6 +103,7 @@ def committed_request(tmp_path):
         )
         return create_product001_mvp1_http_app(
             protected_service=protected, enable_commitment_route=True,
+            receipt_issuer=receipt_issuer,
         )
 
     def request_with(proof):
@@ -318,4 +319,37 @@ def test_gate_receipt_recovers_committed_result_after_response_is_lost(committed
             verification | {"trusted_gate_key": Ed25519PrivateKey.generate().public_key()}
         ))
     assert read_only_audit(database) == original
+    assert decision_counts(database) == (1, 1)
+
+
+
+def test_receipt_http_requires_exact_authenticated_decision_and_never_replays_write(committed_request):
+    from sp001.services.product001_mvp1_commercial_receipt_issuer import (
+        Mvp1CommercialReceiptIssuer,
+    )
+
+    make_app, request_with, database, clock, certificate, _, authority_key = committed_request
+    issuer = Mvp1CommercialReceiptIssuer(
+        database_path=database, gate_id="gate-lab", signing_key=Ed25519PrivateKey.generate(),
+        trusted_issuer_id="issuer", trusted_authority_key=authority_key,
+    )
+    request = request_with(certificate)
+    receipts = "/laboratory/product001/mvp1/receipts"
+    with TestClient(make_app(receipt_issuer=issuer)) as client:
+        assert client.post(receipts, json=request).status_code == 401
+        assert client.post(receipts, headers=HEADERS, json=request).status_code == 503
+        assert decision_counts(database) == (0, 0)
+        response = client.post(PATH, headers=HEADERS, json=request)
+        assert response.status_code == 200
+        assert response.json()["recorded"] is True
+        original = response.json()["receipt"]
+
+        clock[0] = certificate.context.materialize_deadline
+        replay = client.post(receipts, headers=HEADERS, json=request)
+        assert replay.json() == {"receipt": original}
+        changed = request | {"decision": request["decision"] | {"evidence_reference": "changed"}}
+        assert client.post(receipts, headers=HEADERS, json=changed).status_code == 403
+        other_principal = request["decision"]["principal"] | {"subject": "other"}
+        changed = request | {"decision": request["decision"] | {"principal": other_principal}}
+        assert client.post(receipts, headers=HEADERS, json=changed).status_code == 403
     assert decision_counts(database) == (1, 1)

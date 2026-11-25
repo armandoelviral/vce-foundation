@@ -41,6 +41,7 @@ from sp001.infrastructure.product001_commercial_approval_composition import (
     compose_product001_commercial_approval,
 )
 from sp001.infrastructure.product001_mvp1_gate_bootstrap import (
+    GateReceiptConfiguration,
     create_product001_mvp1_deployed_gate,
 )
 from sp001.infrastructure.sqlite_product001_commercial_approval import (
@@ -243,7 +244,9 @@ def recover(state: Path) -> None:
     deliver(state / "handoff", store, private_key, identity["identity"], identity["credential"])
 
 
-def serve(state: Path, commercial_uid: int) -> None:
+def serve(
+    state: Path, commercial_uid: int, *, enable_receipts=False, interrupt_before_receipt=False,
+) -> None:
     key = load_pem_public_key((state / "access-public.pem").read_bytes())
     service = compose_product001_commercial_approval(
         issuer=ISSUER,
@@ -255,10 +258,24 @@ def serve(state: Path, commercial_uid: int) -> None:
         documentary_storage_root=state / "documents",
         clock=lambda: int(time()),
     )
+    receipts = None
+    if enable_receipts:
+        receipts = GateReceiptConfiguration(
+            signing_key_path=state.parent / "receipt-key.raw",
+            database_path=state / "commercial.sqlite",
+            gate_id="sp001-gate-lab",
+            authority_issuer_id=ISSUER,
+        )
+
+    def interrupt():
+        os._exit(76)
+
     app = create_product001_mvp1_deployed_gate(
         authenticated_service=service,
         trust_configuration_path=state / "trust.json",
         commercial_uid=commercial_uid,
+        receipt_configuration=receipts,
+        after_commit=interrupt if interrupt_before_receipt else None,
     )
     uvicorn.run(app, host="127.0.0.1", port=PORT, access_log=False)
 
@@ -272,7 +289,13 @@ def main() -> None:
     parser.add_argument("--interrupt-after-commit", action="store_true")
     parser.add_argument("--commitment-ttl-seconds", type=int)
     parser.add_argument("--revocation-order", choices=("before-consume", "after-consume"))
+    parser.add_argument("--enable-receipts", action="store_true")
+    parser.add_argument("--interrupt-before-receipt", action="store_true")
     args = parser.parse_args()
+    if args.enable_receipts and args.action != "serve":
+        parser.error("--enable-receipts requires serve")
+    if args.interrupt_before_receipt and not args.enable_receipts:
+        parser.error("--interrupt-before-receipt requires --enable-receipts")
     if args.revocation_order is not None and args.action != "issue":
         parser.error("--revocation-order requires issue")
     if args.revocation_order == "before-consume" and args.interrupt_after_commit:
@@ -305,7 +328,10 @@ def main() -> None:
     else:
         if args.commercial_uid is None:
             parser.error("--commercial-uid is required for serve")
-        serve(args.state, args.commercial_uid)
+        serve(
+            args.state, args.commercial_uid, enable_receipts=args.enable_receipts,
+            interrupt_before_receipt=args.interrupt_before_receipt,
+        )
 
 
 if __name__ == "__main__":

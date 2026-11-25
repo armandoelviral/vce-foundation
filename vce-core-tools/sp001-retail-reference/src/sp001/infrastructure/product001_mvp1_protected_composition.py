@@ -12,12 +12,16 @@ from sp001.contracts.product001_mvp1_commitment_certificate import CommitmentCer
 from sp001.contracts.product001_commercial_approval_decision import (
     Product001CommercialApprovalDecision,
 )
+from sp001.contracts.product001_mvp1_contextual_authorization import (
+    decision_digest_from_canonical_bytes,
+)
 from sp001.services.authenticated_product001_commercial_approval import (
     AuthenticatedProduct001CommercialApproval,
 )
 from sp001.services.product001_mvp1_execution_gate import (
     MVP1Authorization,
     MVP1CommitmentAdmission,
+    authorization_payload,
     configure_mvp1_admission,
 )
 
@@ -70,6 +74,16 @@ class Product001MVP1ProtectedApproval:
             decision=decision,
             **evidence,
         )
+
+
+    def authenticate_receipt_request(self, *, credential, decision, certificate):
+        self.__authenticated_service.authenticate_decision(
+            credential=credential, decision=decision,
+        )
+        if certificate.context.decision_digest != decision_digest_from_canonical_bytes(
+            authorization_payload(decision),
+        ):
+            raise PermissionError("receipt request does not match committed decision")
 
 
 def compose_product001_mvp1_protected_approval(

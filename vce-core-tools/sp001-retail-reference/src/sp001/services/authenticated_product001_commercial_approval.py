@@ -60,7 +60,7 @@ class AuthenticatedProduct001CommercialApproval:
                 "credential audience or lifetime rejected"
             ) from exc
 
-    def record(self, *, credential, decision, commitment=None):
+    def authenticate_decision(self, *, credential, decision):
         if not isinstance(credential, str) or not credential.strip():
             raise CommercialAuthenticationRejected(
                 "credential rejected"
@@ -89,6 +89,10 @@ class AuthenticatedProduct001CommercialApproval:
                 "commercial decision principal mismatch"
             )
 
+        return context
+
+    def record(self, *, credential, decision, commitment=None):
+        context = self.authenticate_decision(credential=credential, decision=decision)
         self._document_verifier.verify(decision=decision)
 
         def before_commit():
