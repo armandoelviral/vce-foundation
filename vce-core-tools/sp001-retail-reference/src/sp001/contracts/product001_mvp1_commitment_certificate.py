@@ -66,6 +66,22 @@ def commitment_certificate_digest(certificate: CommitmentCertificateV1) -> str:
     ).hexdigest()
 
 
+def verify_commitment_signature(
+    certificate: CommitmentCertificateV1, *, trusted_key: Ed25519PublicKey,
+) -> None:
+    """Verify the signed statement without evaluating the materialization deadline."""
+    if type(certificate) is not CommitmentCertificateV1:
+        raise TypeError("commitment certificate required")
+    if not isinstance(trusted_key, Ed25519PublicKey):
+        raise TypeError("trusted commitment key required")
+    try:
+        trusted_key.verify(
+            certificate.signature, commitment_signing_payload(certificate.context),
+        )
+    except InvalidSignature as error:
+        raise PermissionError("invalid commitment signature") from error
+
+
 def verify_commitment_certificate(
     certificate: CommitmentCertificateV1,
     *,
@@ -89,11 +105,6 @@ def verify_commitment_certificate(
         != expected_context.decision_digest
     ):
         raise PermissionError("commitment context mismatch")
-    try:
-        trusted_key.verify(
-            certificate.signature, commitment_signing_payload(certificate.context),
-        )
-    except InvalidSignature as error:
-        raise PermissionError("invalid commitment signature") from error
+    verify_commitment_signature(certificate, trusted_key=trusted_key)
     if now >= certificate.context.materialize_deadline:
         raise PermissionError("commitment deadline expired")

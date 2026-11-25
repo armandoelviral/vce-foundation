@@ -22,6 +22,10 @@ from sp001.contracts.product001_mvp1_contextual_authorization import (
     decision_digest_from_canonical_bytes,
     documentary_binding_from_key,
 )
+from sp001.infrastructure.product001_mvp1_commercial_evidence import (
+    CommercialEvidenceStatus,
+    verify_commercial_evidence,
+)
 from sp001.infrastructure.product001_mvp1_http_host import create_product001_mvp1_http_app
 from sp001.infrastructure.product001_mvp1_protected_composition import (
     compose_product001_mvp1_protected_approval,
@@ -118,7 +122,10 @@ def committed_request(tmp_path):
             signature=commitment_key.sign(commitment_signing_payload(context)),
         )
 
-    return make_app, request_with, database, clock, certificate, sign_alternative
+    return (
+        make_app, request_with, database, clock, certificate,
+        sign_alternative, commitment_key.public_key(),
+    )
 
 
 def read_only_audit(database):
@@ -129,7 +136,7 @@ def read_only_audit(database):
 
 
 def test_committed_certificate_records_once_over_http(committed_request):
-    make_app, request_with, database, _, certificate, sign_alternative = committed_request
+    make_app, request_with, database, _, certificate, sign_alternative, _ = committed_request
     with TestClient(make_app()) as client:
         response = client.post(PATH, headers=HEADERS, json=request_with(certificate))
         assert response.status_code == 200, response.text
@@ -159,7 +166,7 @@ def test_committed_certificate_records_once_over_http(committed_request):
 
 
 def test_commitment_audit_rolls_back_with_decision(committed_request):
-    make_app, request_with, database, _, certificate, _ = committed_request
+    make_app, request_with, database, _, certificate, _, _ = committed_request
 
     class RejectAtCommit:
         calls = 0
@@ -179,7 +186,7 @@ def test_commitment_audit_rolls_back_with_decision(committed_request):
 
 
 def test_invalid_requests_leave_no_writes(committed_request):
-    make_app, request_with, database, clock, certificate, _ = committed_request
+    make_app, request_with, database, clock, certificate, _, _ = committed_request
     request = request_with(certificate)
     with TestClient(make_app()) as client:
         assert client.post(PATH, json=request).status_code == 401
@@ -207,3 +214,55 @@ def test_opt_in_requires_commitment_mode(tmp_path):
         create_product001_mvp1_http_app(
             protected_service=protected, enable_commitment_route=True,
         )
+
+
+def test_historical_evidence_is_verified_read_only(committed_request):
+    make_app, request_with, database, clock, certificate, _, trusted_key = committed_request
+    options = dict(
+        database_path=database, certificate=certificate,
+        trusted_key=trusted_key, trusted_issuer_id=certificate.context.issuer_id,
+    )
+    assert verify_commercial_evidence(**options) is CommercialEvidenceStatus.INDETERMINATE
+    with TestClient(make_app()) as client:
+        assert client.post(PATH, headers=HEADERS, json=request_with(certificate)).status_code == 200
+
+    clock[0] = certificate.context.materialize_deadline
+    original = read_only_audit(database)
+    assert verify_commercial_evidence(**options) is CommercialEvidenceStatus.VERIFIED
+    assert read_only_audit(database) == original
+    assert decision_counts(database) == (1, 1)
+
+    wrong_key = Ed25519PrivateKey.generate().public_key()
+    assert verify_commercial_evidence(
+        **(options | {"trusted_key": wrong_key})
+    ) is CommercialEvidenceStatus.REJECTED
+    missing_path = database.with_name("missing.sqlite")
+    assert verify_commercial_evidence(
+        **(options | {"database_path": missing_path})
+    ) is CommercialEvidenceStatus.INDETERMINATE
+    assert not missing_path.exists()
+
+
+def test_absent_and_conflicting_commitment_references_are_distinct(committed_request):
+    make_app, request_with, database, _, certificate, _, trusted_key = committed_request
+    with TestClient(make_app()) as client:
+        assert client.post(PATH, headers=HEADERS, json=request_with(certificate)).status_code == 200
+    audit = json.loads(read_only_audit(database)[2])
+    binding = audit.pop("commitment")
+    options = dict(
+        database_path=database, certificate=certificate,
+        trusted_key=trusted_key, trusted_issuer_id=certificate.context.issuer_id,
+    )
+    for record, result in (
+        (audit, CommercialEvidenceStatus.INDETERMINATE),
+        (
+            audit | {"commitment": binding | {"certificate_digest": "0" * 64}},
+            CommercialEvidenceStatus.REJECTED,
+        ),
+    ):
+        with closing(sqlite3.connect(database)) as db, db:
+            db.execute(
+                "UPDATE product001_commercial_decision_audit SET record = ?",
+                (json.dumps(record, sort_keys=True, separators=(",", ":")),),
+            )
+        assert verify_commercial_evidence(**options) is result
