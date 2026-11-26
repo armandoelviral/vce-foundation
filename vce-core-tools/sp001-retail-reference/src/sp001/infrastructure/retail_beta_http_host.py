@@ -25,48 +25,134 @@ PAGE = '''<!doctype html><html lang="es"><meta charset="utf-8">
 <label>Motivo de la decisión<textarea id="rationale"></textarea></label>
 <button id="decide">Registrar decisión del supervisor</button>
 <button id="export">Exportar expediente revisado</button>
+<p id="action-status" role="status" aria-live="polite"></p>
 <p>Vuelve a pegar la credencial antes de cada acción. No se conserva en almacenamiento del navegador. Un criterio no verificable exige seguimiento.</p></html>'''
-SCRIPT = '''"use strict";
-let assignment = null;
+SCRIPT = r'''"use strict";
+let dossier = null;
 let busy = false;
 let photoUrl = null;
-function clearPhoto(){if(photoUrl)URL.revokeObjectURL(photoUrl);photoUrl=null;el('photo-preview').hidden=true;el('photo-preview').removeAttribute('src');}
 const el = id => document.getElementById(id);
+function show(message) {
+  el('status').textContent = message;
+  el('action-status').textContent = message;
+}
+function controls() {
+  for (const button of document.querySelectorAll('button')) button.disabled = busy;
+  el('submit').disabled = busy || !dossier || !!dossier.submission;
+  el('decide').disabled = busy || !dossier?.submission || !!dossier.decision;
+  el('photo').disabled = busy || !dossier?.submission;
+  el('export').disabled = busy || !dossier?.decision;
+}
+function clearPhoto() {
+  if (photoUrl) URL.revokeObjectURL(photoUrl);
+  photoUrl = null;
+  el('photo-preview').hidden = true;
+  el('photo-preview').removeAttribute('src');
+}
 async function call(action, body) {
-  let token = el('token').value; el('token').value = '';
-  if (!/^[\\x21-\\x7e]+$/.test(token)) throw Error('Pega una credencial sin espacios.');
-  const pending = fetch('/v1/retail-beta/' + action, {method: body ? 'POST' : 'GET',
-    headers: {Authorization:'Bearer '+token, ...(body ? {'Content-Type':'application/json'} : {})},
-    body: body ? JSON.stringify(body) : undefined, credentials:'omit', cache:'no-store', redirect:'error'});
-  token=''; const response=await pending;
-  if (!response.ok) {const error=await response.json();throw Error(error.status);}
+  let token = el('token').value;
+  el('token').value = '';
+  if (!/^[\x21-\x7e]+$/.test(token)) throw Error('Pega una credencial sin espacios.');
+  const pending = fetch('/v1/retail-beta/' + action, {
+    method: body ? 'POST' : 'GET',
+    headers: {Authorization:'Bearer ' + token, ...(body ? {'Content-Type':'application/json'} : {})},
+    body: body ? JSON.stringify(body) : undefined,
+    credentials:'omit', cache:'no-store', redirect:'error'
+  });
+  token = '';
+  const response = await pending;
+  if (!response.ok) {
+    const error = await response.json();
+    const messages = {
+      credential_rejected:'Credencial rechazada o vencida. Requiere una credencial vigente de esta corrida.',
+      conflict:'Ya existe un registro distinto. Abre el expediente para recuperar lo guardado; no cambies la solicitud.',
+      access_denied:'Esta credencial no autoriza la acción. Comprueba inspector o supervisor.',
+      invalid_request:'Datos no válidos para esta acción. Un criterio no verificable exige seguimiento.'
+    };
+    throw Error(messages[error.status] || error.status);
+  }
   return response;
 }
-async function perform(fn) {if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;
- try {el('status').textContent='Procesando…'; await fn();}
- catch(error){el('status').textContent='Acción sin confirmar: '+error.message+' Conserva los datos; consulta antes de repetir.';}
- finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false;}}
-el('load').onclick=()=>perform(async()=>{
- clearPhoto(); el('dossier').textContent=''; assignment=null; el('outcomes').replaceChildren();
- const data=await (await call('dossier')).json(); assignment=data.assignment;
- el('dossier').textContent=JSON.stringify(data,null,2);
- el('scope').textContent=(assignment.simulated ? 'CORRIDA SIMULADA. Aceptación en campo pendiente. ' : 'Corrida de campo declarada. ') +
- 'Caso: '+assignment.case_id+' | Tienda: '+assignment.store+' | Corner: '+assignment.corner+' | Estándar: '+assignment.standard.standard_id+' revisión '+assignment.standard.revision;
- for(const criterion of assignment.standard.criteria){
-  const field=document.createElement('fieldset'); const legend=document.createElement('legend');
-  legend.textContent=criterion.rule_id+' v'+criterion.criterion_version+': '+criterion.statement;field.append(legend);
-  const select=document.createElement('select');select.dataset.rule=criterion.rule_id;select.setAttribute('aria-label','Resultado de '+criterion.rule_id);
-  for(const [value,label] of [['','Seleccionar'],['NON_CONFORMANT','Discrepancia'],['CONFORMANT','Conforme declarado'],['INSUFFICIENT_EVIDENCE','No verificable'],['DISPUTED','En disputa']]){
-   const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);}
-  const note=document.createElement('textarea');note.placeholder='Sustento o razón por la que no se pudo verificar';note.setAttribute('aria-label','Sustento de '+criterion.rule_id);field.append(select,note);el('outcomes').append(field);
- }el('status').textContent='Expediente recuperado. La captura y el envío de criterios son pasos separados.';
+async function perform(fn) {
+  if (busy) return;
+  busy = true; controls();
+  try {show('Procesando…'); await fn();}
+  catch (error) {
+    show('Acción sin confirmar: ' + error.message + ' Los campos se conservan. La vista anterior no confirma el resultado de esta acción.');
+  } finally {busy = false; controls();}
+}
+function render(data) {
+  dossier = data;
+  const assignment = data.assignment;
+  el('dossier').textContent = JSON.stringify(data, null, 2);
+  el('scope').textContent = (assignment.simulated ? 'CORRIDA SIMULADA. Aceptación en campo pendiente. ' : 'Corrida de campo declarada. ') +
+    'Caso: ' + assignment.case_id + ' | Tienda: ' + assignment.store + ' | Corner: ' + assignment.corner +
+    ' | Estándar: ' + assignment.standard.standard_id + ' revisión ' + assignment.standard.revision;
+  el('outcomes').replaceChildren();
+  el('request').disabled = !!data.submission;
+  if (data.submission) el('request').value = data.submission.receipt.request_id;
+  for (const criterion of assignment.standard.criteria) {
+    const field = document.createElement('fieldset');
+    field.disabled = !!data.submission;
+    const legend = document.createElement('legend');
+    legend.textContent = criterion.rule_id + ' v' + criterion.criterion_version + ': ' + criterion.statement;
+    field.append(legend);
+    const select = document.createElement('select');
+    select.dataset.rule = criterion.rule_id;
+    select.setAttribute('aria-label', 'Resultado de ' + criterion.rule_id);
+    for (const [value, label] of [['','Seleccionar'],['NON_CONFORMANT','Discrepancia'],['CONFORMANT','Conforme declarado'],['INSUFFICIENT_EVIDENCE','No verificable'],['DISPUTED','En disputa']]) {
+      const option = document.createElement('option');option.value = value;option.textContent = label;select.append(option);
+    }
+    const note = document.createElement('textarea');
+    note.placeholder = 'Sustento o razón por la que no se pudo verificar';
+    note.setAttribute('aria-label','Sustento de ' + criterion.rule_id);
+    const saved = data.submission?.outcomes[criterion.rule_id];
+    if (saved) {select.value = saved.status;note.value = saved.rationale;}
+    field.append(select,note);el('outcomes').append(field);
+  }
+  el('action').disabled = !!data.decision;
+  el('rationale').disabled = !!data.decision;
+  if (data.decision) {
+    el('action').value = data.decision.action;
+    el('rationale').value = data.decision.rationale;
+  } else if (data.submission && Object.values(data.submission.outcomes).some(o => ['INSUFFICIENT_EVIDENCE','DISPUTED'].includes(o.status))) {
+    el('action').value = 'FOLLOW_UP_REQUIRED';
+  }
+}
+el('load').onclick = () => perform(async () => {
+  // Replace the draft only after a successful read. A rejected credential preserves it.
+  const data = await (await call('dossier')).json();
+  clearPhoto();render(data);
+  show(data.submission ? 'Expediente recuperado. Revisión del inspector registrada: criterios en solo lectura.' :
+       'Expediente recuperado. La captura y el envío de criterios son pasos separados.');
 });
-el('submit').onclick=()=>perform(async()=>{if(!assignment)throw Error('Abre la asignación primero.');
- const outcomes={};for(const f of el('outcomes').children){const s=f.querySelector('select');outcomes[s.dataset.rule]={status:s.value,rationale:f.querySelector('textarea').value};}
- await call('submission',{request_id:el('request').value,outcomes});el('status').textContent='Revisión del inspector registrada; falta decisión del supervisor.';});
-el('photo').onclick=()=>perform(async()=>{clearPhoto();const file=await (await call('photo')).blob();photoUrl=URL.createObjectURL(file);el('photo-preview').src=photoUrl;el('photo-preview').hidden=false;el('status').textContent='Foto recuperada para revisión; no acredita autoría.';});
-el('decide').onclick=()=>perform(async()=>{await call('decision',{action:el('action').value,rationale:el('rationale').value});el('status').textContent='Decisión registrada. Recupera el expediente desde otra sesión.';});
-el('export').onclick=()=>perform(async()=>{const file=await (await call('export')).blob();const url=URL.createObjectURL(file);const link=document.createElement('a');link.href=url;link.download='retail-beta-expediente.zip';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);el('status').textContent='Exportación iniciada. Comprueba el archivo con el verificador.';});
+el('submit').onclick = () => perform(async () => {
+  if (!dossier || dossier.submission) throw Error('Abre el expediente y consulta la revisión registrada.');
+  const outcomes = {};
+  for (const field of el('outcomes').children) {
+    const select = field.querySelector('select');
+    outcomes[select.dataset.rule] = {status:select.value, rationale:field.querySelector('textarea').value};
+  }
+  const submission = await (await call('submission', {request_id:el('request').value, outcomes})).json();
+  render({...dossier, submission});
+  show('Revisión del inspector registrada; falta decisión del supervisor. Criterios en solo lectura.');
+});
+el('photo').onclick = () => perform(async () => {
+  clearPhoto();const file = await (await call('photo')).blob();photoUrl = URL.createObjectURL(file);
+  el('photo-preview').src = photoUrl;el('photo-preview').hidden = false;
+  show('Foto recuperada para revisión; no acredita autoría.');
+});
+el('decide').onclick = () => perform(async () => {
+  const decision = await (await call('decision', {action:el('action').value, rationale:el('rationale').value})).json();
+  render({...dossier, decision});show('Decisión registrada. Recupera el expediente desde otra sesión.');
+});
+el('export').onclick = () => perform(async () => {
+  const file = await (await call('export')).blob();const url = URL.createObjectURL(file);
+  const link = document.createElement('a');link.href = url;link.download = 'retail-beta-expediente.zip';
+  document.body.append(link);link.click();link.remove();setTimeout(() => URL.revokeObjectURL(url), 60000);
+  show('Exportación iniciada. Comprueba el archivo con el verificador.');
+});
+controls();
 '''
 
 

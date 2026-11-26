@@ -104,9 +104,11 @@ asignación, observación, criterios y decisión. El manifiesto **no está firma
 no demuestra procedencia contra reemplazo coordinado de todos los archivos.
 
 Al detener con Ctrl+C se eliminan los archivos de credenciales y se conserva
-la base temporal. No se conserva la clave de firma: este lanzador no ofrece
-reinicio con continuidad de identidad. Una implantación persistente deberá
-proveer un verificador y emisor durables mediante la composición existente.
+la base temporal. La clave de simulación se conserva en `lab-signing-key.pem` con permisos 0600.
+`--resume CARPETA` vuelve a abrir la misma base y emite credenciales de una hora
+mediante nuevas concesiones registradas; no cambia el expediente. La renovación
+es una intervención administrativa local explícita, no una concesión comercial.
+Una implantación comercial deberá usar autoridad externa protegida.
 
 ## Administración y límites
 
@@ -156,3 +158,76 @@ estándar real y aceptación en tienda. No se declara cerrada la beta comercial.
 La primera corrida sin `PYTHONPATH=src` tuvo cinco fallos de importación en
 subprocesos existentes. La repetición configurada pasó completa; no se cambió
 código Intel ni se ocultaron tests para lograrlo.
+
+
+## Corrección de continuidad del laboratorio — 26 de noviembre de 2026
+
+Se conserva la misma asignación, revisión VM, observación, foto y criterios.
+La reanudación requiere carpeta y base privadas del usuario, asignación simulada
+exacta y concesiones previas sin revocaciones. Se detiene ante puerto ocupado,
+base ausente o estándar distinto. No crea una base sustituta si `--resume` falla.
+Se reserva el puerto antes de renovar y se mantiene un bloqueo durante el proceso.
+
+Cada reanudación crea una copia consistente SQLite `backup-before-resume-*.sqlite3`,
+conserva las concesiones previas y registra concesiones nuevas por una hora.
+Un evento local `lab-event-*.json` registra huella de clave pública, digest de
+registros de negocio y ruta de copia. Son declaraciones locales, no auditoría
+inmutable ni prueba independiente contra el administrador del host.
+
+### Corrida antigua sin clave guardada
+
+El lanzador inicial eliminaba de memoria la clave privada y no la persistía.
+No es posible recuperar esa clave ni mantener su continuidad criptográfica.
+`--adopt-legacy-lab` autoriza explícitamente una nueva clave para esta simulación,
+con los mismos principales declarados; no autentica retrospectivamente su autoría.
+El evento se identifica como `LEGACY_KEY_ADOPTED`, nunca como continuidad de clave.
+No modifica resultados ni concede permisos fuera de la asignación de prueba.
+No se usa esta vía para una corrida comercial ni para restaurar un grant revocado.
+
+Después de aplicar el parche de recuperación y pasar las pruebas, detener el
+servidor anterior con Ctrl+C. En el worktree `vce-retail-beta`, ejecutar:
+
+```bash
+cd /Users/armandoelvira/dev/vce-retail-beta/vce-core-tools/sp001-retail-reference
+PYTHONPATH=src \
+  /Users/armandoelvira/dev/vce-foundation/vce-core-tools/.venv/bin/python \
+  -m sp001.infrastructure.retail_beta_lab --port 8768 \
+  --resume '/var/folders/ff/03kmd6n51vsd7jfzxnzdt7580000gn/T/sp001-retail-beta-mxhwn_c4' \
+  --adopt-legacy-lab
+```
+
+Esperado: aviso de recuperación administrativa LEGACY, copia previa y carpeta.
+Copiar el NUEVO `supervisor.txt` de esa carpeta y abrir una ventana privada en
+`http://127.0.0.1:8768/retail-beta`. Abrir expediente, comprobar
+`REQUEST-BETA-001`, R1 NON_CONFORMANT y R2 INSUFFICIENT_EVIDENCE con sus motivos
+originales. Los criterios se muestran en solo lectura. Ver foto con una nueva
+pegada de credencial; seleccionar Seguimiento requerido y explicar qué falta
+comprobar. Volver a pegar credencial para registrar, recuperar desde otra sesión,
+exportar y pasar el verificador. No volver a capturar ni entregar los criterios.
+
+Para reanudaciones posteriores omitir `--adopt-legacy-lab`: se conserva la clave
+local y aparece «Identidad de laboratorio conservada;». Los JWT vencidos siguen
+rechazados; no se desactiva `exp` ni se amplía su vida. No copiar la clave privada
+ni la base completa a este chat.
+
+La interfaz ahora refleja la entrega/decisión confirmada de inmediato, muestra
+los resultados registrados en solo lectura y conserva los campos ante una
+consulta rechazada. Los mensajes aparecen arriba y junto a las acciones.
+Los controles visuales no sustituyen las comprobaciones de autoridad del backend.
+
+Pruebas específicas de recuperación y expediente:
+
+```bash
+PYTHONPATH=src:tests /ruta/al/python -m pytest -q \
+  tests/test_retail_beta_lab_identity.py tests/test_retail_beta_inspection.py
+PYTHONPATH=src:tests:browser_tests /ruta/al/python -m pytest -q \
+  browser_tests/test_retail_beta_browser.py
+```
+
+Validación de la corrección en Linux/CPython 3.14.10: 23 pruebas específicas
+aprobadas en 1.83 s; regresión final 11 989 passed y 6 subtests en 67.37 s.
+Tres arranques reales con adopción legacy y posterior reanudación: PASS.
+Se comprobó también el rechazo de una clave distinta de la última huella local.
+Sintaxis JavaScript: PASS. La descarga de Chromium volvió a ser rechazada con
+HTTP 403; la prueba de navegador ampliada se debe ejecutar en la Mac.
+Estos resultados no constituyen aceptación comercial ni validación en campo.
